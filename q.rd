@@ -356,11 +356,22 @@
 
 
 	<!-- JK: Try to build separate templates for different bands 
-		stolen from bgds/l
+		stolen from bgds/l 
+		This template is for the table definition *for a single time series* as used
+		by datalink.
+
+		TODO: fill this properly
+		zeroPointFlux - Flux at the given zero point, in Jy 
+		effectiveWavelength - Central wavelength - take it from the photsys table
+
+		TODO: ssa_targname is not seen there, do something to fix that issue
+		TODO: add zeropints to the photosys table
+		TODO: take bands parameters from to photosys table, do not doule them here
+		TODO: check region, I den't have it yet
 	-->
 	<STREAM id="time-series-template">
 		<table id="instance_\band_short" onDisk="False">
-			<meta name="description">The \metaString{source} lightcurve for {ssa_targname} in the \band_human filter.</meta>
+			<meta name="description">The \metaString{source} lightcurve in the \band_human filter </meta>
 
        <!-- JK: define them _before_ mentioning them the mixin -->
 		    <param original="ts_ssa.ssa_bandpass"/>
@@ -398,21 +409,18 @@
 	<LOOP source="time-series-template">
 		<csvItems>
 			band_short, band_human, band_ucd, effective_wavelength
-			U, 			Bessell_U, em.opt.U, 3.6e-7
-			B, 			Bessell_B, em.opt.B, 4.4e-7
-			V, 			Bessell_V, em.opt.V, 5.4e-7
-			R, 			Bessell_R, em.opt.R, 6.2e-7
-			I, 			Bessell_I, em.opt.I, 8.3e-7
-			u_sdss,		   u_sdss, em.opt.U, 3.56e-7
-			g_sdss,		   g_sdss, em.opt.B, 4.71e-7
-			r_sdss,		   r_sdss, em.opt.R, 6.18e-7
-			i_sdss,		   i_sdss, em.opt.I, 7.49e-7
-			z_sdss,		   z_sdss, em.opt.I, 8.96e-7
+			U, 			Bessell/U, em.opt.U, 3.6e-7
+			B, 			Bessell/B, em.opt.B, 4.4e-7
+			V, 			Bessell/V, em.opt.V, 5.4e-7
+			R, 			Bessell/R, em.opt.R, 6.2e-7
+			I, 			Bessell/I, em.opt.I, 8.3e-7
+			u_sdss,		   u/sdss, em.opt.U, 3.56e-7
+			g_sdss,		   g/sdss, em.opt.B, 4.71e-7
+			r_sdss,		   r/sdss, em.opt.R, 6.18e-7
+			i_sdss,		   i/sdss, em.opt.I, 7.49e-7
+			z_sdss,		   z/sdss, em.opt.I, 8.96e-7
 		</csvItems>
 	</LOOP>
-
-
-
 
 
 	<!-- This is the table definition *for a single time series* as used
@@ -480,15 +488,15 @@
 				<code>
 					object = self.sourceToken.accref.split("/")[-2]		# self.sourceToken points to the clicked ssa_table row
 					passband = self.sourceToken.accref.split("/")[-1]	# TODO use this as a band
-					band = "B"
+					# band = "B"
 					with base.getTableConn() as conn:
 						for row in conn.queryToDicts(
 							"SELECT dateobs, magnitude AS phot, mag_err"
 							"  FROM \schema.lightcurves AS l"
 							" JOIN \schema.photosys AS p ON p.id = l.photosys_id"
-							"  WHERE object_id=%(object)s AND p.band=%(band)s"
+							"  WHERE object_id=%(object)s AND p.band=%(passband)s"
 							" ORDER BY dateobs",
-							{"object": object, "band": band}		# locals()
+							{"object": object, "passband": passband}		# locals()
 						):
 							dt = row["dateobs"]
 							dt_utc = dt.astimezone(datetime.timezone.utc) # I should have thrown out this trash
@@ -503,7 +511,8 @@
 			</pargetter>
 		</embeddedGrammar>
 
-		<make table="instance_U">	<!-- just a placeholder, we don't have the bare "instance" table -->
+		<make table="instance_U">	<!-- just a placeholder, we don't have the bare "instance" table 
+			tut: this is really overridden in the datalink service's data function to select the actual table definition -->
 			<rowmaker idmaps="*" id="make-ts"/>
 			
 			<!--parmaker can get parameters, provided by pargetter and write them as a metadata in the instance table -->
@@ -535,6 +544,10 @@
 	<service id="sdl" allowed="dlget,dlmeta,static">
 		<property name="staticData">data/periodograms</property>
 		<meta name="title">\schema Datalink Service</meta>
+		<meta name="description">
+            This service produces time series datasets for Kolonica lightcurves.
+        </meta>
+
 
 		<datalinkCore>
 			<descriptorGenerator>
@@ -548,12 +561,14 @@
 						accref = pubDID
 
 					descriptor = ProductDescriptor.fromAccref(pubDID, accref)
-					descriptor.band = "B"
+					# descriptor.band = accref.split.split("/")[-1]
+					# descriptor.band = "V"
 					with base.getTableConn() as conn:
 						descriptor.ssa_row = next(conn.queryToDicts(
 							"SELECT * FROM \schema.ts_ssa"
 							" WHERE accref=%(accref)s",
 							{"accref": accref}))
+					descriptor.band = descriptor.ssa_row.get("ssa_bandpass")
 					return descriptor
 				</code>
 			</descriptorGenerator>
@@ -573,6 +588,7 @@
 			"#this" and #preview content comes automatically from the dc.products table 
 			dataFunction is for dlget service(?)
 			The lightcurve sits in the PrimaryTable (?)
+			dataFunction is stolen from bgds/l2
 			-->
 			<dataFunction>
 				<setup imports="gavo.rsc"/>
@@ -586,11 +602,11 @@
 					#	rd.getById("build-ts"),
 					#	forceSource=descriptor)
 
-					dd = rd.getById("build-ts")
-					tableId = "instance_B"
-					# tableId = "instance_" + descriptor.band
-					descriptor.data = rsc.Data.createWithTable(dd, rd.getById(tableId))
-					descriptor.data = rsc.makeData(dd, data=descriptor.data, forceSource=descriptor)
+					dd = rd.getById("build-ts")	# take build-ts block
+					# tableId = "instance_B"
+					tableId = "instance_" + descriptor.band		# rd.getById(tableId) picks up an appropriate instance table
+					descriptor.data = rsc.Data.createWithTable(dd, rd.getById(tableId)) # here is the magic for dispathing between instance tables 
+					descriptor.data = rsc.makeData(dd, data=descriptor.data, forceSource=descriptor)	# runs all this stuff?
 
 					# tab = descriptor.data.getPrimaryTable()
 					# tab.setMeta("description",
@@ -621,6 +637,7 @@
 		<dbCore queriedTable="ts_ssa">
 			<condDesc buildFrom="ssa_location"/>
 			<condDesc buildFrom="t_max"/>
+			<condDesc buildFrom="ssa_bandpass"/>
 			<!-- add further condDescs in this pattern; if you have useful target
 					names, you'll probably want to index them and say:
 			<condDesc>
@@ -638,6 +655,7 @@
 		</outputTable>
 	</service>
 
+	<!-- TODO Check multicolor query, lok at bgds/l.rd -->
 	<service id="ssa" allowed="form,ssap.xml">
 		<meta name="shortName">\schema TS SSAP</meta>
 		<meta name="ssap.complianceLevel">full</meta>
