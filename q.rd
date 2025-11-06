@@ -1,4 +1,3 @@
-
 <resource schema="upjs_vo" resdir=".">
 	<meta name="creationDate">2025-09-03T09:40:33Z</meta>
 
@@ -35,6 +34,41 @@
 
   <!-- Define my existing database tables structure -->
  
+ 	<table id="photosys" onDisk="True" adql="True">
+		<meta name="description">External table containing photometric systems data</meta>
+		<column name="id" type="integer"
+			ucd="meta.id;meta.main" 
+			tablehead="internal id" 
+			description="Bandpass id in the original table" 
+			verbLevel="1" 
+			required="True"/>
+
+        <column name="band" type="text"
+            ucd="meta.id;instr.filter" 
+            tablehead="internal id" 
+            description="Bandpass name in the original table" 
+            verbLevel="1" 
+            required="True"/>
+
+        <column name="description" type="text"
+            ucd="meta.note" 
+            tablehead="system" 
+            description="Photometric system" 
+            verbLevel="1" 
+            required="True"/>
+
+		<column name="specmid"
+			ucd="em.wl"
+			tablehead="specmid"
+			description="Central wavelength of bandpass"
+			verbLevel="1"
+			required="True"/>
+	</table>
+    <data id="publish_photosys_orig" updating="True">
+        <!-- <make table="photosys"/> -->
+    </data>
+
+
  	<table id="objects" onDisk="True" adql="True">
 		<meta name="description">External table containing objects</meta>
 		<column name="id" type="integer"
@@ -160,7 +194,7 @@
 		</column>
 
 	<!-- custom columns -->
-		<column name="p_object_id" type="integer"
+		<column name="object_id" type="integer"
 			ucd="meta.id;meta.main"
 			tablehead="internal id"
 			description="Object id in the original table"
@@ -205,8 +239,8 @@
 				NULL AS owner,
 				NULL AS datalink,
 				ssa_timeExt,
-				ssa_bandpass,
-				ssa_specmid,
+				p.band AS ssa_bandpass,
+				p.specmid AS ssa_specmid,
 				t_min,
 				t_max,
 				ssa_length,
@@ -216,19 +250,18 @@
 				'ICRS' AS ssa_csysName
 			FROM (
 			SELECT
-				object_id,
+				object_id, photosys_id,
 				COUNT(*) AS ssa_length,
 				(MAX(extract(julian from dateobs at time zone 'UTC+12')) -
 				MIN(extract(julian from dateobs at time zone 'UTC+12'))) AS ssa_timeExt,
 				MIN(extract(julian from dateobs at time zone 'UTC+12')) - 2400000.5 AS t_min,
 				MAX(extract(julian from dateobs at time zone 'UTC+12')) - 2400000.5 AS t_max,
-				'Bessel/V' AS ssa_bandpass,
-				'5.4e-7' AS ssa_specmid,
 			    AVG(magnitude) AS mean_mag
 			FROM \schema.lightcurves
-				GROUP BY object_id
+				GROUP BY object_id, photosys_id
 			) AS q
-				JOIN \schema.objects AS o ON o.id=q.object_id
+				JOIN \schema.objects AS o ON o.id = q.object_id
+				JOIN \schema.photosys p ON p.id = q.photosys_id
 			);
 		</viewStatement>
 	</table>
