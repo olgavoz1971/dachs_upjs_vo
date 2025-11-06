@@ -32,7 +32,13 @@
  	<meta name="productType">timeseries</meta>
  	<meta name="ssap.testQuery">MAXREC=1</meta>
 
-  <!-- Define my existing database tables structure -->
+ 	<!-- Define my existing database tables structure 
+	I should also do this from outside of RD
+		GRANT SELECT ON upjs_vo.lightcurves TO gavoadmin WITH GRANT OPTION;
+		GRANT SELECT ON upjs_vo.objects TO gavoadmin WITH GRANT OPTION;
+		GRANT SELECT ON upjs_vo.photosys TO gavoadmin WITH GRANT OPTION;
+		GRANT SELECT ON upjs_vo.photosys TO gavo;
+	-->
  
  	<table id="photosys" onDisk="True" adql="True">
 		<meta name="description">External table containing photometric systems data</meta>
@@ -194,7 +200,7 @@
 		</column>
 
 	<!-- custom columns -->
-		<column name="object_id" type="integer"
+		<column name="p_object_id" type="integer"
 			ucd="meta.id;meta.main"
 			tablehead="internal id"
 			description="Object id in the original table"
@@ -228,11 +234,11 @@
 			CREATE OR REPLACE VIEW \curtable AS (
 			SELECT
 				'Kolonica Gaia DR3 ' || o.gaia_name AS ssa_dstitle,
-				o.id AS object_id,
+				o.id AS p_object_id,
 				'Gaia DR3 ' || o.gaia_name AS ssa_targname,
 				o.coordequ AS ssa_location,
 				NULL::spoly AS ssa_region,
-				'upjs_vo/q/' ||object_id AS accref,
+				'upjs_vo/q/' || o.id || '/' || p.band AS accref,
 				'application/x-votable+xml' AS mime,
 				50000 AS accsize,
 				NULL AS embargo,
@@ -250,18 +256,18 @@
 				'ICRS' AS ssa_csysName
 			FROM (
 			SELECT
-				object_id, photosys_id,
+				l.object_id, l.photosys_id,
 				COUNT(*) AS ssa_length,
 				(MAX(extract(julian from dateobs at time zone 'UTC+12')) -
 				MIN(extract(julian from dateobs at time zone 'UTC+12'))) AS ssa_timeExt,
 				MIN(extract(julian from dateobs at time zone 'UTC+12')) - 2400000.5 AS t_min,
 				MAX(extract(julian from dateobs at time zone 'UTC+12')) - 2400000.5 AS t_max,
 			    AVG(magnitude) AS mean_mag
-			FROM \schema.lightcurves
-				GROUP BY object_id, photosys_id
+			FROM \schema.lightcurves AS l
+				GROUP BY l.object_id, l.photosys_id
 			) AS q
 				JOIN \schema.objects AS o ON o.id = q.object_id
-				JOIN \schema.photosys p ON p.id = q.photosys_id
+				JOIN \schema.photosys AS p ON p.id = q.photosys_id
 			);
 		</viewStatement>
 	</table>
@@ -349,6 +355,66 @@
 	</coverage>
 
 
+	<!-- JK: Try to build separate templates for different bands 
+		stolen from bgds/l
+	-->
+	<STREAM id="time-series-template">
+		<table id="instance_\band_short" onDisk="False">
+			<meta name="description">The \metaString{source} lightcurve for {ssa_targname} in the \band_human filter.</meta>
+
+       <!-- JK: define them _before_ mentioning them the mixin -->
+		    <param original="ts_ssa.ssa_bandpass"/>
+		    <param original="ts_ssa.ssa_specmid"/>
+			<mixin
+				effectiveWavelength="\effective_wavelength"
+				filterIdentifier='"\band_human"'
+				magnitudeSystem="Vega"
+				zeroPointFlux="3636"
+				phot_description="Kolonica magnitude in \band_human"
+				phot_ucd='phot.mag;\band_ucd'
+				phot_unit="mag"
+				refposition="BARYCENTER"
+				refframe="ICRS"
+				time0="2400000.5"
+				timescale="TCB"
+			>//timeseries#phot-0</mixin>
+
+		    <param original="ts_ssa.t_min"/>
+		    <param original="ts_ssa.t_max"/>
+		    <param original="ts_ssa.ssa_location"/>
+
+	        <!-- Add my columns -->
+    	    <column original="lightcurves.mag_err"/>
+
+	        <!-- JK: Add also something kind of:
+	        <column original="lightcurves.image"/>  fits image ref?
+	        <column original="lightcurves.process_info"/>   my jsonb from lc_metadata
+	        -->
+
+		  </table>
+	</STREAM>
+
+	<!-- instantiate for a few bands -->
+	<LOOP source="time-series-template">
+		<csvItems>
+			band_short, band_human, band_ucd, effective_wavelength
+			U, 			Bessell_U, em.opt.U, 3.6e-7
+			B, 			Bessell_B, em.opt.B, 4.4e-7
+			V, 			Bessell_V, em.opt.V, 5.4e-7
+			R, 			Bessell_R, em.opt.R, 6.2e-7
+			I, 			Bessell_I, em.opt.I, 8.3e-7
+			u_sdss,		   u_sdss, em.opt.U, 3.56e-7
+			g_sdss,		   g_sdss, em.opt.B, 4.71e-7
+			r_sdss,		   r_sdss, em.opt.R, 6.18e-7
+			i_sdss,		   i_sdss, em.opt.I, 7.49e-7
+			z_sdss,		   z_sdss, em.opt.I, 8.96e-7
+		</csvItems>
+	</LOOP>
+
+
+
+
+
 	<!-- This is the table definition *for a single time series* as used
 	by datalink.  If you have per-bin errors or whatever else, just
 	add columns as above.
@@ -357,22 +423,21 @@
 	zeroPointFlux - Flux at the given zero point, in Jy 
 	effectiveWavelength - Central wavelength	(or similar measure) 
 	for the passband used for the photometry, in meters
-	-->
+
 
 	<table id="instance" onDisk="False">
-		<!-- we use a template for description here; it will be filled
-			out by the datalink service below
+		we use a template for description here; it will be filled out by the datalink service below
 		
 		JK: Note1: Unfortunately i can't use @ssa_bandpass and @ssa_specmid in the mixin parameters (i.g., filterIdentifier="@ssa_bandpass").
 		I suppose they have not 'filled' at the time of mixin uses them - as a result, 
 		I don't have them in the lightcurves table metadata in the PhotDM
 		Note2: I also have not succeeded in 'filterIdentifier="Bessel/V"' or 'filterIdentifier="'Bessel/V'"', seems phot-0 does not like "/" sign 
 		ssa_targname and ssa_bandpass on the meta name="description" are from the clicked row of ssa_table (?)
-		-->
+
 
  		<meta name="description">The \metaString{source} lightcurve for {ssa_targname} in the {ssa_bandpass} filter </meta>
 
-		<!-- define them _before_ mentioning them the mixin -->
+		define them _before_ mentioning them the mixin 
 		<param original="ts_ssa.ssa_bandpass"/>
 		<param original="ts_ssa.ssa_specmid"/>
 
@@ -390,27 +455,20 @@
 			timescale="TCB"
 		>//timeseries#phot-0</mixin>
 
-		<!-- add VOTable metadata:
-		<param original="ts_ssa.ssa_bandpass"/>
-		<param original="ts_ssa.ssa_specmid"/>
-		<param original="ts_ssa.ssa_specstart"/>
-		<param original="ts_ssa.ssa_specend"/>
-		-->
-
-		<!-- from carmenes: -->
+		from carmenes:
 		<param original="ts_ssa.t_min"/>
 		<param original="ts_ssa.t_max"/>
 		<param original="ts_ssa.ssa_location"/>
 
-		<!-- Add my columns -->
+		Add my columns
 		<column original="lightcurves.mag_err"/>
 
-		<!-- JK: Add also something kind of:
+		JK: Add also something kind of:
 		<column original="lightcurves.image"/>	fits image ref?
 		<column original="lightcurves.process_info"/>	my jsonb from lc_metadata
-		-->
 
 	</table>
+	-->
 
 	<data id="build-ts" auto="False"> 
 		<!-- stolen from carmenes 
@@ -420,13 +478,17 @@
 		<embeddedGrammar>
 			<iterator>
 				<code>
-					object = self.sourceToken.accref.split("/")[-1]		# self.sourceToken points to the clicked ssa_table row
+					object = self.sourceToken.accref.split("/")[-2]		# self.sourceToken points to the clicked ssa_table row
+					passband = self.sourceToken.accref.split("/")[-1]	# TODO use this as a band
+					band = "B"
 					with base.getTableConn() as conn:
 						for row in conn.queryToDicts(
 							"SELECT dateobs, magnitude AS phot, mag_err"
-							"  FROM \schema.lightcurves"
-							"  WHERE object_id=%(object)s",
-							{"object": object}		# locals()
+							"  FROM \schema.lightcurves AS l"
+							" JOIN \schema.photosys AS p ON p.id = l.photosys_id"
+							"  WHERE object_id=%(object)s AND p.band=%(band)s"
+							" ORDER BY dateobs",
+							{"object": object, "band": band}		# locals()
 						):
 							dt = row["dateobs"]
 							dt_utc = dt.astimezone(datetime.timezone.utc) # I should have thrown out this trash
@@ -441,23 +503,22 @@
 			</pargetter>
 		</embeddedGrammar>
 
-		<make table="instance">
+		<make table="instance_U">	<!-- just a placeholder, we don't have the bare "instance" table -->
 			<rowmaker idmaps="*" id="make-ts"/>
 			
 			<!--parmaker can get parameters, provided by pargetter and write them as a metadata in the instance table -->
 			<parmaker id="make-ts-par" idmaps="ssa_bandpass, ssa_specmid, t_min, t_max, ssa_location">
-				<!-- <apply procDef="//ssap#feedSSAToSDM"/>
-				(from the tutorial) touch manually the instance table metadata -->
+				<!--(from the tutorial) touch manually the instance table metadata -->
 				<apply name="update_metadata">
 					<code>
 						# sourceId = vars["parser_"].sourceToken["ssa_targname"]	does not work
 						sourceId = vars["ssa_targname"]		# works
 						targetTable.setMeta("description", base.getMetaText(targetTable, "description") +
-							" for MY OBJECT (todo: insert Gaia DR3 name or something and filter) object {}".format(sourceId))
+							" for {}".format(sourceId))
 						targetTable.setMeta("name", str(sourceId))
 					</code>
 				</apply>
-			</parmaker> 			
+			</parmaker>
 		</make>
 	</data>
 
@@ -474,6 +535,7 @@
 	<service id="sdl" allowed="dlget,dlmeta,static">
 		<property name="staticData">data/periodograms</property>
 		<meta name="title">\schema Datalink Service</meta>
+
 		<datalinkCore>
 			<descriptorGenerator>
 				<code>
@@ -486,6 +548,7 @@
 						accref = pubDID
 
 					descriptor = ProductDescriptor.fromAccref(pubDID, accref)
+					descriptor.band = "B"
 					with base.getTableConn() as conn:
 						descriptor.ssa_row = next(conn.queryToDicts(
 							"SELECT * FROM \schema.ts_ssa"
@@ -518,13 +581,20 @@
 					# actually calls data's "build-ts" block
 					# descriptor is from metaMaker as input parameters for
 					# build-ts sourceToken
-					descriptor.data = rsc.makeData(
-						rd.getById("build-ts"),
-						forceSource=descriptor)
 
-					tab = descriptor.data.getPrimaryTable()
-					tab.setMeta("description",
-						base.getMetaText(tab, "description").format(**descriptor.ssa_row))
+					# descriptor.data = rsc.makeData(
+					#	rd.getById("build-ts"),
+					#	forceSource=descriptor)
+
+					dd = rd.getById("build-ts")
+					tableId = "instance_B"
+					# tableId = "instance_" + descriptor.band
+					descriptor.data = rsc.Data.createWithTable(dd, rd.getById(tableId))
+					descriptor.data = rsc.makeData(dd, data=descriptor.data, forceSource=descriptor)
+
+					# tab = descriptor.data.getPrimaryTable()
+					# tab.setMeta("description",
+					# 	base.getMetaText(tab, "description").format(**descriptor.ssa_row))
 				</code>
 			</dataFunction>
 
