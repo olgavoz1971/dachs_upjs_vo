@@ -637,16 +637,24 @@
 		<dbCore queriedTable="ts_ssa">
 			<condDesc buildFrom="ssa_location"/>
 			<condDesc buildFrom="t_max"/>
-			<condDesc buildFrom="ssa_bandpass"/>
-			<!-- add further condDescs in this pattern; if you have useful target
-					names, you'll probably want to index them and say:
+<!--			<condDesc buildFrom="ssa_bandpass"/> -->
+
+			<condDesc>	
+				<inputKey original="ssa_bandpass" tablehead="Filter">
+<!--				<values fromdb="ssa_bandpass from \schema.ts_ssa order by ssa_bandpass"/> -->
+					<values fromdb="band from \schema.photosys order by band"/>
+				</inputKey>
+			</condDesc>
+<!--					
+			add further condDescs in this pattern; if you have useful target
+					names, you'll probably want to index them and say: -->
 			<condDesc>
-				<inputKey original="data.ssa_targname" tablehead="Target Object">
-					<values fromdb="ssa_targname from \schema.data
-						order by ssa_targname"/>
+				<inputKey original="ssa_targname" tablehead="Target Object">
+					<values fromdb="ssa_targname from \schema.ts_ssa
+						order by ssa_targname limit 10"/>
 				</inputKey>
 			</condDesc> 
-			-->
+
 		</dbCore>
 		<outputTable>
 			<autoCols>accref, ssa_targname, t_min, t_max, ssa_bandpass,
@@ -655,7 +663,7 @@
 		</outputTable>
 	</service>
 
-	<!-- TODO Check multicolor query, lok at bgds/l.rd -->
+	<!-- TODO Check multicolor query, look at bgds/l.rd -->
 	<service id="ssa" allowed="form,ssap.xml">
 		<meta name="shortName">\schema TS SSAP</meta>
 		<meta name="ssap.complianceLevel">full</meta>
@@ -669,4 +677,66 @@
 		</ssapCore>
 	</service>
 
+	<!-- stolen from bgds/l,l2 -->
+	<service id="preview" allowed="qp">
+		<property name="queryField">obs_id</property>
+		<meta name="title">Kolonica timeseries previews</meta>
+        <meta name="description">
+			A service returning PNG thumbnails for time series. It takes the obs id for which to generate a preview.
+			JK: Here, I try to figure out how to play with these kinds of things.
+			Actually, I haven't found these ts-previews very informative, especially for noisy data,
+			but perhaps I'll manage to invent something
+        </meta>
+		<pythonCore>
+			<inputTable>
+				<inputKey name="obs_id" type="text"
+					tablehead="Obs. Id"
+					description="Observation id of the object to create the preview for."/>
+			</inputTable>
+			<coreProc>
+				<setup>
+					<code>
+						from gavo.svcs import UnknownURI
+						from gavo.helpers.processing import SpectralPreviewMaker
+					</code>
+				</setup>
+				<code>
+					obsId = inputTable.getParam("obs_id")
+					# always go through a mapping here or you'll create a SQL injection (!!!)
+					# try:
+					#	srcTable = {
+					#		"r": "bgds2.lc_r",
+					#		"i": "bgds2.lc_i",
+					#		# where are U? V? z? ...
+					#		}[obsId.split("-")[3]]
+					# except KeyError:
+					#	raise UnknownURI("No time series in the %s band here"%
+					# obsId.split("-")[3])
+					# with base.getUntrustedConn() as conn:
+					#		res = list(conn.query(
+					#		"SELECT mjds, mags FROM %s WHERE obs_id=%%(obs_id)s"%
+					#			srcTable, {"obs_id": obsId}))
+					# passband = "B"
+					# objId = "1"
+					# print(f'{obsId=}')
+					objId, passband = obsId.split("/")
+					print("===================== AHA =====================================")
+					with base.getUntrustedConn() as conn:
+						res = list(conn.query(
+							"SELECT extract(julian from l.dateobs at time zone 'UTC+12') AS obs_time, l.magnitude "
+							"FROM \schema.lightcurves AS l "
+							"JOIN upjs_vo.photosys AS p ON p.id = l.photosys_id "						
+							"WHERE object_id=%(obj_id)s AND p.band=%(passband)s",
+							{"obj_id": objId, "passband": passband}
+						))
+						print(f'{res=}')
+					if not res:
+						raise UnknownURI(f'No time series for {objId} {passband}')
+					return "image/png", SpectralPreviewMaker.get2DPlot(res)
+
+				</code>
+
+			</coreProc>
+		</pythonCore>
+	</service>
 </resource>
