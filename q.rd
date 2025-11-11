@@ -1,4 +1,6 @@
 <resource schema="upjs_vo" resdir=".">
+    <macDef name="pubDIDBase">ivo://\getConfig{ivoa}{authority}/~?\rdId/</macDef>	<!-- bgds l2 -->
+
 	<meta name="creationDate">2025-09-03T09:40:33Z</meta>
 
 	<meta name="title">My amazing lightcurves</meta>
@@ -165,7 +167,7 @@
 		<meta name="description">A view over lightcurves and objects for SSA/ObsCore ingestion</meta>
 
 		<!-- list of metadata varying across datasets -->
-		<LOOP listItems="ssa_dstitle ssa_targname ssa_length ssa_timeExt ssa_bandpass 
+		<LOOP listItems="ssa_dstitle ssa_targname ssa_pubDID ssa_length ssa_timeExt ssa_bandpass 
 					ssa_specmid ssa_csysName">
  			<events>
 				<column original="\item"/>
@@ -175,8 +177,8 @@
 		<column original="//obscore#ObsCore.t_min"/>
 		<column original="//obscore#ObsCore.t_max"/>
 
-		<mixin>//products#table</mixin>
-		<mixin>//ssap#plainlocation</mixin>	<!-- injects ssa_location -->
+		<!-- <mixin>//products#table</mixin>	JK: I wonder if I really need products if I deal with on-the-fly data only -->
+		<mixin>//ssap#plainlocation</mixin>		<!-- injects ssa_location -->
 		<mixin>//ssap#simpleCoverage</mixin>	<!-- ssa_region -->
 
 		<!-- add a q3c index so obscore queries over s_ra
@@ -229,7 +231,14 @@
 			description="Declination (double precision floating-point number)"
 			verbLevel="1"/>
 
-		<!-- note 1: accref = upjs_vo/q/object_id path for (future) product (lightcurve) -->
+		<!-- note 1: accref = ...upjs_vo/q/object_id path for (future) product (lightcurve) this is carmenes-style
+					'upjs_vo/q/' || o.id || '/' || p.band AS accref,
+					 accref = '\getConfig{web}{serverURL}/bgds/l2/tsdl/dlget?ID='|| obs_id  - bgds-style
+					'\getConfig{web}{serverURL}/upjs_vo/q/sdl/dlget?ID=' || o.id || '/' || p.band AS accref,
+
+			TODO!!!! Describe also the columns accref, and other. Should I? I see them in the database, but do not in TOPCAT 
+			JK: AAAAA!!! How does this macro work _inside_ the quoted string???? But it does!
+ 		-->
 		<viewStatement>
 			CREATE OR REPLACE VIEW \curtable AS (
 			SELECT
@@ -238,7 +247,8 @@
 				'Gaia DR3 ' || o.gaia_name AS ssa_targname,
 				o.coordequ AS ssa_location,
 				NULL::spoly AS ssa_region,
-				'upjs_vo/q/' || o.id || '/' || p.band AS accref,
+				'\getConfig{web}{serverURL}/\rdId/sdl/dlget?ID=' || o.id || '/' || p.band AS accref,
+				'\pubDIDBase' || o.id || '/' || p.band AS ssa_pubdid,
 				'application/x-votable+xml' AS mime,
 				50000 AS accsize,
 				NULL AS embargo,
@@ -282,11 +292,15 @@
 	<data id="create-raw-view">			<!-- stolen from carmenes t.rd -->
 		<recreateAfter>make-ssa-view</recreateAfter>	<!-- make_ssa_view should be called after this -->
 		<property key="previewDir">previews</property>
-		<make table="raw_data">		<!-- do this manually because we din't have place for rowfilter //products#define -->
+
+		<make table="raw_data">		
+		<!-- 
+			do this manually because we din't have place for rowfilter //products#define 
 			<script type="preImport" lang="SQL">
 				DELETE FROM dc.products WHERE sourcetable='upjs_vo.raw_data';
 			</script>
 
+			Do I really  need this stuff? Let;s try to do without it
 			<script type="postCreation" lang="SQL" name="add to product table">
 				INSERT INTO dc.products (SELECT
 					accref,
@@ -296,24 +310,25 @@
 					\sqlquote{\internallink{/upjs_vo/q/sdl/dlget?ID=}} ||
 						gavo_urlescape(accref) AS accesspath,
 					'upjs_vo.raw_data' AS sourcetable,
-					'upjs_vo/previews/' || accref || '.png' AS preview, <!-- todo build the "preview" service for on the fly generation -->
+					'upjs_vo/previews/' || accref || '.png' AS preview,
 					NULL AS datalink,
 					'image/png' AS preview_mime
 				FROM upjs_vo.raw_data);
 			</script>
+		-->
 		</make>
 	</data>
 
 	<table id="ts_ssa" onDisk="True" adql="True">		<!-- also stolen from carmenes t.rd  -->
 		<meta name="_associatedDatalinkService">		<!-- declared a table as having datalink support -->
-			<meta name="serviceId">sdl</meta>
+			<meta name="serviceId">sdl</meta>			<!-- JK: this will go to the table metadata, TOPCAT use this sdl to build *sdl/dlmeta* stuff -->
 			<meta name="idColumn">ssa_pubDID</meta>
 		</meta>
 
-	<!-- todo:  do something with passbands  like for Gaia or BGDS ???
-		ssa_fluxcalib - something for  differential photometry 
-		[!p]* ([^p]* does not work) excludes my private columns from the ssa view  - ??? this excludes t_min column too
+		<!--
+		JK: [!p]* ([^p]* does not work) excludes my private columns from the ssa view  - ??? this excludes t_min column too
 		copied SSA columns cannot be overridden in mixin parameter (like ssa_bandpass)
+			ssa_pubDID="\sql_standardPubDID"  -  we do it manullay in the raw_data
 		-->
 		<mixin
 			sourcetable="raw_data"
@@ -323,7 +338,6 @@
 			ssa_dstype="'timeseries'"
 			ssa_fluxcalib="'CALIBRATED'"
 			ssa_fluxucd="'phot.mag'"
-			ssa_pubDID="\sql_standardPubDID"
 			ssa_spectralucd="NULL"
 			ssa_spectralunit="NULL"
 			ssa_targclass="'star'"
@@ -421,63 +435,7 @@
 			z_sdss,		   z/sdss, em.opt.I, 8.96e-7
 		</csvItems>
 	</LOOP>
-
-
-	<!-- This is the table definition *for a single time series* as used
-	by datalink.  If you have per-bin errors or whatever else, just
-	add columns as above.
-
-	TODO: fill this properly
-	zeroPointFlux - Flux at the given zero point, in Jy 
-	effectiveWavelength - Central wavelength	(or similar measure) 
-	for the passband used for the photometry, in meters
-
-
-	<table id="instance" onDisk="False">
-		we use a template for description here; it will be filled out by the datalink service below
 		
-		JK: Note1: Unfortunately i can't use @ssa_bandpass and @ssa_specmid in the mixin parameters (i.g., filterIdentifier="@ssa_bandpass").
-		I suppose they have not 'filled' at the time of mixin uses them - as a result, 
-		I don't have them in the lightcurves table metadata in the PhotDM
-		Note2: I also have not succeeded in 'filterIdentifier="Bessel/V"' or 'filterIdentifier="'Bessel/V'"', seems phot-0 does not like "/" sign 
-		ssa_targname and ssa_bandpass on the meta name="description" are from the clicked row of ssa_table (?)
-
-
- 		<meta name="description">The \metaString{source} lightcurve for {ssa_targname} in the {ssa_bandpass} filter </meta>
-
-		define them _before_ mentioning them the mixin 
-		<param original="ts_ssa.ssa_bandpass"/>
-		<param original="ts_ssa.ssa_specmid"/>
-
-		<mixin
-			effectiveWavelength="12345"
-			filterIdentifier="Bessel_V"
-			magnitudeSystem="Vega"
-            zeroPointFlux="3636"
-			phot_description="somehow-calibrated magnitude"
-			phot_ucd="phot.mag;em.opt.V"
-			phot_unit="mag"
-			refposition="BARYCENTER"
-			refframe="ICRS"
-			time0="2400000.5"
-			timescale="TCB"
-		>//timeseries#phot-0</mixin>
-
-		from carmenes:
-		<param original="ts_ssa.t_min"/>
-		<param original="ts_ssa.t_max"/>
-		<param original="ts_ssa.ssa_location"/>
-
-		Add my columns
-		<column original="lightcurves.mag_err"/>
-
-		JK: Add also something kind of:
-		<column original="lightcurves.image"/>	fits image ref?
-		<column original="lightcurves.process_info"/>	my jsonb from lc_metadata
-
-	</table>
-	-->
-
 	<data id="build-ts" auto="False"> 
 		<!-- stolen from carmenes 
 		note 1: parmaker copies values from the SSA input row to the params in the instance table.
@@ -486,9 +444,10 @@
 		<embeddedGrammar>
 			<iterator>
 				<code>
-					object = self.sourceToken.accref.split("/")[-2]		# self.sourceToken points to the clicked ssa_table row
-					passband = self.sourceToken.accref.split("/")[-1]	# TODO use this as a band
-					# band = "B"
+					obsId = self.sourceToken.accref.split('ID=')[-1]	# self.sourceToken points to the clicked ssa_table row
+					object = obsId.split("/")[-2]
+					passband = obsId.split("/")[-1]	# TODO use this as a band
+					print(f"\n===================== build-ts == {obsId=} {object=} {passband=}\n")
 					with base.getTableConn() as conn:
 						for row in conn.queryToDicts(
 							"SELECT dateobs, magnitude AS phot, mag_err"
@@ -533,12 +492,13 @@
 
 
 	<!--
-			static for prepared periodogramms
-			descriptorGenerator: dataset description
-			metaMaker: makes #* stuff (semantics)
-			dataFunction: builds ts
-			dataFormatter: -> VOTable(?)
-			pubDID is the only input parameter there
+		static for prepared things (like periodogramms)
+		descriptorGenerator: dataset description
+		JK: As we abandoned dc.products there (following bgds) and
+		can't use ProductDescriptor.fromAccref() anymore, we need to steal bgds TSDescriptor class
+		metaMaker: makes #* stuff (semantics)
+		dataFunction: builds ts
+		pubDID is the only input parameter there
 	-->
 
 	<service id="sdl" allowed="dlget,dlmeta,static">
@@ -548,36 +508,78 @@
             This service produces time series datasets for Kolonica lightcurves.
         </meta>
 
-
 		<datalinkCore>
 			<descriptorGenerator>
-				<code>
-					# extract info from the ssa-table row and fill
-					# descriptor.ssa_row and something
-					if "?" in pubDID:
-						accref = urllib.parse.unquote_plus(pubDID.split("?")[-1])
-					else:
-						# it already is an accref rather than a full pubDID
-						accref = pubDID
+				<setup>
+					<code>
+						from gavo import svcs
 
-					descriptor = ProductDescriptor.fromAccref(pubDID, accref)
-					# descriptor.band = accref.split.split("/")[-1]
-					# descriptor.band = "V"
-					with base.getTableConn() as conn:
-						descriptor.ssa_row = next(conn.queryToDicts(
-							"SELECT * FROM \schema.ts_ssa"
-							" WHERE accref=%(accref)s",
-							{"accref": accref}))
-					descriptor.band = descriptor.ssa_row.get("ssa_bandpass")
-					return descriptor
+						class TSDescriptor(ProductDescriptor):	# bgds l2
+							def __init__(self, pubDID):
+								# We accept "local" pubDIDs (without ivo://...?), too
+								print(f'\n=== {pubDID=} ====\n')
+								if pubDID.startswith("ivo://"):
+									self.pubDID = pubDID
+									# accref = urllib.parse.unquote_plus(pubDID.split("?")[-1])
+									# self.accreff = accref
+								else:
+									self.pubDID = '\pubDIDBase'+pubDID
+								self.objId = pubDID.split("/")[-2]
+								self.band = pubDID.split("/")[-1]
+								print(f'\n=== {self.pubDID=} {self.objId=} {self.band=} ====\n')
+
+								self.suppressAutoLinks = True	# I don't know what this means, just copy
+								# print(f'============= {accref=} ======\n')
+								with base.getTableConn() as conn:
+									res = list(conn.queryToDicts(
+										"SELECT * FROM \schema.ts_ssa WHERE ssa_pubDID=%(pubdid)s",
+										{"pubdid": self.pubDID}))
+								if not res:
+									raise svcs.UnknownURI("No timeseries for %s" % self.pubDID)
+								self.ssa_row = res[0]
+								self.accref = self.ssa_row['accref']
+								print(f'============= {self.ssa_row=} ==============')
+					</code>
+				</setup>
+				<code>
+					return TSDescriptor(pubDID)		# this turns into descriptor I will use below
 				</code>
 			</descriptorGenerator>
+
+			<!-- We should do #this explicitly without products table -->
+			<metaMaker semantics="#this">
+				<code>
+					acrf = descriptor.ssa_row["accref"]
+					print(f'==================== metaMaker semantics=#this {acrf=}')
+					yield descriptor.makeLink(
+					descriptor.ssa_row["accref"],	# JK: seems, I already have it
+					description=f"Kolonica time series for {descriptor.objId} in {descriptor.band}",
+					contentType="application/x-votable+xml",
+					contentLength="15000",
+					contentQualifier="#timeseries")
+				</code>
+			</metaMaker>
+
+			<!-- My useless on-the-fly preview -->
+			<metaMaker semantics="#preview">
+				<code>
+					print(f'============ metaMaker semantics=#preview {descriptor.objId=} {descriptor.band=}')
+					url = makeAbsoluteURL(f"\rdId/preview/qp/{descriptor.objId}/{descriptor.band}"
+					print(f'{url=}')
+					yield descriptor.makeLink(
+						url,
+						description=f"Preview for {descriptor.objId} in {descriptor.band}",
+						contentType="image/png",
+						contentLength="2000"
+					)
+				</code>
+			</metaMaker>
 
 			<!-- I don't have fits_accref yet, TODO --> 
 
 			<metaMaker name="add_periodogram" semantics="#derivation">
+				<!-- todo -->
 				<code>
-					objname = descriptor.accref.split("/")[-1]
 					yield descriptor.makeLinkFromFile(
 						rd.getAbsPath(f"data/periodograms/bilet.pdf"),
 						description="Periodograms derivied from this time series")
@@ -586,14 +588,13 @@
 
 			<!-- 
 			"#this" and #preview content comes automatically from the dc.products table 
-			dataFunction is for dlget service(?)
+			dataFunction is executed by dlget (?)
 			The lightcurve sits in the PrimaryTable (?)
 			dataFunction is stolen from bgds/l2
 			-->
 			<dataFunction>
 				<setup imports="gavo.rsc"/>
 				<code>
-					# fills descriptor.data
 					# actually calls data's "build-ts" block
 					# descriptor is from metaMaker as input parameters for
 					# build-ts sourceToken
@@ -716,11 +717,8 @@
 					#		res = list(conn.query(
 					#		"SELECT mjds, mags FROM %s WHERE obs_id=%%(obs_id)s"%
 					#			srcTable, {"obs_id": obsId}))
-					# passband = "B"
-					# objId = "1"
-					# print(f'{obsId=}')
 					objId, passband = obsId.split("/")
-					print("===================== AHA =====================================")
+					print(f"===================== AHA PRVIEW == {obsId=} {objId=}")
 					with base.getUntrustedConn() as conn:
 						res = list(conn.query(
 							"SELECT extract(julian from l.dateobs at time zone 'UTC+12') AS obs_time, l.magnitude "
@@ -729,13 +727,10 @@
 							"WHERE object_id=%(obj_id)s AND p.band=%(passband)s",
 							{"obj_id": objId, "passband": passband}
 						))
-						print(f'{res=}')
 					if not res:
 						raise UnknownURI(f'No time series for {objId} {passband}')
 					return "image/png", SpectralPreviewMaker.get2DPlot(res)
-
 				</code>
-
 			</coreProc>
 		</pythonCore>
 	</service>
