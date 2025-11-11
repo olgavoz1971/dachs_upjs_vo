@@ -564,7 +564,7 @@
 			<metaMaker semantics="#preview">
 				<code>
 					print(f'============ metaMaker semantics=#preview {descriptor.objId=} {descriptor.band=}')
-					url = makeAbsoluteURL(f"\rdId/preview/qp/{descriptor.objId}/{descriptor.band}"
+					url = makeAbsoluteURL(f"\rdId/preview/qp/{descriptor.objId}/{descriptor.band}")
 					print(f'{url=}')
 					yield descriptor.makeLink(
 						url,
@@ -699,24 +699,12 @@
 					<code>
 						from gavo.svcs import UnknownURI
 						from gavo.helpers.processing import SpectralPreviewMaker
+						from astropy.stats import sigma_clip
+						from numpy import nan
 					</code>
 				</setup>
 				<code>
 					obsId = inputTable.getParam("obs_id")
-					# always go through a mapping here or you'll create a SQL injection (!!!)
-					# try:
-					#	srcTable = {
-					#		"r": "bgds2.lc_r",
-					#		"i": "bgds2.lc_i",
-					#		# where are U? V? z? ...
-					#		}[obsId.split("-")[3]]
-					# except KeyError:
-					#	raise UnknownURI("No time series in the %s band here"%
-					# obsId.split("-")[3])
-					# with base.getUntrustedConn() as conn:
-					#		res = list(conn.query(
-					#		"SELECT mjds, mags FROM %s WHERE obs_id=%%(obs_id)s"%
-					#			srcTable, {"obs_id": obsId}))
 					objId, passband = obsId.split("/")
 					print(f"===================== AHA PRVIEW == {obsId=} {objId=}")
 					with base.getUntrustedConn() as conn:
@@ -729,7 +717,12 @@
 						))
 					if not res:
 						raise UnknownURI(f'No time series for {objId} {passband}')
-					return "image/png", SpectralPreviewMaker.get2DPlot(res)
+					# Try to clean data, kind of:
+					jds, mags = zip(*res)
+					clipped_mags = sigma_clip(mags, sigma=3)
+					cleaned_data = list(zip(jds, -1*clipped_mags.filled(nan)))	# How to invert y-axis?
+					return "image/png", SpectralPreviewMaker.get2DPlot(cleaned_data, linear=True, connectPoints=False)
+					# return "image/png", SpectralPreviewMaker.get2DPlot(res, linear=True, connectPoints=False)
 				</code>
 			</coreProc>
 		</pythonCore>
