@@ -38,6 +38,7 @@
 	I should also do this from outside of RD
 		GRANT SELECT ON upjs_vo.lightcurves TO gavoadmin WITH GRANT OPTION;
 		GRANT SELECT ON upjs_vo.objects TO gavoadmin WITH GRANT OPTION;
+		GRANT SELECT ON upjs_vo.observations TO gavoadmin WITH GRANT OPTION;
 		GRANT SELECT ON upjs_vo.photosys TO gavoadmin WITH GRANT OPTION;
 		GRANT SELECT ON upjs_vo.photosys TO gavo;
 	-->
@@ -99,23 +100,79 @@
 			description="Equatorial coordiantes ICRS in the original table (rad, rad)" 
 			verbLevel="1" 
 			required="False"/>
-
 	</table>
 
 	<data id="publish_objects_orig" updating="True">
 		<!-- <make table="objects"/> -->
  	</data>
 
+	<table id="observations" onDisk="True" adql="True">
+		<meta name="description">External table containing information on fits-images</meta>
+		<column name="id" type="integer"
+			ucd="meta.id;meta.main"
+			tablehead="internal id"
+			description="Image id in the original table"
+			verbLevel="1"
+			required="True"/>
+
+		<column name="dateobs" type="timestamp"
+			ucd="time.epoch" 
+			tablehead="dateobs" 
+			description="Timestamp with timezone" 
+			verbLevel="1" 
+			required="True"/>
+
+		<column name="accumtime" type="real" 
+			ucd="time.duration;obs.exposure"
+			unit="s"
+			tablehead="accumtime" 
+			description="Image accumulation time" 
+			verbLevel="1" 
+			required="True"/>
+
+		<column name="fov" type="spoint"
+			ucd="pos.angdistance;instr.fov"
+			tablehead="FOV" 
+			description="Field of view of the image along axes (1,2)" 
+			verbLevel="1" 
+			required="True"/>
+
+		<column name="band" type="text"
+				ucd="meta.id;instr.filter"
+				tablehead="filter"
+				description="photometric filter"
+				verbLevel="1"
+				required="True"/>
+
+		<column name="filename" type="text"
+				ucd="meta.id;meta.file"
+				tablehead="filename"
+				description="File name of the fits"
+				verbLevel="14"
+				required="False"/>
+
+		<column name="path_to_fits" type="text"
+				ucd="meta.ref;meta.file"
+				tablehead="file path"
+				description="Fits file path"
+				verbLevel="14"
+				required="False"/>
+	</table>
+
+	<data id="publish_obsevations_orig" updating="True">
+		<make table="observations"/>
+	</data>
+
 
  	<table id="lightcurves" onDisk="True" adql="True">
 		<meta name="description">External table containing lightcurves</meta>
 
 		<column name="id" type="bigint" 
-			ucd="meta.id;meta.main" 
-			tablehead="internal id"
-			description="lightcurve point id in the original table" 
-			verbLevel="1" 
-		required="True"/>
+				ucd="meta.id;meta.main" 
+				tablehead="internal id"
+				description="lightcurve point id in the original table" 
+				verbLevel="1" 
+				required="True"/>
 
 		<column name="object_id" type="integer" 
 				ucd="meta.id" 
@@ -127,11 +184,11 @@
 		<column name="dateobs" type="timestamp" 
 				ucd="time.epoch" 
 				tablehead="dateobs" 
-				description="timestamp with timezone" 
+				description="Barycentric time; timestamp with timezone" 
 				verbLevel="1" 
 				required="True"/>
 
-		<column name="magnitude" type="double precision" 
+		<column name="magnitude" type="real" 
 				ucd="phot.mag"
 				unit="mag"
 				tablehead="magnitude" 
@@ -231,6 +288,13 @@
 			description="Declination (double precision floating-point number)"
 			verbLevel="1"/>
 
+<!--
+		<column name="p_filename" type="text"
+			ucd="meta.id;meta.file"
+			tablehead="file name"
+			description="Fits file name"
+			verbLevel="14"/>
+-->
 		<!-- note 1: accref = ...upjs_vo/q/object_id path for (future) product (lightcurve) this is carmenes-style
 					'upjs_vo/q/' || o.id || '/' || p.band AS accref,
 					 accref = '\getConfig{web}{serverURL}/bgds/l2/tsdl/dlget?ID='|| obs_id  - bgds-style
@@ -254,28 +318,28 @@
 				NULL AS embargo,
 				NULL AS owner,
 				NULL AS datalink,
-				ssa_timeExt,
+				q.ssa_timeExt,
 				p.band AS ssa_bandpass,
 				p.specmid AS ssa_specmid,
-				t_min,
-				t_max,
-				ssa_length,
+				q.t_min,
+				q.t_max,
+				q.ssa_length,
 				degrees(long(o.coordequ)) AS p_ra,
 				degrees(lat(o.coordequ)) AS p_dec,
 				mean_mag AS p_mean_mag,
 				'ICRS' AS ssa_csysName
 			FROM (
-			SELECT
-				l.object_id, l.photosys_id,
-				COUNT(*) AS ssa_length,
-				(MAX(extract(julian from dateobs at time zone 'UTC+12')) -
-				MIN(extract(julian from dateobs at time zone 'UTC+12'))) AS ssa_timeExt,
-				MIN(extract(julian from dateobs at time zone 'UTC+12')) - 2400000.5 AS t_min,
-				MAX(extract(julian from dateobs at time zone 'UTC+12')) - 2400000.5 AS t_max,
-			    AVG(magnitude) AS mean_mag
-			FROM \schema.lightcurves AS l
-				GROUP BY l.object_id, l.photosys_id
-			) AS q
+				SELECT
+					l.object_id, l.photosys_id,
+					COUNT(*) AS ssa_length,
+					(MAX(extract(julian from l.dateobs at time zone 'UTC+12')) -
+					MIN(extract(julian from l.dateobs at time zone 'UTC+12'))) AS ssa_timeExt,
+					MIN(extract(julian from l.dateobs at time zone 'UTC+12')) - 2400000.5 AS t_min,
+					MAX(extract(julian from l.dateobs at time zone 'UTC+12')) - 2400000.5 AS t_max,
+			    	AVG(magnitude) AS mean_mag
+				FROM \schema.lightcurves AS l
+					GROUP BY l.object_id, l.photosys_id
+				) AS q
 				JOIN \schema.objects AS o ON o.id = q.object_id
 				JOIN \schema.photosys AS p ON p.id = q.photosys_id
 			);
@@ -410,6 +474,7 @@
 
 	        <!-- Add my columns -->
     	    <column original="lightcurves.mag_err"/>
+			<column original="observations.filename"/>
 
 	        <!-- JK: Add also something kind of:
 	        <column original="lightcurves.image"/>  fits image ref?
@@ -419,7 +484,7 @@
 		  </table>
 	</STREAM>
 
-	<!-- instantiate for a few bands -->
+	<!-- instantiate for a few bands - take names from https://svo2.cab.inta-csic.es/theory/fps/ ??? -->
 	<LOOP source="time-series-template">
 		<csvItems>
 			band_short, band_human, band_ucd, effective_wavelength
@@ -450,11 +515,12 @@
 					print(f"\n===================== build-ts == {obsId=} {object=} {passband=}\n")
 					with base.getTableConn() as conn:
 						for row in conn.queryToDicts(
-							"SELECT dateobs, magnitude AS phot, mag_err"
+							"SELECT l.dateobs as dateobs, magnitude AS phot, mag_err, i.filename as filename"
 							"  FROM \schema.lightcurves AS l"
 							" JOIN \schema.photosys AS p ON p.id = l.photosys_id"
+							" JOIN \schema.observations AS i ON i.id = l.observation_id"
 							"  WHERE object_id=%(object)s AND p.band=%(passband)s"
-							" ORDER BY dateobs",
+							" ORDER BY l.dateobs",
 							{"object": object, "passband": passband}		# locals()
 						):
 							dt = row["dateobs"]
@@ -581,7 +647,7 @@
 				<!-- todo -->
 				<code>
 					yield descriptor.makeLinkFromFile(
-						rd.getAbsPath(f"data/periodograms/bilet.pdf"),
+						rd.getAbsPath(f"data/periodograms/placeholder.pdf"),
 						description="Periodograms derivied from this time series")
 				</code>
 			</metaMaker>
