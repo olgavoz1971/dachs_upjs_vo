@@ -43,12 +43,12 @@
 		GRANT SELECT ON upjs_vo.photosys TO gavo;
 	-->
  
- 	<table id="photosys" onDisk="True" adql="True">
+ 	<table id="photosys" onDisk="True" adql="Hidden">
 		<meta name="description">External table containing photometric systems data</meta>
 		<column name="id" type="integer"
 			ucd="meta.id;meta.main" 
 			tablehead="internal id" 
-			description="Bandpass id in the original table" 
+			description="Observation id in the original table" 
 			verbLevel="1" 
 			required="True"/>
 
@@ -78,7 +78,7 @@
     </data>
 
 
- 	<table id="objects" onDisk="True" adql="True">
+ 	<table id="objects" onDisk="True" adql="Hidden">
 		<meta name="description">External table containing objects</meta>
 		<column name="id" type="integer"
 			ucd="meta.id;meta.main" 
@@ -106,7 +106,7 @@
 		<!-- <make table="objects"/> -->
  	</data>
 
-	<table id="observations" onDisk="True" adql="True">
+	<table id="observations" onDisk="True" adql="Hidden">
 		<meta name="description">External table containing information on fits-images</meta>
 		<column name="id" type="integer"
 			ucd="meta.id;meta.main"
@@ -138,33 +138,160 @@
 			required="True"/>
 
 		<column name="band" type="text"
-				ucd="meta.id;instr.filter"
-				tablehead="filter"
-				description="photometric filter"
-				verbLevel="1"
-				required="True"/>
+			ucd="meta.id;instr.filter"
+			tablehead="filter"
+			description="photometric filter from the fits-header"
+			verbLevel="1"
+			required="True"/>
+
+		<column name="coordequ" type="spoint"
+			ucd="pos.eq;meta.main"
+			tablehead="coordequ" 
+			description="Equatorial coordiantes ICRS in the original table (rad, rad)" 
+			verbLevel="1" 
+			required="False"/>
 
 		<column name="filename" type="text"
-				ucd="meta.id;meta.file"
-				tablehead="filename"
-				description="File name of the fits"
-				verbLevel="14"
-				required="False"/>
+			ucd="meta.id;meta.file"
+			tablehead="filename"
+			description="File name of the fits"
+			verbLevel="14"
+			required="False"/>
 
 		<column name="path_to_fits" type="text"
-				ucd="meta.ref;meta.file"
-				tablehead="file path"
-				description="Fits file path"
-				verbLevel="14"
-				required="False"/>
+			ucd="meta.ref;meta.file"
+			tablehead="file path"
+			description="Fits file path"
+			verbLevel="14"
+			required="False"/>
 	</table>
 
 	<data id="publish_obsevations_orig" updating="True">
-		<make table="observations"/>
+		<!-- <make table="observations"/> -->
 	</data>
 
+<!-- I want to implement siap2, so I need a View, correct? The reason why I
+don't actually want to make this table from scratch is obsevation_id -
+which is used to join lightcurves points with fits images. They are in the
+existing database -->
 
- 	<table id="lightcurves" onDisk="True" adql="True">
+	<table id="observations_siap2" onDisk="True" adql="True">
+		<meta name="description">SIAP2 view on the observations table</meta>
+		<mixin>//siap2#pgs</mixin>			<!-- JK: All this into one heap????? siap2 + products table???  -->
+		<mixin>//products#table</mixin>		<!-- form carmenes -->
+		<mixin preview="NULL">//obscore#publishObscoreLike</mixin>
+
+		<column name="observation_id" type="integer"
+			description="Observation id in the original observations table"
+			ucd="meta.id;meta.main" 
+			tablehead="internal id" 
+			verbLevel="1" 
+			required="True"/>
+
+		<column name="airmass"
+			ucd="obs.airMass"
+			description="Airmass of the target"
+			verbLevel="18"/>
+
+		<column name="band" type="text"
+			ucd="meta.id;instr.filter"
+			tablehead="filter"
+			description="photometric filter from the fits-header"
+			verbLevel="1"
+			required="True"/>
+
+		<!-- This is extra HJust to pass import, where I stuck
+		<column name="accref" type="text"
+			ucd="meta.id"
+			tablehead="accref"
+			description="some extra accref"
+			verbLevel="1"
+			required="True"/>
+		--> 
+
+		<column original="//obscore#ObsCore.t_min"/>
+		<column original="//obscore#ObsCore.t_max"/>
+
+		<!-- fill fields from header-realted table 
+				'\getConfig{web}{serverURL}/\rdId' || path_to_fits || '/' || filename AS access_url,
+
+		em_min, em_max - use //siap#getBandFromFilter to fill them
+		-->
+		<viewStatement>
+            CREATE MATERIALIZED VIEW \curtable AS
+            SELECT 
+				band, 
+				o.id AS observation_id, 
+				accumtime AS t_exptime,
+				extract(julian from dateobs at time zone 'UTC+12') - 2400000.5 AS t_min,  
+				extract(julian from dateobs at time zone 'UTC+12') - 2400000.5 AS t_max,
+				LEAST(degrees(fov[0]), degrees(fov[1])) AS s_fov,
+				NULL AS s_region,
+				NULL AS s_resolution,
+				NULL AS t_resolution,
+				3.5E-7 AS em_min,
+				8.0E-7 AS em_max,
+				NULL AS em_res_power,
+				'phot.flux.density' AS o_ucd,
+				NULL AS pol_states,
+				(m.data->>'INSTRUME') AS instrument_name,
+				(m.data->>'TELESCOP') AS facility_name,
+				(m.data->>'AIRMASS')::float AS airmass,
+				(m.data->>'NAXIS1')::int AS s_xel1,
+				(m.data->>'NAXIS2')::int AS s_xel2,
+				1 AS t_xel,
+				1 AS em_xel,
+				1 AS pol_xel,
+				((m.data->>'XPIXSZ')::float / ((m.data->>'FOCALLEN')::float * 1000)) * 206265 AS s_pixel_scale,
+				NULL AS em_ucd,
+				'\schema.observations_siap2' AS source_table,
+				'image' AS dataproduct_type,
+				NULL AS dataproduct_subtype,
+				1 AS calib_level,
+				'Kolonica' AS obs_collection,
+				'Kolonica CCD placeholder' AS obs_title,
+				(m.data->>'OBJECT') AS target_name,
+				'star' AS target_class,
+				NULL AS obs_creator_did,
+				replace(path_to_fits, '/home/skvo/data/upjs', 'upjs_vo/data') || '/' || filename AS access_url,
+				'application/fits' AS access_format,
+				FLOOR(((m.data->>'BITPIX')::int / 8.0 * (m.data->>'NAXIS1')::int * (m.data->>'NAXIS2')::int) / 1024)::int AS access_estsize,
+				'\pubDIDBase' || filename AS obs_publisher_did,
+				'\pubDIDBase' || filename AS obs_id,
+				replace(path_to_fits, '/home/skvo/data/upjs', 'upjs_vo/data') || '/' || filename AS accref,
+				NULL as owner,
+				NULL as embargo,
+				50000 AS accsize,
+				'image/fits' AS mime,
+				degrees(long(coordequ)) AS s_ra,
+				degrees(lat(coordequ)) AS s_dec
+			FROM \schema.observations AS o
+			JOIN \schema.metadata_obs_json AS m ON o.id = m.observation_id;
+		</viewStatement>
+	</table>
+
+	<data id="create-observations-view">	
+		<make table="observations_siap2">	<!-- from carmenes - Seems, I need to do this mannually  -->
+			<script type="preImport" lang="SQL">
+				DELETE FROM dc.products WHERE sourcetable='upjs_vo.observations_siap2'
+			</script>
+			<script type="postCreation" lang="SQL" name="add to product table">
+				INSERT INTO dc.products (SELECT
+					accref,
+					owner,
+					NULL as embargo,
+					mime,
+					accref as accesspath,
+					source_table as sourcetable,
+					NULL as preview,
+					NULL as datalink,
+					'image/png' as preview_mime
+				FROM upjs_vo.observations_siap2);					
+			</script>
+		</make>
+	</data>
+
+ 	<table id="lightcurves" onDisk="True" adql="Hidden">
 		<meta name="description">External table containing lightcurves</meta>
 
 		<column name="id" type="bigint" 
@@ -203,15 +330,6 @@
 				description="stellar magnitude" 
 				verbLevel="1" 
 				required="False"/>
-
-<!--
-		<column name="band" type="text"
-				ucd="meta.id;instr.filter"
-				tablehead="filter"
-				description="photometric filter"
-				verbLevel="1"
-				required="True"/>
--->
 
 	</table>
 
@@ -476,8 +594,19 @@
     	    <column original="lightcurves.mag_err"/>
 			<column original="observations.filename"/>
 
+			<column name="access_url" type="text"
+				ucd="meta.ref.url"
+				tablehead="access_url"
+				description="Path to access fits image"
+				verbLevel="1"
+				required="False"/>
+
+			<column name="airmass"
+				ucd="obs.airMass"
+				description="Airmass of the target"
+				verbLevel="18"/>
+
 	        <!-- JK: Add also something kind of:
-	        <column original="lightcurves.image"/>  fits image ref?
 	        <column original="lightcurves.process_info"/>   my jsonb from lc_metadata
 	        -->
 
@@ -515,10 +644,11 @@
 					print(f"\n===================== build-ts == {obsId=} {object=} {passband=}\n")
 					with base.getTableConn() as conn:
 						for row in conn.queryToDicts(
-							"SELECT l.dateobs as dateobs, magnitude AS phot, mag_err, i.filename as filename"
+							"SELECT l.dateobs as dateobs, magnitude AS phot, mag_err, airmass, "
+							" \sqlquote{\internallink{/getproduct/}} || gavo_urlescape(i.access_url) as access_url"
 							"  FROM \schema.lightcurves AS l"
 							" JOIN \schema.photosys AS p ON p.id = l.photosys_id"
-							" JOIN \schema.observations AS i ON i.id = l.observation_id"
+							" JOIN \schema.observations_siap2 AS i ON i.observation_id = l.observation_id"
 							"  WHERE object_id=%(object)s AND p.band=%(passband)s"
 							" ORDER BY l.dateobs",
 							{"object": object, "passband": passband}		# locals()
