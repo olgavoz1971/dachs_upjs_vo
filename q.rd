@@ -181,6 +181,8 @@ existing database -->
 		<mixin>//products#table</mixin>		<!-- form carmenes -->
 		<mixin preview="access_url || '?preview=True'"
 			>//obscore#publishObscoreLike</mixin>
+		<FEED source="//scs#spoint-index-def" ra="s_ra" dec="s_dec"/>
+		<index columns="s_region" method="GIST"/>
 
 		<column name="observation_id" type="integer"
 			description="Observation id in the original observations table"
@@ -225,7 +227,7 @@ existing database -->
 		<viewStatement>
             CREATE MATERIALIZED VIEW \curtable AS
             SELECT 
-				band, 
+				band,
 				observation_id, 
 				t_exptime,
 				t AS t_min,
@@ -266,13 +268,13 @@ existing database -->
 				NULL AS obs_creator_did,
 				access_url,
 				'application/fits' AS access_format,
-				access_estsize,
-				obs_publisher_did,
-				obs_id,
-				accref,
+				(accsize / 1024)::int AS access_estsize,
+				'\pubDIDBase' || access_url AS obs_publisher_did,
+				'\pubDIDBase' || access_url AS obs_id,
+				access_url AS accref,
 				NULL as owner,
 				NULL as embargo,
-				50000 AS accsize,
+				accsize,
 				'image/fits' AS mime,
 				degrees(ra_rad) AS s_ra,
 				degrees(dec_rad) AS s_dec
@@ -288,16 +290,13 @@ existing database -->
 					LEAST(degrees(fov[0]), degrees(fov[1])) AS s_fov,
 					(m.data->>'INSTRUME') AS instrument_name,
 					(m.data->>'TELESCOP') AS facility_name,
-					(m.data->>'AIRMASS')::float AS airmass,
+					round((m.data->>'AIRMASS')::numeric, 2) AS airmass,
 					(m.data->>'NAXIS1')::int AS s_xel1,
 					(m.data->>'NAXIS2')::int AS s_xel2,
 					((m.data->>'XPIXSZ')::float / ((m.data->>'FOCALLEN')::float * 1000)) * 206265 AS s_pixel_scale,
 					(m.data->>'OBJECT') AS target_name,
 					replace(path_to_fits, '/home/skvo/data/upjs', 'upjs_vo/data') || '/' || filename AS access_url,
-					FLOOR(((m.data->>'BITPIX')::int / 8.0 * (m.data->>'NAXIS1')::int * (m.data->>'NAXIS2')::int) / 1024)::int AS access_estsize,
-					'\pubDIDBase' || filename AS obs_publisher_did,
-					'\pubDIDBase' || filename AS obs_id,
-					replace(path_to_fits, '/home/skvo/data/upjs', 'upjs_vo/data') || '/' || filename AS accref
+					FLOOR((m.data->>'BITPIX')::int / 8.0 * (m.data->>'NAXIS1')::int * (m.data->>'NAXIS2')::int)::int AS accsize
 				FROM \schema.observations AS o
 				JOIN \schema.metadata_obs_json AS m ON o.id = m.observation_id
 			) AS foo;
@@ -337,6 +336,7 @@ existing database -->
 
 		<dbCore queriedTable="observations_siap2">
 		<FEED source="//siap2#parameters"/>
+		<condDesc buildFrom="band"/>
 		<condDesc buildFrom="airmass"/>
 	</dbCore>
 </service>
