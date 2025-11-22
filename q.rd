@@ -179,7 +179,8 @@ existing database -->
 		<meta name="description">SIAP2 view on the observations table</meta>
 		<mixin>//siap2#pgs</mixin>			<!-- JK: All this into one heap????? siap2 + products table???  -->
 		<mixin>//products#table</mixin>		<!-- form carmenes -->
-		<mixin preview="NULL">//obscore#publishObscoreLike</mixin>
+		<mixin preview="access_url || '?preview=True'"
+			>//obscore#publishObscoreLike</mixin>
 
 		<column name="observation_id" type="integer"
 			description="Observation id in the original observations table"
@@ -207,26 +208,36 @@ existing database -->
 			description="some extra accref"
 			verbLevel="1"
 			required="True"/>
-		--> 
+		-->
 
 		<column original="//obscore#ObsCore.t_min"/>
 		<column original="//obscore#ObsCore.t_max"/>
 
 		<!-- fill fields from header-realted table 
 				'\getConfig{web}{serverURL}/\rdId' || path_to_fits || '/' || filename AS access_url,
+				pgsphere.SPoint.fromDALI(coordequ, degrees(fov[0])/60) AS s_region,
 
-		em_min, em_max - use //siap#getBandFromFilter to fill them
+				em_min, em_max - use //siap#getBandFromFilter to fill them
+				NULL::spoly AS s_region,	
+				scircle(coordequ, radians(s_fov/2)) AS s_region,
+
 		-->
 		<viewStatement>
             CREATE MATERIALIZED VIEW \curtable AS
             SELECT 
 				band, 
-				o.id AS observation_id, 
-				accumtime AS t_exptime,
-				extract(julian from dateobs at time zone 'UTC+12') - 2400000.5 AS t_min,  
-				extract(julian from dateobs at time zone 'UTC+12') - 2400000.5 AS t_max,
-				LEAST(degrees(fov[0]), degrees(fov[1])) AS s_fov,
-				NULL AS s_region,
+				observation_id, 
+				t_exptime,
+				t AS t_min,
+				t AS t_max,
+				s_fov,
+				spoly(
+					'{(' || (ra_rad - radians(s_fov/2)) || ',' || (dec_rad - radians(s_fov/2)) || '),'
+					|| '(' || (ra_rad - radians(s_fov/2)) || ',' || (dec_rad + radians(s_fov/2)) || '),'
+					|| '(' || (ra_rad + radians(s_fov/2)) || ',' || (dec_rad + radians(s_fov/2)) || '),'
+					|| '(' || (ra_rad + radians(s_fov/2)) || ',' || (dec_rad - radians(s_fov/2)) || ')'
+					|| '}'
+					)::spoly AS s_region,
 				NULL AS s_resolution,
 				NULL AS t_resolution,
 				3.5E-7 AS em_min,
@@ -234,15 +245,15 @@ existing database -->
 				NULL AS em_res_power,
 				'phot.flux.density' AS o_ucd,
 				NULL AS pol_states,
-				(m.data->>'INSTRUME') AS instrument_name,
-				(m.data->>'TELESCOP') AS facility_name,
-				(m.data->>'AIRMASS')::float AS airmass,
-				(m.data->>'NAXIS1')::int AS s_xel1,
-				(m.data->>'NAXIS2')::int AS s_xel2,
+				instrument_name,
+				facility_name,
+				airmass,
+				s_xel1,
+				s_xel2,
 				1 AS t_xel,
 				1 AS em_xel,
 				1 AS pol_xel,
-				((m.data->>'XPIXSZ')::float / ((m.data->>'FOCALLEN')::float * 1000)) * 206265 AS s_pixel_scale,
+				s_pixel_scale,
 				NULL AS em_ucd,
 				'\schema.observations_siap2' AS source_table,
 				'image' AS dataproduct_type,
@@ -250,23 +261,46 @@ existing database -->
 				1 AS calib_level,
 				'Kolonica' AS obs_collection,
 				'Kolonica CCD placeholder' AS obs_title,
-				(m.data->>'OBJECT') AS target_name,
+				target_name,
 				'star' AS target_class,
 				NULL AS obs_creator_did,
-				replace(path_to_fits, '/home/skvo/data/upjs', 'upjs_vo/data') || '/' || filename AS access_url,
+				access_url,
 				'application/fits' AS access_format,
-				FLOOR(((m.data->>'BITPIX')::int / 8.0 * (m.data->>'NAXIS1')::int * (m.data->>'NAXIS2')::int) / 1024)::int AS access_estsize,
-				'\pubDIDBase' || filename AS obs_publisher_did,
-				'\pubDIDBase' || filename AS obs_id,
-				replace(path_to_fits, '/home/skvo/data/upjs', 'upjs_vo/data') || '/' || filename AS accref,
+				access_estsize,
+				obs_publisher_did,
+				obs_id,
+				accref,
 				NULL as owner,
 				NULL as embargo,
 				50000 AS accsize,
 				'image/fits' AS mime,
-				degrees(long(coordequ)) AS s_ra,
-				degrees(lat(coordequ)) AS s_dec
-			FROM \schema.observations AS o
-			JOIN \schema.metadata_obs_json AS m ON o.id = m.observation_id;
+				degrees(ra_rad) AS s_ra,
+				degrees(dec_rad) AS s_dec
+			FROM (
+				SELECT
+					band,
+					o.id AS observation_id,
+					accumtime AS t_exptime,
+					extract(julian from dateobs at time zone 'UTC+12') - 2400000.5 AS t,
+					coordequ,
+					long(coordequ) AS ra_rad,
+					lat(coordequ) AS dec_rad,
+					LEAST(degrees(fov[0]), degrees(fov[1])) AS s_fov,
+					(m.data->>'INSTRUME') AS instrument_name,
+					(m.data->>'TELESCOP') AS facility_name,
+					(m.data->>'AIRMASS')::float AS airmass,
+					(m.data->>'NAXIS1')::int AS s_xel1,
+					(m.data->>'NAXIS2')::int AS s_xel2,
+					((m.data->>'XPIXSZ')::float / ((m.data->>'FOCALLEN')::float * 1000)) * 206265 AS s_pixel_scale,
+					(m.data->>'OBJECT') AS target_name,
+					replace(path_to_fits, '/home/skvo/data/upjs', 'upjs_vo/data') || '/' || filename AS access_url,
+					FLOOR(((m.data->>'BITPIX')::int / 8.0 * (m.data->>'NAXIS1')::int * (m.data->>'NAXIS2')::int) / 1024)::int AS access_estsize,
+					'\pubDIDBase' || filename AS obs_publisher_did,
+					'\pubDIDBase' || filename AS obs_id,
+					replace(path_to_fits, '/home/skvo/data/upjs', 'upjs_vo/data') || '/' || filename AS accref
+				FROM \schema.observations AS o
+				JOIN \schema.metadata_obs_json AS m ON o.id = m.observation_id
+			) AS foo;
 		</viewStatement>
 	</table>
 
@@ -290,6 +324,24 @@ existing database -->
 			</script>
 		</make>
 	</data>
+
+	<service id="s" allowed="form,siap2.xml">
+		<meta name="shortName">My shiny SIAP2 service</meta>
+		<meta name="sia.type">Pointed</meta>
+		<meta name="testQuery.pos.ra">258.5</meta>
+		<meta name="testQuery.pos.dec">76.8</meta>
+		<meta name="testQuery.size.ra">0.1</meta>
+		<meta name="testQuery.size.dec">0.1</meta>
+
+		<publish render="siap2.xml" sets="ivo_managed"/>
+
+		<dbCore queriedTable="observations_siap2">
+		<FEED source="//siap2#parameters"/>
+		<condDesc buildFrom="airmass"/>
+	</dbCore>
+</service>
+
+
 
  	<table id="lightcurves" onDisk="True" adql="Hidden">
 		<meta name="description">External table containing lightcurves</meta>
