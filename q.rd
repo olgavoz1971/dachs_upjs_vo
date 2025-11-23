@@ -467,13 +467,6 @@ existing database -->
 				verbLevel="1" 
 				required="False"/>
 
-			<column name="filename" type="text"
-				ucd="meta.id;meta.file"
-				tablehead="filename"
-				description="File name of the fits"
-				verbLevel="14"
-				required="False"/>
-
 			<column name="access_url" type="text"
 				ucd="meta.ref.url"
 				tablehead="access_url"
@@ -524,7 +517,7 @@ existing database -->
 					print(f"\n===================== build-ts == {obsId=} {object=} {passband=}\n")
 					with base.getTableConn() as conn:
 						for row in conn.queryToDicts(
-							"SELECT l.dateobs as dateobs, magnitude AS phot, mag_err, filename, airmass, "
+							"SELECT l.dateobs as dateobs, magnitude AS phot, mag_err, airmass, "
 							" \sqlquote{\internallink{/getproduct/}} || gavo_urlescape(i.access_url) as access_url"
 							"  FROM \schema.lightcurves AS l"
 							" JOIN \schema.photosys AS p ON p.id = l.photosys_id"
