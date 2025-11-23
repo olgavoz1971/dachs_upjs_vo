@@ -28,7 +28,6 @@
       remove if there are no messengers involved.  -->
  	<meta name="coverage.waveband">Optical</meta>
 
-
  	<meta name="ssap.dataSource">pointed</meta>   <!-- custom ? -->
  	<meta name="ssap.creationType">archival</meta>
  	<meta name="productType">timeseries</meta>
@@ -43,133 +42,6 @@
 		GRANT SELECT ON upjs_vo.photosys TO gavo;
 	-->
  
- 	<table id="photosys" onDisk="True" adql="Hidden">
-		<meta name="description">External table containing photometric systems data</meta>
-		<column name="id" type="integer"
-			ucd="meta.id;meta.main" 
-			tablehead="internal id" 
-			description="Observation id in the original table" 
-			verbLevel="1" 
-			required="True"/>
-
-        <column name="band" type="text"
-            ucd="meta.id;instr.filter" 
-            tablehead="internal id" 
-            description="Bandpass name in the original table" 
-            verbLevel="1" 
-            required="True"/>
-
-        <column name="description" type="text"
-            ucd="meta.note" 
-            tablehead="system" 
-            description="Photometric system" 
-            verbLevel="1" 
-            required="True"/>
-
-		<column name="specmid"
-			ucd="em.wl"
-			tablehead="specmid"
-			description="Central wavelength of bandpass"
-			verbLevel="1"
-			required="True"/>
-	</table>
-    <data id="publish_photosys_orig" updating="True">
-        <!-- <make table="photosys"/> -->
-    </data>
-
-
- 	<table id="objects" onDisk="True" adql="Hidden">
-		<meta name="description">External table containing objects</meta>
-		<column name="id" type="integer"
-			ucd="meta.id;meta.main" 
-			tablehead="internal id" 
-			description="Object id in the original table" 
-			verbLevel="1" 
-			required="True"/>
-
-		<column name="gaia_name" type="text"
-			ucd="meta.id" 
-			tablehead="Gaia DR3 ID" 
-			description="Gaia DR3 identifier" 
-			verbLevel="1" 
-			required="True"/>
-
-		<column name="coordequ" type="spoint"
-			ucd="pos.eq;meta.main"
-			tablehead="coordequ" 
-			description="Equatorial coordiantes ICRS in the original table (rad, rad)" 
-			verbLevel="1" 
-			required="False"/>
-	</table>
-
-	<data id="publish_objects_orig" updating="True">
-		<!-- <make table="objects"/> -->
- 	</data>
-
-	<table id="observations" onDisk="True" adql="Hidden">
-		<meta name="description">External table containing information on fits-images</meta>
-		<column name="id" type="integer"
-			ucd="meta.id;meta.main"
-			tablehead="internal id"
-			description="Image id in the original table"
-			verbLevel="1"
-			required="True"/>
-
-		<column name="dateobs" type="timestamp"
-			ucd="time.epoch" 
-			tablehead="dateobs" 
-			description="Timestamp with timezone" 
-			verbLevel="1" 
-			required="True"/>
-
-		<column name="accumtime" type="real" 
-			ucd="time.duration;obs.exposure"
-			unit="s"
-			tablehead="accumtime" 
-			description="Image accumulation time" 
-			verbLevel="1" 
-			required="True"/>
-
-		<column name="fov" type="spoint"
-			ucd="pos.angdistance;instr.fov"
-			tablehead="FOV" 
-			description="Field of view of the image along axes (1,2)" 
-			verbLevel="1" 
-			required="True"/>
-
-		<column name="band" type="text"
-			ucd="meta.id;instr.filter"
-			tablehead="filter"
-			description="photometric filter from the fits-header"
-			verbLevel="1"
-			required="True"/>
-
-		<column name="coordequ" type="spoint"
-			ucd="pos.eq;meta.main"
-			tablehead="coordequ" 
-			description="Equatorial coordiantes ICRS in the original table (rad, rad)" 
-			verbLevel="1" 
-			required="False"/>
-
-		<column name="filename" type="text"
-			ucd="meta.id;meta.file"
-			tablehead="filename"
-			description="File name of the fits"
-			verbLevel="14"
-			required="False"/>
-
-		<column name="path_to_fits" type="text"
-			ucd="meta.ref;meta.file"
-			tablehead="file path"
-			description="Fits file path"
-			verbLevel="14"
-			required="False"/>
-	</table>
-
-	<data id="publish_obsevations_orig" updating="True">
-		<!-- <make table="observations"/> -->
-	</data>
-
 <!-- I want to implement siap2, so I need a View, correct? The reason why I
 don't actually want to make this table from scratch is obsevation_id -
 which is used to join lightcurves points with fits images. They are in the
@@ -335,60 +207,11 @@ existing database -->
 		<publish render="siap2.xml" sets="ivo_managed"/>
 
 		<dbCore queriedTable="observations_siap2">
-		<FEED source="//siap2#parameters"/>
-		<condDesc buildFrom="band"/>
-		<condDesc buildFrom="airmass"/>
-	</dbCore>
-</service>
-
-
-
- 	<table id="lightcurves" onDisk="True" adql="Hidden">
-		<meta name="description">External table containing lightcurves</meta>
-
-		<column name="id" type="bigint" 
-				ucd="meta.id;meta.main" 
-				tablehead="internal id"
-				description="lightcurve point id in the original table" 
-				verbLevel="1" 
-				required="True"/>
-
-		<column name="object_id" type="integer" 
-				ucd="meta.id" 
-				tablehead="object id" 
-				description="object id from the original objects table" 
-				verbLevel="1" 
-				required="True"/>
-
-		<column name="dateobs" type="timestamp" 
-				ucd="time.epoch" 
-				tablehead="dateobs" 
-				description="Barycentric time; timestamp with timezone" 
-				verbLevel="1" 
-				required="True"/>
-
-		<column name="magnitude" type="real" 
-				ucd="phot.mag"
-				unit="mag"
-				tablehead="magnitude" 
-				description="stellar magnitude" 
-				verbLevel="1" 
-				required="True"/>
-
-		<column name="mag_err" type="double precision"
-				ucd="stat.error;phot.mag"
-				unit="mag"
-				tablehead="magnitude" 
-				description="stellar magnitude" 
-				verbLevel="1" 
-				required="False"/>
-
-	</table>
-
-	<data id="publish_lightcurves_orig" updating="True">
-		<!-- <make table="lightcurves"/> -->
-	</data>
-
+			<FEED source="//siap2#parameters"/>
+			<condDesc buildFrom="band"/>
+			<condDesc buildFrom="airmass"/>
+		</dbCore>
+	</service>
 
 	<table id="raw_data" adql="True" onDisk="True" namePath="//ssap#instance">
 		<meta name="description">A view over lightcurves and objects for SSA/ObsCore ingestion</meta>
@@ -458,13 +281,6 @@ existing database -->
 			description="Declination (double precision floating-point number)"
 			verbLevel="1"/>
 
-<!--
-		<column name="p_filename" type="text"
-			ucd="meta.id;meta.file"
-			tablehead="file name"
-			description="Fits file name"
-			verbLevel="14"/>
--->
 		<!-- note 1: accref = ...upjs_vo/q/object_id path for (future) product (lightcurve) this is carmenes-style
 					'upjs_vo/q/' || o.id || '/' || p.band AS accref,
 					 accref = '\getConfig{web}{serverURL}/bgds/l2/tsdl/dlget?ID='|| obs_id  - bgds-style
@@ -643,8 +459,20 @@ existing database -->
 		    <param original="ts_ssa.ssa_location"/>
 
 	        <!-- Add my columns -->
-    	    <column original="lightcurves.mag_err"/>
-			<column original="observations.filename"/>
+			<column name="mag_err" type="double precision"
+				ucd="stat.error;phot.mag"
+				unit="mag"
+				tablehead="magnitude" 
+				description="stellar magnitude error" 
+				verbLevel="1" 
+				required="False"/>
+
+			<column name="filename" type="text"
+				ucd="meta.id;meta.file"
+				tablehead="filename"
+				description="File name of the fits"
+				verbLevel="14"
+				required="False"/>
 
 			<column name="access_url" type="text"
 				ucd="meta.ref.url"
@@ -696,7 +524,7 @@ existing database -->
 					print(f"\n===================== build-ts == {obsId=} {object=} {passband=}\n")
 					with base.getTableConn() as conn:
 						for row in conn.queryToDicts(
-							"SELECT l.dateobs as dateobs, magnitude AS phot, mag_err, airmass, "
+							"SELECT l.dateobs as dateobs, magnitude AS phot, mag_err, filename, airmass, "
 							" \sqlquote{\internallink{/getproduct/}} || gavo_urlescape(i.access_url) as access_url"
 							"  FROM \schema.lightcurves AS l"
 							" JOIN \schema.photosys AS p ON p.id = l.photosys_id"
