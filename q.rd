@@ -217,8 +217,8 @@
 		TODO: check region, I den't have it yet
 	-->
 	<STREAM id="instance-template">
-		<table id="instance-\band" onDisk="False">
-			<!-- metadata modified by sdl's dataFunction
+		<table id="instance_\band_short" onDisk="False">
+			<!-- metadata modified by sdl's dataFunction -->
 			<meta name="description">The \metaString{source} lightcurve in the
 			\band_human filter </meta>
 
@@ -272,7 +272,7 @@
 		</STREAM>
 
 	<!-- instantiate for a few bands - take names from https://svo2.cab.inta-csic.es/theory/fps/ ??? -->
-	<LOOP source="time-series-template">
+	<LOOP source="instance-template">
 		<csvItems>
 			band_short, band_human, band_ucd, effective_wavelength
 			U, 			Bessell/U, em.opt.U, 3.6e-7
@@ -286,12 +286,6 @@
 			i_sdss,		   i/sdss, em.opt.I, 7.49e-7
 			z_sdss,		   z/sdss, em.opt.I, 8.96e-7
 		</csvItems>
-
-		<events>
-			<FEED source="instance-template" band="\band_short"
-				band_human="\band_human" effective_wavelength="\effective_wavelength"
-				band_ucd="\band_ucd"/>
-		</events>
 	</LOOP>
 		
 	<data id="build-ts" auto="False">
@@ -308,11 +302,10 @@
 					print(f"\n===================== build-ts == {obsId=} {object=} {passband=}\n")
 					with base.getTableConn() as conn:
 						for row in conn.queryToDicts(
-							"SELECT l.dateobs as dateobs, magnitude AS phot, mag_err, airmass, "
-							" origin_image"
-							"  FROM \schema.lightcurves AS l"
+							"SELECT l.dateobs as dateobs, magnitude AS phot, mag_err, "
+							" 99.99 AS airmass, image_filename AS origin_image"
+							" FROM \schema.lightcurves AS l"
 							" JOIN \schema.photosys AS p ON p.id = l.photosys_id"
-							" JOIN \schema.observations_siap2 AS i ON i.observation_id = l.observation_id"
 							"  WHERE object_id=%(object)s AND p.band=%(passband)s"
 							" ORDER BY l.dateobs",
 							{"object": object, "passband": passband}		# locals()
