@@ -112,7 +112,7 @@
 				o.coordequ AS ssa_location,
 				NULL::spoly AS ssa_region,
 				'\getConfig{web}{serverURL}/\rdId/sdl/dlget?ID=' || o.id || '/' || p.band AS accref,
-				'\pubDIDBase' || o.id || '/' || p.band AS ssa_pubdid,
+				'\pubDIDBase' || 'upjs/ts/' || o.id || '/' || p.band AS ssa_pubdid,
 				'application/x-votable+xml' AS mime,
 				50000 AS accsize,
 				NULL AS embargo,
@@ -216,13 +216,15 @@
 		TODO: take bands parameters from to photosys table, do not doule them here
 		TODO: check region, I den't have it yet
 	-->
-	<STREAM id="time-series-template">
-		<table id="instance_\band_short" onDisk="False">
-			<meta name="description">The \metaString{source} lightcurve in the \band_human filter </meta>
+	<STREAM id="instance-template">
+		<table id="instance-\band" onDisk="False">
+			<!-- metadata modified by sdl's dataFunction
+			<meta name="description">The \metaString{source} lightcurve in the
+			\band_human filter </meta>
 
-       <!-- JK: define them _before_ mentioning them the mixin -->
-		    <param original="ts_ssa.ssa_bandpass"/>
-		    <param original="ts_ssa.ssa_specmid"/>
+    	<!-- JK: define them _before_ mentioning them the mixin -->
+	  	<param original="ts_ssa.ssa_bandpass"/>
+	  	<param original="ts_ssa.ssa_specmid"/>
 			<mixin
 				effectiveWavelength="\effective_wavelength"
 				filterIdentifier='"\band_human"'
@@ -237,11 +239,11 @@
 				timescale="TCB"
 			>//timeseries#phot-0</mixin>
 
-		    <param original="ts_ssa.t_min"/>
-		    <param original="ts_ssa.t_max"/>
-		    <param original="ts_ssa.ssa_location"/>
+    	<param original="ts_ssa.t_min"/>
+	  	<param original="ts_ssa.t_max"/>
+	  	<param original="ts_ssa.ssa_location"/>
 
-	        <!-- Add my columns -->
+	      	<!-- Add my columns -->
 			<column name="mag_err" type="double precision"
 				ucd="stat.error;phot.mag"
 				unit="mag"
@@ -250,7 +252,7 @@
 				verbLevel="1"
 				required="False"/>
 
-			<column name="access_url" type="text"
+			<column name="origin_image" type="text"
 				ucd="meta.ref.url"
 				tablehead="access_url"
 				description="Path to access fits image"
@@ -262,12 +264,12 @@
 				description="Airmass of the target"
 				verbLevel="18"/>
 
-	        <!-- JK: Add also something kind of:
-	        <column original="lightcurves.process_info"/>   my jsonb from lc_metadata
-	        -->
+	      	<!-- JK: Add also something kind of:
+	      	<column original="lightcurves.process_info"/>   my jsonb from lc_metadata
+	      	-->
 
-		  </table>
-	</STREAM>
+			</table>
+		</STREAM>
 
 	<!-- instantiate for a few bands - take names from https://svo2.cab.inta-csic.es/theory/fps/ ??? -->
 	<LOOP source="time-series-template">
@@ -284,6 +286,12 @@
 			i_sdss,		   i/sdss, em.opt.I, 7.49e-7
 			z_sdss,		   z/sdss, em.opt.I, 8.96e-7
 		</csvItems>
+
+		<events>
+			<FEED source="instance-template" band="\band_short"
+				band_human="\band_human" effective_wavelength="\effective_wavelength"
+				band_ucd="\band_ucd"/>
+		</events>
 	</LOOP>
 		
 	<data id="build-ts" auto="False">
@@ -301,7 +309,7 @@
 					with base.getTableConn() as conn:
 						for row in conn.queryToDicts(
 							"SELECT l.dateobs as dateobs, magnitude AS phot, mag_err, airmass, "
-							" \sqlquote{\internallink{/getproduct/}} || gavo_urlescape(i.access_url) as access_url"
+							" origin_image"
 							"  FROM \schema.lightcurves AS l"
 							" JOIN \schema.photosys AS p ON p.id = l.photosys_id"
 							" JOIN \schema.observations_siap2 AS i ON i.observation_id = l.observation_id"
@@ -366,22 +374,13 @@
 					<code>
 						from gavo import svcs
 
-						class TSDescriptor(ProductDescriptor):	# bgds l2
+						class TSDescriptor(ProductDescriptor):
 							def __init__(self, pubDID):
-								# We accept "local" pubDIDs (without ivo://...?), too
-								print(f'\n=== {pubDID=} ====\n')
-								if pubDID.startswith("ivo://"):
-									self.pubDID = pubDID
-									# accref = urllib.parse.unquote_plus(pubDID.split("?")[-1])
-									# self.accreff = accref
-								else:
-									self.pubDID = '\pubDIDBase'+pubDID
 								self.objId = pubDID.split("/")[-2]
 								self.band = pubDID.split("/")[-1]
 								print(f'\n=== {self.pubDID=} {self.objId=} {self.band=} ====\n')
 
-								self.suppressAutoLinks = True	# I don't know what this means, just copy
-								# print(f'============= {accref=} ======\n')
+								self.suppressAutoLinks = True	# We're not in the products table
 								with base.getTableConn() as conn:
 									res = list(conn.queryToDicts(
 										"SELECT * FROM \schema.ts_ssa WHERE ssa_pubDID=%(pubdid)s",
@@ -439,7 +438,6 @@
 			</metaMaker>
 
 			<!--
-			"#this" and #preview content comes automatically from the dc.products table
 			dataFunction is executed by dlget (?)
 			The lightcurve sits in the PrimaryTable (?)
 			dataFunction is stolen from bgds/l2
@@ -451,9 +449,9 @@
 					# descriptor is from metaMaker as input parameters for
 					# build-ts sourceToken
 
-					# descriptor.data = rsc.makeData(
-					#	rd.getById("build-ts"),
-					#	forceSource=descriptor)
+					descriptor.data = rsc.makeData(
+						rd.getById("build-ts"),
+						forceSource=descriptor)
 
 					dd = rd.getById("build-ts")	# take build-ts block
 					# tableId = "instance_B"
