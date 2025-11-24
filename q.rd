@@ -102,6 +102,7 @@
 
 			TODO!!!! Describe also the columns accref, and other. Should I? I see them in the database, but do not in TOPCAT
 			JK: AAAAA!!! How does this macro work _inside_ the quoted string???? But it does!
+				'\getConfig{web}{serverURL}/\rdId/sdl/dlget?ID=' || o.id || '/' || p.band AS accref,
  		-->
 		<viewStatement>
 			CREATE OR REPLACE VIEW \curtable AS (
@@ -111,7 +112,7 @@
 				'Gaia DR3 ' || o.gaia_name AS ssa_targname,
 				o.coordequ AS ssa_location,
 				NULL::spoly AS ssa_region,
-				'\getConfig{web}{serverURL}/\rdId/sdl/dlget?ID=' || o.id || '/' || p.band AS accref,
+				'\getConfig{web}{serverURL}/\rdId/sdl/dlget?ID=' || '\pubDIDBase' || 'upjs/ts/' || o.id || '/' || p.band AS accref,
 				'\pubDIDBase' || 'upjs/ts/' || o.id || '/' || p.band AS ssa_pubdid,
 				'application/x-votable+xml' AS mime,
 				50000 AS accsize,
@@ -257,7 +258,8 @@
 				tablehead="access_url"
 				description="Path to access fits image"
 				verbLevel="1"
-				required="False"/>
+				required="False"
+				displayHint="type=product"/>
 
 			<column name="airmass"
 				ucd="obs.airMass"
@@ -303,7 +305,7 @@
 					with base.getTableConn() as conn:
 						for row in conn.queryToDicts(
 							"SELECT l.dateobs as dateobs, l.magnitude AS phot, l.mag_err, "
-							" 99.99 AS airmass, l.image_filename AS origin_image"
+							" 99.99 AS airmass, 'upjs_vo/' || l.image_filename AS origin_image"
 							" FROM \schema.lightcurves AS l"
 							" JOIN \schema.photosys AS p ON p.id = l.photosys_id"
 							"  WHERE object_id=%(object)s AND p.band=%(passband)s"
@@ -374,7 +376,8 @@
 					print(f'==================== metaMaker semantics=#this {acrf=}')
 					yield descriptor.makeLink(
 					descriptor.metadata["accref"],	# JK: seems, I already have it
-					description=f"Kolonica time series for {descriptor.objId} in {descriptor.band}",
+					# description=f"Kolonica time series for {descriptor.objId} in {descriptor.band}",
+					description=f"Kolonica time series",
 					contentType="application/x-votable+xml",
 					contentLength="15000",
 					contentQualifier="#timeseries")
