@@ -38,6 +38,13 @@
       <rowfilter procDef="//products#define">
         <bind key="table">"\schema.main"</bind>
       </rowfilter>
+
+      <rowfilter>
+      	<code>
+      		if "CRVAL1" in row:
+      			yield row
+      	</code>
+      </rowfilter>
     </fitsProdGrammar>
 
     <make table="main">
