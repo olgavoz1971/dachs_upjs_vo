@@ -32,16 +32,9 @@
   </coverage>
 
   <data id="import" updating="True">
+    <sources pattern="data/*.fit" recurse="True"/>
 
-    <sources pattern="data/*.fit*" recurse="True"/>
-
-<!--    <sources recurse="True"> 
-       <pattern>"data/*.fit"</pattern>
-       <pattern>"data/*.fit.fz"</pattern>
-    </sources>
--->
-
-    <fitsProdGrammar qnd='False'>
+    <fitsProdGrammar>
       <rowfilter procDef="//products#define">
         <bind key="table">"\schema.main"</bind>
       </rowfilter>
