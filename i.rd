@@ -60,10 +60,10 @@
           "R": "Bessell R",
           "I": "Bessell I",
           "u_sdss": "SDSS u",
-          "g_sdss": "SDSS g",
-          "r_sdss": "SDSS r",
-          "i_sdss": "SDSS i",
-          "z_sdss": "SDSS z",}</bind>
+          "g": "SDSS g",
+          "r": "SDSS r",
+          "i": "SDSS i",
+          "z": "SDSS z",}</bind>
         </apply>
 
         <apply procDef="//siap2#setMeta">
