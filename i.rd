@@ -21,10 +21,7 @@
 
   <table id="main" onDisk="True" adql="True">
     <mixin have_bandpass_id="True">//siap2#pgs</mixin>
-    <!-- Comment in the following element once you're ready to publish;
-      it will add your data to the obscore view
     <mixin preview="NULL">//obscore#publishObscoreLike</mixin>
-    -->
   </table>
 
   <coverage>
@@ -33,13 +30,10 @@
 
   <data id="import" updating="True">
 
-    <sources pattern="data/*.fit*" recurse="True"/>
-
-<!--    <sources recurse="True"> 
-       <pattern>"data/*.fit"</pattern>
-       <pattern>"data/*.fit.fz"</pattern>
+    <sources recurse="True">
+       <pattern>data/*.fit</pattern>
+       <pattern>data/*.fit.fz</pattern>
     </sources>
--->
 
     <fitsProdGrammar qnd='False'>
       <rowfilter procDef="//products#define">
@@ -47,10 +41,10 @@
       </rowfilter>
 
       <rowfilter>
-      	<code>
-      		if "CRVAL1" in row:
-      			yield row
-      	</code>
+        <code>
+          if "CRVAL1" in row:
+            yield row
+        </code>
       </rowfilter>
     </fitsProdGrammar>
 

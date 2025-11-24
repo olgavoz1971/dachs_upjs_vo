@@ -33,7 +33,7 @@
  	<meta name="productType">timeseries</meta>
  	<meta name="ssap.testQuery">MAXREC=1</meta>
 
- 	<!-- Define my existing database tables structure 
+ 	<!-- Define my existing database tables structure
 	I should also do this from outside of RD
 		GRANT SELECT ON upjs_vo.lightcurves TO gavoadmin WITH GRANT OPTION;
 		GRANT SELECT ON upjs_vo.objects TO gavoadmin WITH GRANT OPTION;
@@ -41,183 +41,12 @@
 		GRANT SELECT ON upjs_vo.photosys TO gavoadmin WITH GRANT OPTION;
 		GRANT SELECT ON upjs_vo.photosys TO gavo;
 	-->
- 
-<!-- I want to implement siap2, so I need a View, correct? The reason why I
-don't actually want to make this table from scratch is obsevation_id -
-which is used to join lightcurves points with fits images. They are in the
-existing database -->
-
-	<table id="observations_siap2" onDisk="True" adql="True">
-		<meta name="description">SIAP2 view on the observations table</meta>
-		<mixin>//siap2#pgs</mixin>			<!-- JK: All this into one heap????? siap2 + products table???  -->
-		<mixin>//products#table</mixin>		<!-- form carmenes -->
-		<mixin preview="access_url || '?preview=True'"
-			>//obscore#publishObscoreLike</mixin>
-		<FEED source="//scs#spoint-index-def" ra="s_ra" dec="s_dec"/>
-		<index columns="s_region" method="GIST"/>
-
-		<column name="observation_id" type="integer"
-			description="Observation id in the original observations table"
-			ucd="meta.id;meta.main" 
-			tablehead="internal id" 
-			verbLevel="1" 
-			required="True"/>
-
-		<column name="airmass"
-			ucd="obs.airMass"
-			description="Airmass of the target"
-			verbLevel="18"/>
-
-		<column name="band" type="text"
-			ucd="meta.id;instr.filter"
-			tablehead="filter"
-			description="photometric filter from the fits-header"
-			verbLevel="1"
-			required="True"/>
-
-		<!-- This is extra HJust to pass import, where I stuck
-		<column name="accref" type="text"
-			ucd="meta.id"
-			tablehead="accref"
-			description="some extra accref"
-			verbLevel="1"
-			required="True"/>
-		-->
-
-		<column original="//obscore#ObsCore.t_min"/>
-		<column original="//obscore#ObsCore.t_max"/>
-
-		<!-- fill fields from header-realted table 
-				'\getConfig{web}{serverURL}/\rdId' || path_to_fits || '/' || filename AS access_url,
-				pgsphere.SPoint.fromDALI(coordequ, degrees(fov[0])/60) AS s_region,
-
-				em_min, em_max - use //siap#getBandFromFilter to fill them
-				NULL::spoly AS s_region,	
-				scircle(coordequ, radians(s_fov/2)) AS s_region,
-
-		-->
-		<viewStatement>
-            CREATE MATERIALIZED VIEW \curtable AS
-            SELECT 
-				band,
-				observation_id, 
-				t_exptime,
-				t AS t_min,
-				t AS t_max,
-				s_fov,
-				spoly(
-					'{(' || (ra_rad - radians(s_fov/2)) || ',' || (dec_rad - radians(s_fov/2)) || '),'
-					|| '(' || (ra_rad - radians(s_fov/2)) || ',' || (dec_rad + radians(s_fov/2)) || '),'
-					|| '(' || (ra_rad + radians(s_fov/2)) || ',' || (dec_rad + radians(s_fov/2)) || '),'
-					|| '(' || (ra_rad + radians(s_fov/2)) || ',' || (dec_rad - radians(s_fov/2)) || ')'
-					|| '}'
-					)::spoly AS s_region,
-				NULL AS s_resolution,
-				NULL AS t_resolution,
-				3.5E-7 AS em_min,
-				8.0E-7 AS em_max,
-				NULL AS em_res_power,
-				'phot.flux.density' AS o_ucd,
-				NULL AS pol_states,
-				instrument_name,
-				facility_name,
-				airmass,
-				s_xel1,
-				s_xel2,
-				1 AS t_xel,
-				1 AS em_xel,
-				1 AS pol_xel,
-				s_pixel_scale,
-				NULL AS em_ucd,
-				'\schema.observations_siap2' AS source_table,
-				'image' AS dataproduct_type,
-				NULL AS dataproduct_subtype,
-				1 AS calib_level,
-				'Kolonica' AS obs_collection,
-				'Kolonica CCD placeholder' AS obs_title,
-				target_name,
-				'star' AS target_class,
-				NULL AS obs_creator_did,
-				access_url,
-				'application/fits' AS access_format,
-				(accsize / 1024)::int AS access_estsize,
-				'\pubDIDBase' || access_url AS obs_publisher_did,
-				'\pubDIDBase' || access_url AS obs_id,
-				access_url AS accref,
-				NULL as owner,
-				NULL as embargo,
-				accsize,
-				'image/fits' AS mime,
-				degrees(ra_rad) AS s_ra,
-				degrees(dec_rad) AS s_dec
-			FROM (
-				SELECT
-					band,
-					o.id AS observation_id,
-					accumtime AS t_exptime,
-					extract(julian from dateobs at time zone 'UTC+12') - 2400000.5 AS t,
-					coordequ,
-					long(coordequ) AS ra_rad,
-					lat(coordequ) AS dec_rad,
-					LEAST(degrees(fov[0]), degrees(fov[1])) AS s_fov,
-					(m.data->>'INSTRUME') AS instrument_name,
-					(m.data->>'TELESCOP') AS facility_name,
-					round((m.data->>'AIRMASS')::numeric, 2) AS airmass,
-					(m.data->>'NAXIS1')::int AS s_xel1,
-					(m.data->>'NAXIS2')::int AS s_xel2,
-					((m.data->>'XPIXSZ')::float / ((m.data->>'FOCALLEN')::float * 1000)) * 206265 AS s_pixel_scale,
-					(m.data->>'OBJECT') AS target_name,
-					replace(path_to_fits, '/home/skvo/data/upjs', 'upjs_vo/data') || '/' || filename AS access_url,
-					FLOOR((m.data->>'BITPIX')::int / 8.0 * (m.data->>'NAXIS1')::int * (m.data->>'NAXIS2')::int)::int AS accsize
-				FROM \schema.observations AS o
-				JOIN \schema.metadata_obs_json AS m ON o.id = m.observation_id
-			) AS foo;
-		</viewStatement>
-	</table>
-
-	<data id="create-observations-view">	
-		<make table="observations_siap2">	<!-- from carmenes - Seems, I need to do this mannually  -->
-			<script type="preImport" lang="SQL">
-				DELETE FROM dc.products WHERE sourcetable='upjs_vo.observations_siap2'
-			</script>
-			<script type="postCreation" lang="SQL" name="add to product table">
-				INSERT INTO dc.products (SELECT
-					accref,
-					owner,
-					NULL as embargo,
-					mime,
-					accref as accesspath,
-					source_table as sourcetable,
-					NULL as preview,
-					NULL as datalink,
-					'image/png' as preview_mime
-				FROM upjs_vo.observations_siap2);					
-			</script>
-		</make>
-	</data>
-
-	<service id="s" allowed="form,siap2.xml">
-		<meta name="shortName">My shiny SIAP2 service</meta>
-		<meta name="sia.type">Pointed</meta>
-		<meta name="testQuery.pos.ra">258.5</meta>
-		<meta name="testQuery.pos.dec">76.8</meta>
-		<meta name="testQuery.size.ra">0.1</meta>
-		<meta name="testQuery.size.dec">0.1</meta>
-
-		<publish render="siap2.xml" sets="ivo_managed"/>
-
-		<dbCore queriedTable="observations_siap2">
-			<FEED source="//siap2#parameters"/>
-			<condDesc buildFrom="band"/>
-			<condDesc buildFrom="airmass"/>
-		</dbCore>
-	</service>
 
 	<table id="raw_data" adql="True" onDisk="True" namePath="//ssap#instance">
 		<meta name="description">A view over lightcurves and objects for SSA/ObsCore ingestion</meta>
 
 		<!-- list of metadata varying across datasets -->
-		<LOOP listItems="ssa_dstitle ssa_targname ssa_pubDID ssa_length ssa_timeExt ssa_bandpass 
+		<LOOP listItems="ssa_dstitle ssa_targname ssa_pubDID ssa_length ssa_timeExt ssa_bandpass
 					ssa_specmid ssa_csysName">
  			<events>
 				<column original="\item"/>
@@ -227,7 +56,6 @@ existing database -->
 		<column original="//obscore#ObsCore.t_min"/>
 		<column original="//obscore#ObsCore.t_max"/>
 
-		<!-- <mixin>//products#table</mixin>	JK: I wonder if I really need products if I deal with on-the-fly data only -->
 		<mixin>//ssap#plainlocation</mixin>		<!-- injects ssa_location -->
 		<mixin>//ssap#simpleCoverage</mixin>	<!-- ssa_region -->
 
@@ -259,7 +87,7 @@ existing database -->
 			verbLevel="1"
 			required="True"/>	<!-- think more about this, I really need this to produce lightcurve -->
 		
-		<column name="p_mean_mag" type="double precision" 
+		<column name="p_mean_mag" type="double precision"
 			ucd="phot.mag;stat.mean"
 			unit="mag"
 			tablehead="mean magnitude"
@@ -267,26 +95,12 @@ existing database -->
 			verbLevel="1"
 			required="True"/>	<!-- And this column is worth showing to users -->
 
-		<column name="p_ra" type="double precision"
-			unit="deg"
-			ucd="pos.eq.ra;meta.main"
-			tablehead="RA"
-			description="Right Ascension (double precision floating-point number)"
-			verbLevel="1"/>
-
-		<column name="p_dec" type="double precision"
-			unit="deg"
-			ucd="pos.eq.dec;meta.main"
-			tablehead="Dec"
-			description="Declination (double precision floating-point number)"
-			verbLevel="1"/>
-
 		<!-- note 1: accref = ...upjs_vo/q/object_id path for (future) product (lightcurve) this is carmenes-style
 					'upjs_vo/q/' || o.id || '/' || p.band AS accref,
 					 accref = '\getConfig{web}{serverURL}/bgds/l2/tsdl/dlget?ID='|| obs_id  - bgds-style
 					'\getConfig{web}{serverURL}/upjs_vo/q/sdl/dlget?ID=' || o.id || '/' || p.band AS accref,
 
-			TODO!!!! Describe also the columns accref, and other. Should I? I see them in the database, but do not in TOPCAT 
+			TODO!!!! Describe also the columns accref, and other. Should I? I see them in the database, but do not in TOPCAT
 			JK: AAAAA!!! How does this macro work _inside_ the quoted string???? But it does!
  		-->
 		<viewStatement>
@@ -328,45 +142,14 @@ existing database -->
 				) AS q
 				JOIN \schema.objects AS o ON o.id = q.object_id
 				JOIN \schema.photosys AS p ON p.id = q.photosys_id
-			);
+			)
 		</viewStatement>
 	</table>
 
-
-	<!-- if you have data that is continually added to, consider using
-		updating="True" and an ignorePattern here; see also howDoI.html,
-		incremental updating.
-		<data id="import">  
-	-->
-
-	<data id="create-raw-view">			<!-- stolen from carmenes t.rd -->
-		<recreateAfter>make-ssa-view</recreateAfter>	<!-- make_ssa_view should be called after this -->
+	<data id="create-raw-view">
+		<recreateAfter>make-ssa-view</recreateAfter>
 		<property key="previewDir">previews</property>
-
-		<make table="raw_data">		
-		<!-- 
-			do this manually because we din't have place for rowfilter //products#define 
-			<script type="preImport" lang="SQL">
-				DELETE FROM dc.products WHERE sourcetable='upjs_vo.raw_data';
-			</script>
-
-			Do I really  need this stuff? Let;s try to do without it
-			<script type="postCreation" lang="SQL" name="add to product table">
-				INSERT INTO dc.products (SELECT
-					accref,
-					owner,
-					NULL AS embargo,
-					mime,
-					\sqlquote{\internallink{/upjs_vo/q/sdl/dlget?ID=}} ||
-						gavo_urlescape(accref) AS accesspath,
-					'upjs_vo.raw_data' AS sourcetable,
-					'upjs_vo/previews/' || accref || '.png' AS preview,
-					NULL AS datalink,
-					'image/png' AS preview_mime
-				FROM upjs_vo.raw_data);
-			</script>
-		-->
-		</make>
+		<make table="raw_data"/>		
 	</data>
 
 	<table id="ts_ssa" onDisk="True" adql="True">		<!-- also stolen from carmenes t.rd  -->
@@ -419,13 +202,13 @@ existing database -->
 	</coverage>
 
 
-	<!-- JK: Try to build separate templates for different bands 
-		stolen from bgds/l 
+	<!-- JK: Try to build separate templates for different bands
+		stolen from bgds/l
 		This template is for the table definition *for a single time series* as used
 		by datalink.
 
 		TODO: fill this properly
-		zeroPointFlux - Flux at the given zero point, in Jy 
+		zeroPointFlux - Flux at the given zero point, in Jy
 		effectiveWavelength - Central wavelength - take it from the photsys table
 
 		TODO: ssa_targname is not seen there, do something to fix that issue
@@ -462,9 +245,9 @@ existing database -->
 			<column name="mag_err" type="double precision"
 				ucd="stat.error;phot.mag"
 				unit="mag"
-				tablehead="magnitude" 
-				description="stellar magnitude error" 
-				verbLevel="1" 
+				tablehead="magnitude"
+				description="stellar magnitude error"
+				verbLevel="1"
 				required="False"/>
 
 			<column name="access_url" type="text"
@@ -503,8 +286,8 @@ existing database -->
 		</csvItems>
 	</LOOP>
 		
-	<data id="build-ts" auto="False"> 
-		<!-- stolen from carmenes 
+	<data id="build-ts" auto="False">
+		<!-- stolen from carmenes
 		note 1: parmaker copies values from the SSA input row to the params in the instance table.
         note 2: pargetter gets parameters from the related row of the parent table (ssa-table) to fill instance table metadata
 		-->
@@ -539,7 +322,7 @@ existing database -->
 			</pargetter>
 		</embeddedGrammar>
 
-		<make table="instance_U">	<!-- just a placeholder, we don't have the bare "instance" table 
+		<make table="instance_U">	<!-- just a placeholder, we don't have the bare "instance" table
 			tut: this is really overridden in the datalink service's data function to select the actual table definition -->
 			<rowmaker idmaps="*" id="make-ts"/>
 			
@@ -644,7 +427,7 @@ existing database -->
 				</code>
 			</metaMaker>
 
-			<!-- I don't have fits_accref yet, TODO --> 
+			<!-- I don't have fits_accref yet, TODO -->
 
 			<metaMaker name="add_periodogram" semantics="#derivation">
 				<!-- todo -->
@@ -655,8 +438,8 @@ existing database -->
 				</code>
 			</metaMaker>
 
-			<!-- 
-			"#this" and #preview content comes automatically from the dc.products table 
+			<!--
+			"#this" and #preview content comes automatically from the dc.products table
 			dataFunction is executed by dlget (?)
 			The lightcurve sits in the PrimaryTable (?)
 			dataFunction is stolen from bgds/l2
@@ -675,7 +458,7 @@ existing database -->
 					dd = rd.getById("build-ts")	# take build-ts block
 					# tableId = "instance_B"
 					tableId = "instance_" + descriptor.band		# rd.getById(tableId) picks up an appropriate instance table
-					descriptor.data = rsc.Data.createWithTable(dd, rd.getById(tableId)) # here is the magic for dispathing between instance tables 
+					descriptor.data = rsc.Data.createWithTable(dd, rd.getById(tableId)) # here is the magic for dispathing between instance tables
 					descriptor.data = rsc.makeData(dd, data=descriptor.data, forceSource=descriptor)	# runs all this stuff?
 
 					# tab = descriptor.data.getPrimaryTable()
@@ -723,7 +506,7 @@ existing database -->
 					<values fromdb="ssa_targname from \schema.ts_ssa
 						order by ssa_targname limit 10"/>
 				</inputKey>
-			</condDesc> 
+			</condDesc>
 
 		</dbCore>
 		<outputTable>
