@@ -289,26 +289,26 @@
 	</LOOP>
 		
 	<data id="build-ts" auto="False">
-		<!-- stolen from carmenes
-		note 1: parmaker copies values from the SSA input row to the params in the instance table.
-        note 2: pargetter gets parameters from the related row of the parent table (ssa-table) to fill instance table metadata
+		<!--
+		note 1: parmaker copies values from the SSA input row to the params in the
+			instance table.
 		-->
 		<embeddedGrammar>
 			<iterator>
 				<code>
-					obsId = self.sourceToken.accref.split('ID=')[-1]	# self.sourceToken points to the clicked ssa_table row
-					object = obsId.split("/")[-2]
-					passband = obsId.split("/")[-1]	# TODO use this as a band
-					print(f"\n===================== build-ts == {obsId=} {object=} {passband=}\n")
+					parts = self.sourceToken.metadata["ssa_pubdid"].split('/')
+					passband = parts[-1]
+					object = parts[-2]
+
 					with base.getTableConn() as conn:
 						for row in conn.queryToDicts(
-							"SELECT l.dateobs as dateobs, magnitude AS phot, mag_err, "
-							" 99.99 AS airmass, image_filename AS origin_image"
+							"SELECT l.dateobs as dateobs, l.magnitude AS phot, l.mag_err, "
+							" 99.99 AS airmass, l.image_filename AS origin_image"
 							" FROM \schema.lightcurves AS l"
 							" JOIN \schema.photosys AS p ON p.id = l.photosys_id"
 							"  WHERE object_id=%(object)s AND p.band=%(passband)s"
 							" ORDER BY l.dateobs",
-							{"object": object, "passband": passband}		# locals()
+							{"object": object, "passband": passband}
 						):
 							dt = row["dateobs"]
 							dt_utc = dt.astimezone(datetime.timezone.utc) # I should have thrown out this trash
@@ -318,7 +318,7 @@
 			</iterator>
 			<pargetter>
 				<code>
-					return self.sourceToken.ssa_row
+					return self.sourceToken.metadata
 				</code>
 			</pargetter>
 		</embeddedGrammar>
@@ -362,41 +362,18 @@
         </meta>
 
 		<datalinkCore>
-			<descriptorGenerator>
-				<setup>
-					<code>
-						from gavo import svcs
-
-						class TSDescriptor(ProductDescriptor):
-							def __init__(self, pubDID):
-								self.objId = pubDID.split("/")[-2]
-								self.band = pubDID.split("/")[-1]
-								print(f'\n=== {self.pubDID=} {self.objId=} {self.band=} ====\n')
-
-								self.suppressAutoLinks = True	# We're not in the products table
-								with base.getTableConn() as conn:
-									res = list(conn.queryToDicts(
-										"SELECT * FROM \schema.ts_ssa WHERE ssa_pubDID=%(pubdid)s",
-										{"pubdid": self.pubDID}))
-								if not res:
-									raise svcs.UnknownURI("No timeseries for %s" % self.pubDID)
-								self.ssa_row = res[0]
-								self.accref = self.ssa_row['accref']
-								print(f'============= {self.ssa_row=} ==============')
-					</code>
-				</setup>
-				<code>
-					return TSDescriptor(pubDID)		# this turns into descriptor I will use below
-				</code>
+			<descriptorGenerator procDef="//datalink#fromtable">
+				<bind key="tableName">"\schema.ts_ssa"</bind>
+				<bind key="idColumn">"ssa_pubdid"</bind>
 			</descriptorGenerator>
 
 			<!-- We should do #this explicitly without products table -->
 			<metaMaker semantics="#this">
 				<code>
-					acrf = descriptor.ssa_row["accref"]
+					acrf = descriptor.metadata["accref"]
 					print(f'==================== metaMaker semantics=#this {acrf=}')
 					yield descriptor.makeLink(
-					descriptor.ssa_row["accref"],	# JK: seems, I already have it
+					descriptor.metadata["accref"],	# JK: seems, I already have it
 					description=f"Kolonica time series for {descriptor.objId} in {descriptor.band}",
 					contentType="application/x-votable+xml",
 					contentLength="15000",
@@ -438,23 +415,14 @@
 			<dataFunction>
 				<setup imports="gavo.rsc"/>
 				<code>
-					# actually calls data's "build-ts" block
-					# descriptor is from metaMaker as input parameters for
-					# build-ts sourceToken
-
+					bandid = descriptor.metadata["ssa_pubdid"].split("/")[-1]
+					dd = rd.getById("build-ts")
+					descriptor.data = rsc.Data.createWithTable(dd,
+						rd.getById("instance_"+bandid))
 					descriptor.data = rsc.makeData(
-						rd.getById("build-ts"),
+						dd,
+						data=descriptor.data,
 						forceSource=descriptor)
-
-					dd = rd.getById("build-ts")	# take build-ts block
-					# tableId = "instance_B"
-					tableId = "instance_" + descriptor.band		# rd.getById(tableId) picks up an appropriate instance table
-					descriptor.data = rsc.Data.createWithTable(dd, rd.getById(tableId)) # here is the magic for dispathing between instance tables
-					descriptor.data = rsc.makeData(dd, data=descriptor.data, forceSource=descriptor)	# runs all this stuff?
-
-					# tab = descriptor.data.getPrimaryTable()
-					# tab.setMeta("description",
-					# 	base.getMetaText(tab, "description").format(**descriptor.ssa_row))
 				</code>
 			</dataFunction>
 
