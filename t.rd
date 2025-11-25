@@ -75,8 +75,9 @@
     <column name="quality" type="integer"
       ucd="meta.code.qual"
       tablehead="Quality"
-      description="Quality flag"
-      required="False"/>
+      description="Quality flag">
+      <values nullLiteral="-1"/>
+    </column>
 
     <column name="image_filename" type="text"
       ucd="meta.id;meta.fits"
@@ -87,24 +88,16 @@
   </table>
 
   <data id="import_lightcurves">
-    <sources pattern="%resdir-relative pattern, like data/*.txt%"/>
-
-    <!-- the grammar really depends on your input material.  See
-      http://docs.g-vo.org/DaCHS/ref.html#grammars-available,
-      in particular columnGrammar, csvGrammar, fitsTableGrammar,
-      and reGrammar; if nothing else helps see embeddedGrammar
-      or customGrammar -->
-    <csvGrammar names="name1 some_other_name and_so_on"/>
-
     <make table="lightcurves">
-      <rowmaker idmaps="*">
-        <!-- the following is an example of a mapping rule that uses
-        a python expression; @something takes the value of the something
-        field returned by the grammar.  You obviously need to edit
-        or remove this concrete rule. -->
-        <!-- <map dest="%name of a column%">int(@some_other_name[2:])</map>
-        -->
-      </rowmaker>
+      <script lang="python" type="postCreation" name="Load dump">
+        table.connection.commit()
+        src = table.tableDef.rd.getAbsPath("dumps/lightcurves.dump")
+        with open(src) as f:
+          cursor = table.connection.cursor()
+          cursor.copy_expert(
+            "COPY {} FROM STDIN".format(table.tableDef.getQName()),
+            f)
+      </script>
     </make>
   </data>
 
@@ -138,50 +131,50 @@
 
     <column name="coordequ" type="spoint"
       ucd="pos.eq;meta.main"
-      tablehead="Coordequ" 
-      description="Equatorial coordiantes, ICRS" 
+      tablehead="Coordequ"
+      description="Equatorial coordiantes, ICRS"
       required="False"/>
 
     <column name="gaia_name" type="text"
-      ucd="meta.id" 
-      tablehead="Gaia DR3 ID" 
-      description="Gaia DR3 identifier" 
+      ucd="meta.id"
+      tablehead="Gaia DR3 ID"
+      description="Gaia DR3 identifier"
       required="False"/>
 
     <column name="simbad_name" type="text"
-      ucd="meta.id" 
-      tablehead="Simbad name" 
-      description="Simbad resolvable name" 
+      ucd="meta.id"
+      tablehead="Simbad name"
+      description="Simbad resolvable name"
       required="False"/>
 
     <column name="ucac4_name" type="text"
-      ucd="meta.id" 
-      tablehead="UCAC4 name" 
-      description="UCAC4 name" 
+      ucd="meta.id"
+      tablehead="UCAC4 name"
+      description="UCAC4 name"
       required="False"/>
 
     <column name="apass_name" type="text"
-      ucd="meta.id" 
-      tablehead="APASS name" 
-      description="APASS name" 
+      ucd="meta.id"
+      tablehead="APASS name"
+      description="APASS name"
       required="False"/>
 
     <column name="vsx_name" type="text"
-      ucd="meta.id" 
-      tablehead="VSX name" 
-      description="VSX name" 
+      ucd="meta.id"
+      tablehead="VSX name"
+      description="VSX name"
       required="False"/>
 
     <column name="class" type="text"
-      ucd="src.class" 
-      tablehead="Target class" 
-      description="Target class" 
+      ucd="src.class"
+      tablehead="Target class"
+      description="Target class"
       required="False"/>
 
     <column name="description" type="text"
-      ucd="meta.note" 
-      tablehead="Description" 
-      description="Target description" 
+      ucd="meta.note"
+      tablehead="Description"
+      description="Target description"
       required="False"/>
   </table>
 
@@ -215,15 +208,15 @@
       required="True"/>
 
     <column name="band" type="text"
-      ucd="meta.id;instr.filter" 
-      tablehead="Bandpass" 
-      description="Bandpass name" 
+      ucd="meta.id;instr.filter"
+      tablehead="Bandpass"
+      description="Bandpass name"
       required="True"/>
 
     <column name="description" type="text"
-      ucd="meta.note" 
-      tablehead="Description" 
-      description="Photometric system description" 
+      ucd="meta.note"
+      tablehead="Description"
+      description="Photometric system description"
       required="False"/>
 
   </table>
