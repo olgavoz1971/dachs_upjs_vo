@@ -41,6 +41,24 @@
 		GRANT SELECT ON upjs_vo.photosys TO gavoadmin WITH GRANT OPTION;
 		GRANT SELECT ON upjs_vo.photosys TO gavo;
 	-->
+	
+	<execute on="loaded" title="define id parse functions"><job>
+		<code><![CDATA[
+			# we have artificial accrefs of the form upjs/ts/<id>_<band>;
+			# what we define here needs to be reflected in the viewStatement
+			# of the raw_data table
+			def unparseIdentifier(object, bandpass):
+				"""returns an accref from bandpass and object.
+				"""
+				return f"upjs/ts/{object}-{bandpass}"
+
+			def parseIdentifier(id):
+				"""returns object and bandpass from an accref or a pubDID.
+				"""
+				assert "upjs/ts" in id
+				return id.split("/")[-1].split("-")
+		]]></code>
+	</job></execute>
 
 	<table id="raw_data" adql="True" onDisk="True" namePath="//ssap#instance">
 		<meta name="description">A view over lightcurves and objects for SSA/ObsCore ingestion</meta>
@@ -112,7 +130,7 @@
 				'Gaia DR3 ' || o.gaia_name AS ssa_targname,
 				o.coordequ AS ssa_location,
 				NULL::spoly AS ssa_region,
-				'\getConfig{web}{serverURL}/\rdId/sdl/dlget?ID=' || '\pubDIDBase' || 'upjs/ts/' || o.id || '/' || p.band AS accref,
+				'\getConfig{web}{serverURL}/\rdId/sdl/dlget?ID=' || '\pubDIDBase' || 'upjs/ts/' || o.id || '-' || p.band AS accref,
 				'\pubDIDBase' || 'upjs/ts/' || o.id || '/' || p.band AS ssa_pubdid,
 				'application/x-votable+xml' AS mime,
 				50000 AS accsize,
@@ -298,9 +316,8 @@
 		<embeddedGrammar>
 			<iterator>
 				<code>
-					parts = self.sourceToken.metadata["ssa_pubdid"].split('/')
-					passband = parts[-1]
-					object = parts[-2]
+					object, bandpass = rd.parseIdentifier(
+						self.sourceToken.metadata["ssa_pubdid"])
 
 					with base.getTableConn() as conn:
 						for row in conn.queryToDicts(
@@ -372,19 +389,14 @@
 			<!-- We should do #this explicitly without products table -->
 			<metaMaker semantics="#this">
 				<code>
-					acrf = descriptor.metadata["accref"]
-					# parts = acrf.split('/')
-					# passband = parts[-1]
-					# object = parts[-2]
 					targname = descriptor.metadata["ssa_targname"]
 					passband = descriptor.metadata["ssa_bandpass"]
-					print(f'==================== metaMaker semantics=#this {acrf=}')
 					yield descriptor.makeLink(
-					acrf,
-					description=f"Kolonica time series for {targname} in {passband}",
-					contentType="application/x-votable+xml",
-					contentLength="15000",
-					contentQualifier="#timeseries")
+						descriptor.metadata["accref"]
+						description=f"Kolonica time series for {targname} in {passband}",
+						contentType="application/x-votable+xml",
+						contentLength="15000",
+						contentQualifier="#timeseries")
 				</code>
 			</metaMaker>
 
@@ -422,14 +434,14 @@
 			</metaMaker>
 
 			<!--
-			dataFunction is executed by dlget (?)
+			dataFunction is executed by dlget
 			The lightcurve sits in the PrimaryTable (?)
 			dataFunction is stolen from bgds/l2
 			-->
 			<dataFunction>
 				<setup imports="gavo.rsc"/>
 				<code>
-					bandid = descriptor.metadata["ssa_pubdid"].split("/")[-1]
+					_, bandid = rd.parseIdentifier(descriptor.metadata["ssa_pubdid"])
 					dd = rd.getById("build-ts")
 					descriptor.data = rsc.Data.createWithTable(dd,
 						rd.getById("instance_"+bandid))
@@ -526,11 +538,8 @@
 					</code>
 				</setup>
 				<code>
-					parts = inputTable.getParam("obs_id").split('/')
-					print(f"===================== PRVIEW == {parts=}")
-					objId = parts[-2]
-					passband = parts[-1]
-					# objId, passband = obsId.split("/")
+					objId, passband = rd.parseIdentifier(
+						inputTable.getParam("obs_id"))
 					print(f"===================== PRVIEW == {passband=} {objId=}")
 					with base.getUntrustedConn() as conn:
 						res = list(conn.query(
