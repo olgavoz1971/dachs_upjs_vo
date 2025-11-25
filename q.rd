@@ -57,6 +57,9 @@
 				"""
 				assert "upjs/ts" in id
 				return id.split("/")[-1].split("-")
+
+			rd.unparseIdentifier = unparseIdentifier
+			rd.parseIdentifier = parseIdentifier
 		]]></code>
 	</job></execute>
 
@@ -131,7 +134,7 @@
 				o.coordequ AS ssa_location,
 				NULL::spoly AS ssa_region,
 				'\getConfig{web}{serverURL}/\rdId/sdl/dlget?ID=' || '\pubDIDBase' || 'upjs/ts/' || o.id || '-' || p.band AS accref,
-				'\pubDIDBase' || 'upjs/ts/' || o.id || '/' || p.band AS ssa_pubdid,
+				'\pubDIDBase' || 'upjs/ts/' || o.id || '-' || p.band AS ssa_pubdid,
 				'application/x-votable+xml' AS mime,
 				50000 AS accsize,
 				NULL AS embargo,
@@ -316,13 +319,13 @@
 		<embeddedGrammar>
 			<iterator>
 				<code>
-					object, bandpass = rd.parseIdentifier(
+					object, passband = rd.parseIdentifier(
 						self.sourceToken.metadata["ssa_pubdid"])
 
 					with base.getTableConn() as conn:
 						for row in conn.queryToDicts(
 							"SELECT l.dateobs as dateobs, l.magnitude AS phot, l.mag_err, "
-							" 99.99 AS airmass, 'upjs_vo/' || l.image_filename AS origin_image"
+							" 99.99 AS airmass, l.image_filename AS origin_image"
 							" FROM \schema.lightcurves AS l"
 							" JOIN \schema.photosys AS p ON p.id = l.photosys_id"
 							"  WHERE object_id=%(object)s AND p.band=%(passband)s"
@@ -392,7 +395,7 @@
 					targname = descriptor.metadata["ssa_targname"]
 					passband = descriptor.metadata["ssa_bandpass"]
 					yield descriptor.makeLink(
-						descriptor.metadata["accref"]
+						descriptor.metadata["accref"],
 						description=f"Kolonica time series for {targname} in {passband}",
 						contentType="application/x-votable+xml",
 						contentLength="15000",
@@ -403,16 +406,12 @@
 			<!-- My useless on-the-fly preview -->
 			<metaMaker semantics="#preview">
 				<code>
-					# print(f'============ metaMaker semantics=#preview {descriptor.objId=} {descriptor.band=}')
-					# print(f'============ metaMaker semantics=#preview {descriptor.metadata=}')
 					pubdid = descriptor.metadata['ssa_pubdid']
 					target = descriptor.metadata['ssa_targname']
 					band = descriptor.metadata['ssa_bandpass']
-					print(f'============ metaMaker semantics=#preview {pubdid}')
 					path_ending = "/".join(pubdid.split("/")[-3:])
 					# url = makeAbsoluteURL(f"\rdId/preview/qp/{descriptor.objId}/{descriptor.band}")
 					url = makeAbsoluteURL(f"\rdId/preview/qp/{path_ending}")
-					print(f'{url=}')
 					yield descriptor.makeLink(
 						url,
 						description=f"Preview for {target} in {band}",
@@ -540,7 +539,6 @@
 				<code>
 					objId, passband = rd.parseIdentifier(
 						inputTable.getParam("obs_id"))
-					print(f"===================== PRVIEW == {passband=} {objId=}")
 					with base.getUntrustedConn() as conn:
 						res = list(conn.query(
 							"SELECT extract(julian from l.dateobs at time zone 'UTC+12') AS obs_time, l.magnitude "
