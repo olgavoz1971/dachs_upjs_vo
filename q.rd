@@ -373,11 +373,15 @@
 			<metaMaker semantics="#this">
 				<code>
 					acrf = descriptor.metadata["accref"]
+					# parts = acrf.split('/')
+					# passband = parts[-1]
+					# object = parts[-2]
+					targname = descriptor.metadata["ssa_targname"]
+					passband = descriptor.metadata["ssa_bandpass"]
 					print(f'==================== metaMaker semantics=#this {acrf=}')
 					yield descriptor.makeLink(
-					descriptor.metadata["accref"],	# JK: seems, I already have it
-					# description=f"Kolonica time series for {descriptor.objId} in {descriptor.band}",
-					description=f"Kolonica time series",
+					acrf,
+					description=f"Kolonica time series for {targname} in {passband}",
 					contentType="application/x-votable+xml",
 					contentLength="15000",
 					contentQualifier="#timeseries")
@@ -387,12 +391,19 @@
 			<!-- My useless on-the-fly preview -->
 			<metaMaker semantics="#preview">
 				<code>
-					print(f'============ metaMaker semantics=#preview {descriptor.objId=} {descriptor.band=}')
-					url = makeAbsoluteURL(f"\rdId/preview/qp/{descriptor.objId}/{descriptor.band}")
+					# print(f'============ metaMaker semantics=#preview {descriptor.objId=} {descriptor.band=}')
+					# print(f'============ metaMaker semantics=#preview {descriptor.metadata=}')
+					pubdid = descriptor.metadata['ssa_pubdid']
+					target = descriptor.metadata['ssa_targname']
+					band = descriptor.metadata['ssa_bandpass']
+					print(f'============ metaMaker semantics=#preview {pubdid}')
+					path_ending = "/".join(pubdid.split("/")[-3:])
+					# url = makeAbsoluteURL(f"\rdId/preview/qp/{descriptor.objId}/{descriptor.band}")
+					url = makeAbsoluteURL(f"\rdId/preview/qp/{path_ending}")
 					print(f'{url=}')
 					yield descriptor.makeLink(
 						url,
-						description=f"Preview for {descriptor.objId} in {descriptor.band}",
+						description=f"Preview for {target} in {band}",
 						contentType="image/png",
 						contentLength="2000"
 					)
@@ -405,7 +416,7 @@
 				<!-- todo -->
 				<code>
 					yield descriptor.makeLinkFromFile(
-						rd.getAbsPath(f"data/periodograms/placeholder.pdf"),
+						rd.getAbsPath(f"data/periodograms/picture.png"),
 						description="Periodograms derivied from this time series")
 				</code>
 			</metaMaker>
@@ -498,9 +509,6 @@
 		<meta name="title">Kolonica timeseries previews</meta>
         <meta name="description">
 			A service returning PNG thumbnails for time series. It takes the obs id for which to generate a preview.
-			JK: Here, I try to figure out how to play with these kinds of things.
-			Actually, I haven't found these ts-previews very informative, especially for noisy data,
-			but perhaps I'll manage to invent something
         </meta>
 		<pythonCore>
 			<inputTable>
@@ -518,9 +526,12 @@
 					</code>
 				</setup>
 				<code>
-					obsId = inputTable.getParam("obs_id")
-					objId, passband = obsId.split("/")
-					print(f"===================== AHA PRVIEW == {obsId=} {objId=}")
+					parts = inputTable.getParam("obs_id").split('/')
+					print(f"===================== PRVIEW == {parts=}")
+					objId = parts[-2]
+					passband = parts[-1]
+					# objId, passband = obsId.split("/")
+					print(f"===================== PRVIEW == {passband=} {objId=}")
 					with base.getUntrustedConn() as conn:
 						res = list(conn.query(
 							"SELECT extract(julian from l.dateobs at time zone 'UTC+12') AS obs_time, l.magnitude "
