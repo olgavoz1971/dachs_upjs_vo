@@ -1,4 +1,4 @@
-<resource schema="upjs" resdir=".">
+<resource schema="upjs_ts" resdir=".">
   <meta name="creationDate">2025-11-25T12:38:44Z</meta>
 
   <meta name="title">External Tables with Lightcurves From Kolonica Observatory</meta>
@@ -21,6 +21,7 @@
   <meta name="coverage.waveband">Optical</meta>
 
   <table id="lightcurves" onDisk="True" adql="Hidden">
+    <meta name="description">The external table with photometric points of all objects</meta>
     <column name="id" type="bigint"
       ucd="meta.id;meta.main"
       tablehead="PP Id"
@@ -101,28 +102,8 @@
     </make>
   </data>
 
-<!--
-  <service id="q" allowed="form">
-    if you want a browser-based service in addition to TAP, use
-    this.  Otherwise, delete this and just write <publish/> into
-    the table element above to publish the table as such.  With a
-    service, the table will be published as part of the service
-    <meta name="shortName">%max. 16 characters%</meta>
-
-    the browser interface goes to the VO and the front page
-    <publish render="form" sets="ivo_managed, local"/>
-    all publish elements only become active after you run
-      dachs pub q
-
-    <dbCore queriedTable="lightcurves">
-      to add query constraints on table columns, add condDesc
-      elements built from the column
-      <condDesc buildFrom="%colname%"/>
-    </dbCore>
-  </service>
--->
-
   <table id="objects" onDisk="True" adql="Hidden">
+    <meta name="description">The external table with objects</meta>
     <column name="id" type="integer"
       ucd="meta.id;meta.main"
       tablehead="Object Id"
@@ -179,28 +160,21 @@
   </table>
 
   <data id="import_objects">
-    <sources pattern="%resdir-relative pattern, like data/*.txt%"/>
-
-    <!-- the grammar really depends on your input material.  See
-      http://docs.g-vo.org/DaCHS/ref.html#grammars-available,
-      in particular columnGrammar, csvGrammar, fitsTableGrammar,
-      and reGrammar; if nothing else helps see embeddedGrammar
-      or customGrammar -->
-    <csvGrammar names="name1 some_other_name and_so_on"/>
-
     <make table="objects">
-      <rowmaker idmaps="*">
-        <!-- the following is an example of a mapping rule that uses
-        a python expression; @something takes the value of the something
-        field returned by the grammar.  You obviously need to edit
-        or remove this concrete rule. -->
-        <!-- <map dest="%name of a column%">int(@some_other_name[2:])</map>
-        -->
-      </rowmaker>
+      <script lang="python" type="postCreation" name="Load dump">
+        table.connection.commit()
+        src = table.tableDef.rd.getAbsPath("dumps/objects.dump")
+        with open(src) as f:
+          cursor = table.connection.cursor()
+          cursor.copy_expert(
+            "COPY {} FROM STDIN".format(table.tableDef.getQName()),
+            f)
+      </script>
     </make>
   </data>
 
   <table id="photosys" onDisk="True" adql="Hidden">
+    <meta name="description">The external table with photometric systems</meta>
     <column name="id" type="integer"
       ucd="meta.id;meta.main"
       tablehead="Photosys Id"
@@ -244,10 +218,10 @@
   </data>
 
 
-  <regSuite title="upjs regression">
-    <regTest title="upjs table serves some data">
+  <regSuite title="upjs_ts regression">
+    <regTest title="upjs_ts table serves some data">
       <url parSet="TAP"
-        QUERY="SELECT * FROM upjs.main WHERE %select one column%"
+        QUERY="SELECT * FROM upjs_ts.main WHERE %select one column%"
         >/tap/sync</url>
       <code>
         # The actual assertions are pyUnit-like.  Obviously, you want to
