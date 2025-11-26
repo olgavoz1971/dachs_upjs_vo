@@ -22,6 +22,9 @@
 
   <table id="lightcurves" onDisk="True" adql="Hidden">
     <meta name="description">The external table with photometric points of all objects</meta>
+    <index columns="object_id"/>
+    <index columns="photosys_id"/>
+    <index columns="dateobs"/>
     <column name="id" type="bigint"
       ucd="meta.id;meta.main"
       tablehead="PP Id"
@@ -103,7 +106,9 @@
   </data>
 
   <table id="objects" onDisk="True" adql="Hidden">
+    <index columns="id"/>
     <meta name="description">The external table with objects</meta>
+
     <column name="id" type="integer"
       ucd="meta.id;meta.main"
       tablehead="Object Id"
@@ -185,6 +190,7 @@
     </scsCore>
   </service>
 
+
   <table id="photosys" onDisk="True" adql="Hidden">
     <meta name="description">The external table with photometric systems</meta>
     <column name="id" type="integer"
@@ -205,30 +211,27 @@
       description="Photometric system description"
       required="False"/>
 
+    <column name="specmid" type="real"
+      ucd="em.wl.central"
+      tablehead="specmid"
+      description="Central wavelength of the band"
+      required="False"/>
+
   </table>
 
   <data id="import_photosys">
-    <sources pattern="%resdir-relative pattern, like data/*.txt%"/>
-
-    <!-- the grammar really depends on your input material.  See
-      http://docs.g-vo.org/DaCHS/ref.html#grammars-available,
-      in particular columnGrammar, csvGrammar, fitsTableGrammar,
-      and reGrammar; if nothing else helps see embeddedGrammar
-      or customGrammar -->
-    <csvGrammar names="name1 some_other_name and_so_on"/>
-
-    <make table="objects">
-      <rowmaker idmaps="*">
-        <!-- the following is an example of a mapping rule that uses
-        a python expression; @something takes the value of the something
-        field returned by the grammar.  You obviously need to edit
-        or remove this concrete rule. -->
-        <!-- <map dest="%name of a column%">int(@some_other_name[2:])</map>
-        -->
-      </rowmaker>
+    <make table="photosys">
+      <script lang="python" type="postCreation" name="Load dump">
+        table.connection.commit()
+        src = table.tableDef.rd.getAbsPath("dumps/photosys.dump")
+        with open(src) as f:
+          cursor = table.connection.cursor()
+          cursor.copy_expert(
+            "COPY {} FROM STDIN".format(table.tableDef.getQName()),
+            f)
+      </script>
     </make>
   </data>
-
 
   <regSuite title="upjs_ts regression">
     <regTest title="upjs_ts table serves some data">

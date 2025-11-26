@@ -1,4 +1,4 @@
-<resource schema="upjs" resdir=".">
+<resource schema="upjs_img" resdir=".">
   <meta name="creationDate">2025-11-24T08:21:08Z</meta>
 
   <meta name="title">Images From Kolonica Observatory</meta>
@@ -9,7 +9,7 @@
 
   <meta name="subject">observational-astronomy</meta>
 
-  <meta name="creator">TBD</meta>
+  <meta name="creator">UPJS</meta>
   <meta name="instrument">Ziga and Alica telescopes</meta>
   <meta name="facility">Kolonica</meta>
 
@@ -21,7 +21,7 @@
 
   <table id="main" onDisk="True" adql="True">
     <mixin have_bandpass_id="True">//siap2#pgs</mixin>
-    <mixin preview="NULL">//obscore#publishObscoreLike</mixin>
+    <!-- <mixin preview="NULL">//obscore#publishObscoreLike</mixin> -->
   </table>
 
   <coverage>
@@ -132,13 +132,13 @@
   </service>
 
   <service id="i" allowed="form,siap2.xml">
-    <meta name="shortName">%up to 16 characters%</meta>
+    <meta name="shortName">upjs ts imgs</meta>
 
     <!-- other sia.types: Cutout, Mosaic, Atlas -->
     <meta name="sia.type">Pointed</meta>
 
-    <meta name="testQuery.pos.ra">%ra one finds an image at%</meta>
-    <meta name="testQuery.pos.dec">%dec one finds an image at%</meta>
+    <meta name="testQuery.pos.ra">120</meta>
+    <meta name="testQuery.pos.dec">120</meta>
     <meta name="testQuery.size.ra">0.1</meta>
     <meta name="testQuery.size.dec">0.1</meta>
 

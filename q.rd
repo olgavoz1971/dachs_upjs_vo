@@ -1,4 +1,4 @@
-<resource schema="upjs_vo" resdir=".">
+<resource schema="upjs_ts" resdir=".">
     <macDef name="pubDIDBase">ivo://\getConfig{ivoa}{authority}/~?\rdId/</macDef>	<!-- bgds l2 -->
 
 	<meta name="creationDate">2025-09-03T09:40:33Z</meta>
@@ -35,11 +35,11 @@
 
  	<!-- Define my existing database tables structure
 	I should also do this from outside of RD
-		GRANT SELECT ON upjs_vo.lightcurves TO gavoadmin WITH GRANT OPTION;
-		GRANT SELECT ON upjs_vo.objects TO gavoadmin WITH GRANT OPTION;
-		GRANT SELECT ON upjs_vo.observations TO gavoadmin WITH GRANT OPTION;
-		GRANT SELECT ON upjs_vo.photosys TO gavoadmin WITH GRANT OPTION;
-		GRANT SELECT ON upjs_vo.photosys TO gavo;
+		GRANT SELECT ON upjs_ts.lightcurves TO gavoadmin WITH GRANT OPTION;
+		GRANT SELECT ON upjs_ts.objects TO gavoadmin WITH GRANT OPTION;
+		GRANT SELECT ON upjs_ts.observations TO gavoadmin WITH GRANT OPTION;
+		GRANT SELECT ON upjs_ts.photosys TO gavoadmin WITH GRANT OPTION;
+		GRANT SELECT ON upjs_ts.photosys TO gavo;
 	-->
 	
 	<execute on="loaded" title="define id parse functions"><job>
@@ -116,10 +116,10 @@
 			verbLevel="1"
 			required="True"/>	<!-- And this column is worth showing to users -->
 
-		<!-- note 1: accref = ...upjs_vo/q/object_id path for (future) product (lightcurve) this is carmenes-style
-					'upjs_vo/q/' || o.id || '/' || p.band AS accref,
+		<!-- note 1: accref = ...upjs_ts/q/object_id path for (future) product (lightcurve) this is carmenes-style
+					'upjs_ts/q/' || o.id || '/' || p.band AS accref,
 					 accref = '\getConfig{web}{serverURL}/bgds/l2/tsdl/dlget?ID='|| obs_id  - bgds-style
-					'\getConfig{web}{serverURL}/upjs_vo/q/sdl/dlget?ID=' || o.id || '/' || p.band AS accref,
+					'\getConfig{web}{serverURL}/upjs_ts/q/sdl/dlget?ID=' || o.id || '/' || p.band AS accref,
 
 			TODO!!!! Describe also the columns accref, and other. Should I? I see them in the database, but do not in TOPCAT
 			JK: AAAAA!!! How does this macro work _inside_ the quoted string???? But it does!
@@ -555,7 +555,7 @@
 						res = list(conn.query(
 							"SELECT extract(julian from l.dateobs at time zone 'UTC+12') AS obs_time, l.magnitude "
 							"FROM \schema.lightcurves AS l "
-							"JOIN upjs_vo.photosys AS p ON p.id = l.photosys_id "						
+							"JOIN upjs_ts.photosys AS p ON p.id = l.photosys_id "						
 							"WHERE object_id=%(obj_id)s AND p.band=%(passband)s",
 							{"obj_id": objId, "passband": passband}
 						))
