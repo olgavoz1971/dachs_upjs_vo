@@ -403,6 +403,18 @@
 				</code>
 			</metaMaker>
 
+			<metaMaker semantics="#progenitor">
+				<code>
+					ra, dec = descriptor.metadata["ssa_location"].addCooPair()
+					yield descriptor.makeLink(
+						makeAbsoluteURL("upjs/t/calibrators/scs.xml?"
+							"RA={}&amp;DEC={}&amp;SR=0.5".format(ra, dec),
+						description="Calibrator stars for this time series' photometry"
+							"points.",
+						contentType="application/x-votable+xml")
+				</code>
+			</metaMaker>
+
 			<!-- My useless on-the-fly preview -->
 			<metaMaker semantics="#preview">
 				<code>

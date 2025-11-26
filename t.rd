@@ -173,6 +173,18 @@
     </make>
   </data>
 
+  <service id="calibrators" allowed="scs.xml">
+    <meta name="shortName">upjs calibrators</meta>
+    <meta name="testQuery">
+      <meta name="ra">9.4076</meta>
+      <meta name="dec">9.6414</meta>
+      <meta name="sr">1.0</meta>
+    </meta>
+    <scsCore queriedTable="objects">
+      <FEED source="//scs#coreDescs"/>
+    </scsCore>
+  </service>
+
   <table id="photosys" onDisk="True" adql="Hidden">
     <meta name="description">The external table with photometric systems</meta>
     <column name="id" type="integer"
