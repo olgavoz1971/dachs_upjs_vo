@@ -20,7 +20,7 @@
 
   <meta name="coverage.waveband">Optical</meta>
 
-  <table id="lightcurves" onDisk="True" adql="Hidden">
+  <table id="lightcurves" onDisk="True" adql="True">
     <meta name="description">The external table with photometric points of all objects</meta>
     <index columns="object_id"/>
     <index columns="photosys_id"/>
@@ -111,7 +111,7 @@
     </make>
   </data>
 
-  <table id="objects" onDisk="True" adql="Hidden">
+  <table id="objects" onDisk="True" adql="True">
     <index columns="id"/>
     <meta name="description">The external table with objects</meta>
 

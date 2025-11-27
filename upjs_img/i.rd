@@ -3,8 +3,9 @@
 
   <meta name="title">Images From Kolonica Observatory</meta>
   <meta name="description">
-    These images were taken to produce time series of variable stars at
-    Kolonica Observatory, Slovakia, with two telescopes.
+    These images were taken to monitor selected areas around eclipsing binaries at the Kolonica Observatory, Slovakia, using two telescopes.
+    The first, called ZIGA (PlaneWave CDK20 – Corrected Dall–Kirkham), has a 508 mm aperture and is equipped with a Moravian Instruments G4-16000 CCD camera with UBVRI Bessell photometric filters.
+    The second, called Alica (Explore Scientific MN-152 – Maksutov–Newton), has a 152 mm aperture and is equipped with a Moravian Instruments G2-8300 CCD camera with g′ r′ i′ Sloan photometric filters.
   </meta>
 
   <meta name="subject">observational-astronomy</meta>
@@ -61,11 +62,11 @@
           "V": "Bessell V",
           "R": "Bessell R",
           "I": "Bessell I",
-          "u_sdss": "SDSS u",
-          "g": "SDSS g",
-          "r": "SDSS r",
-          "i": "SDSS i",
-          "z": "SDSS z",}</bind>
+          "u_sdss": "SDSS u'",
+          "g": "SDSS g'",
+          "r": "SDSS r'",
+          "i": "SDSS i'",
+          "z": "SDSS z'",}</bind>
         </apply>
 
         <apply procDef="//siap2#setMeta">

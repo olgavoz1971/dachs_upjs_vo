@@ -1,0 +1,18 @@
+publisher: Pavol Josef Šafarik University
+contact.name: UPJŠ Archive
+contact.address: Jesenná 5, 040 01 Košice, Slovakia
+contact.email: astro.upjs@gmail.com
+creator.name: UPJŠ Archive
+creator.logo: \getConfig{web}{serverURL}/favicon.png
+
+_noresultwarning: Your query did not match any data.
+
+authority.creationDate: 2025-11-25T11:59:49
+authority.shortName: upjs
+
+site.description: We publish timeseries originated from small telescopes. \
+Our team is from Pavol Josef Šafarik University in Košice, Slovakia
+
+authority.title: UPJŠ Authority
+authority.description: These records belong to UPJŠ dachs server
+authority.referenceURL: https://astronomy.science.upjs.sk 

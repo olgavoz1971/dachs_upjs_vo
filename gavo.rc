@@ -1,0 +1,13 @@
+[general]
+maintainerAddress: astro.upjs@gmail.com
+
+[web]
+bindAddress:
+serverURL: https://skvo.science.upjs.sk
+adaptProtocol: False
+sitename: Pavol Josef Šafarik University Archive
+adminpasswd: *****
+logFormat: combined
+
+[ivoa]
+authority: astro.upjs
