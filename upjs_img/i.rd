@@ -4,12 +4,12 @@
   <meta name="title">Images From Kolonica Observatory</meta>
   <meta name="description">
     These images were taken to produce time series of variable stars at
-    Kolonica Observatory, Slovakia, with two telescopes TBD.
+    Kolonica Observatory, Slovakia, with two telescopes.
   </meta>
 
   <meta name="subject">observational-astronomy</meta>
 
-  <meta name="creator">UPJS</meta>
+  <meta name="creator">UPJŠ</meta>
   <meta name="instrument">Ziga and Alica telescopes</meta>
   <meta name="facility">Kolonica</meta>
 
@@ -31,8 +31,9 @@
   <data id="import" updating="True">
 
     <sources recurse="True">
-       <pattern>data/*.fit</pattern>
-       <pattern>data/*.fit.fz</pattern>
+       <pattern>data/*/*.fit</pattern>
+       <pattern>data/*/*.fit.fz</pattern>
+       <ignoreSources fromdb="select access_url from \schema.main"/>
     </sources>
 
     <fitsProdGrammar qnd='False'>
@@ -114,8 +115,8 @@
     don't want to serve a browser service, just remove the following
     element. -->
   <service id="browse" allowed="form">
-    <meta name="shortName">%short name for the browser service%</meta>
-    <meta name="title">Browser interface to %whatever%</meta>
+    <meta name="shortName">upjs ts imgs form</meta>
+    <meta name="title">Browser interface for searching Kolonica fits images</meta>
     <dbCore queriedTable="main">
       <condDesc original="//siap2#humanInput"/>
       <condDesc>

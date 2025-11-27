@@ -70,7 +70,7 @@
       description="Differential magnitude"
       required="False"/>
 
-    <column name="mag_diff_error" type="double precision"
+    <column name="mag_diff_err" type="double precision"
       ucd="stat.error;phot.mag"
       tablehead="Mag diff error"
       description="Estimation of differential magnitude error"
@@ -87,6 +87,12 @@
       ucd="meta.id;meta.fits"
       tablehead="Image filename"
       description="Path to the fits image"
+      required="False"/>
+
+    <column name="comp_stars" type="text[]"
+      ucd="meta.id"
+      tablehead="Comparison stars"
+      description="Comparison stars for the photomery point"
       required="False"/>
 
   </table>
@@ -178,6 +184,7 @@
     </make>
   </data>
 
+<!--
   <service id="calibrators" allowed="scs.xml">
     <meta name="shortName">upjs calibrators</meta>
     <meta name="testQuery">
@@ -189,7 +196,7 @@
       <FEED source="//scs#coreDescs"/>
     </scsCore>
   </service>
-
+-->
 
   <table id="photosys" onDisk="True" adql="Hidden">
     <meta name="description">The external table with photometric systems</meta>

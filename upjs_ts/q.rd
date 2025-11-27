@@ -3,9 +3,11 @@
 
 	<meta name="creationDate">2025-09-03T09:40:33Z</meta>
 
-	<meta name="title">My amazing lightcurves</meta>
+	<meta name="title"> Timeseries originating from small telescopes in Kolonica Observatory, Slovakia</meta>
 	<meta name="description">
-	This is a loooooooong description of my amazing time series
+		Kolonica observatory is situated in the areal of Astronomical Observatory on Kolonica Saddle operated by Vihorlat Observatory in Humenné.
+		The observatory is located in the northeastern part of Slovakia, in the area of Dark-Sky Park Poloniny, 
+		a place with the best conditions for astronomical observations in Slovakia.
 	</meta>
 
 <!-- Take keywords from
@@ -14,9 +16,9 @@
  	<meta name="subject">light-curves</meta>
  	<meta name="subject">variable-stars</meta>
 
- 	<meta name="creator">Last, F.I; Next, A.</meta>
-	<meta name="source">2012IAUS..282...81P</meta>
- 	<meta name="instrument">Some telescope in Kolonica</meta>
+	<meta name="creator">UPJŠ</meta>
+	<meta name="source">Parimucha, S., in prep.</meta>
+ 	<meta name="instrument">ZIGA and Alica telescopes</meta>
  	<meta name="facility">Kolonica</meta>
 
   <!-- <meta name="source">%ideally, a bibcode%</meta> -->
@@ -33,15 +35,6 @@
  	<meta name="productType">timeseries</meta>
  	<meta name="ssap.testQuery">MAXREC=1</meta>
 
- 	<!-- Define my existing database tables structure
-	I should also do this from outside of RD
-		GRANT SELECT ON upjs_ts.lightcurves TO gavoadmin WITH GRANT OPTION;
-		GRANT SELECT ON upjs_ts.objects TO gavoadmin WITH GRANT OPTION;
-		GRANT SELECT ON upjs_ts.observations TO gavoadmin WITH GRANT OPTION;
-		GRANT SELECT ON upjs_ts.photosys TO gavoadmin WITH GRANT OPTION;
-		GRANT SELECT ON upjs_ts.photosys TO gavo;
-	-->
-	
 	<execute on="loaded" title="define id parse functions"><job>
 		<code><![CDATA[
 			# we have artificial accrefs of the form upjs/ts/<id>_<band>;
@@ -126,7 +119,7 @@
 				'\getConfig{web}{serverURL}/\rdId/sdl/dlget?ID=' || o.id || '/' || p.band AS accref,
  		-->
 		<viewStatement>
-			CREATE OR REPLACE VIEW \curtable AS (
+			CREATE MATERIALIZED VIEW \curtable AS (
 			SELECT
 				'Kolonica Gaia DR3 ' || o.gaia_name AS ssa_dstitle,
 				o.id AS p_object_id,
@@ -212,6 +205,7 @@
 			calibLevel="2"
 			coverage="ssa_region"
 			oUCD="'phot.mag'"
+			createDIDIndex="True"
 		>//obscore#publishSSAPMIXC</mixin>	<!-- publish this through ObsCore to -->
 	</table>
 
@@ -481,7 +475,7 @@
 		still working as SSA is non-trivial -->
 	<service id="web" defaultRenderer="form">
 		<meta name="shortName">\schema Web</meta>
-		<meta name="title">Our Amazing Time Series Browser Service</meta>
+		<meta name="title">Kolonica Time Series Browser Service</meta>
 
 		<dbCore queriedTable="ts_ssa">
 			<condDesc buildFrom="ssa_location"/>
