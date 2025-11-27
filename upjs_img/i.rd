@@ -21,7 +21,7 @@
 
   <table id="main" onDisk="True" adql="True">
     <mixin have_bandpass_id="True">//siap2#pgs</mixin>
-    <!-- <mixin preview="NULL">//obscore#publishObscoreLike</mixin> -->
+    <mixin preview="NULL">//obscore#publishObscoreLike</mixin>
   </table>
 
   <coverage>
@@ -138,8 +138,8 @@
     <!-- other sia.types: Cutout, Mosaic, Atlas -->
     <meta name="sia.type">Pointed</meta>
 
-    <meta name="testQuery.pos.ra">120</meta>
-    <meta name="testQuery.pos.dec">120</meta>
+    <meta name="testQuery.pos.ra">258.6</meta>
+    <meta name="testQuery.pos.dec">76.7</meta>
     <meta name="testQuery.size.ra">0.1</meta>
     <meta name="testQuery.size.dec">0.1</meta>
 

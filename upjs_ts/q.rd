@@ -397,6 +397,7 @@
 				</code>
 			</metaMaker>
 
+			<!-- todo
 			<metaMaker semantics="#progenitor">
 				<code>
 					ra, dec = descriptor.metadata["ssa_location"].addCooPair()
@@ -404,10 +405,10 @@
 						makeAbsoluteURL("upjs/t/calibrators/scs.xml?"
 							"RA={}&amp;DEC={}&amp;SR=0.5".format(ra, dec),
 						description="Calibrator stars for this time series' photometry"
-							"points.",
-						contentType="application/x-votable+xml")
+							"points.", contentType="application/x-votable+xml"))
 				</code>
 			</metaMaker>
+			-->
 
 			<!-- My useless on-the-fly preview -->
 			<metaMaker semantics="#preview">
@@ -427,16 +428,15 @@
 				</code>
 			</metaMaker>
 
-			<!-- I don't have fits_accref yet, TODO -->
-
+			<!-- this is a placeholder 
 			<metaMaker name="add_periodogram" semantics="#derivation">
-				<!-- todo -->
 				<code>
 					yield descriptor.makeLinkFromFile(
 						rd.getAbsPath(f"data/periodograms/picture.png"),
 						description="Periodograms derivied from this time series")
 				</code>
 			</metaMaker>
+			-->
 
 			<!--
 			dataFunction is executed by dlget
@@ -506,7 +506,6 @@
 		</outputTable>
 	</service>
 
-	<!-- TODO Check multicolor query, look at bgds/l.rd -->
 	<service id="ssa" allowed="form,ssap.xml">
 		<meta name="shortName">\schema TS SSAP</meta>
 		<meta name="ssap.complianceLevel">full</meta>
