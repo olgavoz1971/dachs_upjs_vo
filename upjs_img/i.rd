@@ -158,24 +158,44 @@
     </dbCore>
   </service>
 
-  <regSuite title="upjs regression">
+  <regSuite title="upjs_img regression">
     <!-- see http://docs.g-vo.org/DaCHS/ref.html#regression-testing
       for more info on these. -->
 
-    <regTest title="upjs SIAP serves some data">
-      <url POS="%CIRCLE ra dec size that has a bit of data%"
-        >i/siap2.xml</url>
+    <regTest title="upjs SIAP2 service works">
+      <url POS="CIRCLE 258.6 76.7 0.1">
+        i/siap2.xml
+      </url>
       <code>
-        <!-- to figure out some good strings to use here, run
-          dachs test -D tmp.xml q
-          and look at tmp.xml -->
-        self.assertHasStrings(
-          "%some characteristic string returned by the query%",
-          "%another characteristic string returned by the query%")
+          # dachs test -D tmp.xml i
+          # and look at tmp.xml -->
+          # self.data self.headers self.status self.requestTime self.url.httpURL
+          # Incidentally, that last name (_http_) is right; the regression framework only supports http, 
+          # and it's not terribly likely that we'll change that.
+          # print(f"upjs SIAP2 regression test")
+          res = self.getVOTableRows()
+          # print(f"{res[0]=}")
+          # print(f"{len(res)=}")
+          # print(f'{res[0]["access_url"]=}')
+          # self.assertEqual(res[0]["access_url"], EqualingRE(r"http://.*/getproduct/.*/ZIGA/2021-10-29/2021-10-29T19%3A26%3A18_V\.fit"))
+          self.assertHasStrings("VOTABLE", "publisher", "siap2")
+          self.assertHTTPStatus(200)
+          self.assertTrue(len(res) >= 702)
+        </code>
+    </regTest>
+    <regTest title="TAP: VY UMi images are in obscore">
+      <url parSet="TAP"><QUERY>
+          SELECT count(*) AS nrows FROM ivoa.obscore WHERE dataproduct_type = 'image' AND target_name = 'VY UMi'
+        </QUERY>/tap/sync</url>
+      <code>
+        row = self.getFirstVOTableRow()
+        # print(f'{row["nrows"]=}')
+        self.assertTrue(row["nrows"] >= 461)
       </code>
     </regTest>
-
     <!-- add more tests: image actually delivered, form-based service
       renders custom widgets, etc. -->
+
+
   </regSuite>
 </resource>
