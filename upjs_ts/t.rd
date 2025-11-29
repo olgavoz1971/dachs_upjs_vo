@@ -25,6 +25,7 @@
     <index columns="object_id"/>
     <index columns="photosys_id"/>
     <index columns="dateobs"/>
+
     <column name="id" type="bigint"
       ucd="meta.id;meta.main"
       tablehead="PP Id"
@@ -113,6 +114,7 @@
 
   <table id="objects" onDisk="True" adql="True">
     <index columns="id"/>
+    <mixin>//scs#pgs-pos-index</mixin>
     <meta name="description">The external table with objects</meta>
 
     <column name="id" type="integer"
@@ -121,11 +123,30 @@
       description="Internal object identifier"
       required="True"/>
 
+    <column name="ra" type="double precision"
+      ucd="pos.eq.ra;meta.main"
+      tablehead="RA"
+      verbLevel="1"
+      unit="deg"
+      description="Right ascension from"
+      required="True"/>
+
+    <column name="dec"
+      type="double precision"
+      ucd="pos.eq.dec;meta.main"
+      tablehead="Dec"
+      verbLevel="1"
+      unit="deg"
+      description="Declination"
+      required="True"/>
+
+<!--
     <column name="coordequ" type="spoint"
       ucd="pos.eq;meta.main"
       tablehead="Coordequ"
       description="Equatorial coordiantes, ICRS"
       required="False"/>
+-->
 
     <column name="gaia_name" type="text"
       ucd="meta.id"
@@ -137,18 +158,6 @@
       ucd="meta.id"
       tablehead="Simbad name"
       description="Simbad resolvable name"
-      required="False"/>
-
-    <column name="ucac4_name" type="text"
-      ucd="meta.id"
-      tablehead="UCAC4 name"
-      description="UCAC4 name"
-      required="False"/>
-
-    <column name="apass_name" type="text"
-      ucd="meta.id"
-      tablehead="APASS name"
-      description="APASS name"
       required="False"/>
 
     <column name="vsx_name" type="text"
@@ -174,7 +183,7 @@
     <make table="objects">
       <script lang="python" type="postCreation" name="Load dump">
         table.connection.commit()
-        src = table.tableDef.rd.getAbsPath("dumps/objects.dump")
+        src = table.tableDef.rd.getAbsPath("dumps/objects_2.dump")
         with open(src) as f:
           cursor = table.connection.cursor()
           cursor.copy_expert(
@@ -241,17 +250,46 @@
   </data>
 
   <regSuite title="upjs_ts regression">
-    <regTest title="upjs_ts table serves some data">
+    <regTest title="upjs_ts objects table serves some data">
       <url parSet="TAP"
-        QUERY="SELECT * FROM upjs_ts.main WHERE %select one column%"
-        >/tap/sync</url>
+        QUERY="SELECT * FROM upjs_ts.objects WHERE gaia_name='1656754192432536832'"
+      >/tap/sync</url>
+      <code>
+        # The actual assertions are pyUnit-like.  Obviously, you want to
+        # remove the print statement once you've worked out what to test
+        # against.
+        row = self.getFirstVOTableRow()
+        # print(row)
+        self.assertAlmostEqual(row["ra"], 259.244800000003)
+        self.assertAlmostEqual(row["dec"], 76.53109999999987)
+      </code>
+    </regTest>
+
+    <regTest title="upjs_ts lightcurves table serves some data">
+      <url parSet="TAP"
+        QUERY="select l.dateobs, l.image_filename FROM upjs_ts.lightcurves l join upjs_ts.objects o on l.object_id = o.id  WHERE o.gaia_name='1656754192432536832' and l.dateobs='2021-10-22 22:37:08.832'"
+      >/tap/sync</url>
       <code>
         # The actual assertions are pyUnit-like.  Obviously, you want to
         # remove the print statement once you've worked out what to test
         # against.
         row = self.getFirstVOTableRow()
         print(row)
-        self.assertAlmostEqual(row["ra"], 22.22222)
+        self.assertEqual(row["image_filename"], 'upjs_img/data/Alica/2021-10-22/2021-10-22T20:36:42_r.fit.fz')
+      </code>
+    </regTest>
+
+    <regTest title="upjs_ts photosys table serves some data">
+      <url parSet="TAP"
+        QUERY="SELECT * FROM upjs_ts.photosys WHERE band='I'"
+      >/tap/sync</url>
+      <code>
+        # The actual assertions are pyUnit-like.  Obviously, you want to
+        # remove the print statement once you've worked out what to test
+        # against.
+        row = self.getFirstVOTableRow()
+        # print(row)
+        self.assertEqual(row["description"], "BESSELL")
       </code>
     </regTest>
 
