@@ -564,4 +564,41 @@
 			</coreProc>
 		</pythonCore>
 	</service>
+
+	<!-- ivo://astro.upjs/~?upjs_ts/q/upjs/ts/2309-R -->
+	<regSuite title="upjs_ts regression">
+		<regTest title="upjs_ts SSAP serves some data">
+			<url REQUEST="queryData" PUBDID="ivo://astro.upjs/~?upjs_ts/q/upjs/ts/122-i_sdss"
+				>ssa/ssap.xml</url>
+					<code>
+					# print(f'{self.data=}')
+					self.assertHasStrings("Kolonica Gaia DR3 1704796837612266368", "258.65889999999996 76.77089999999973")
+				</code>
+		</regTest>
+
+		<regTest title="upjs_ts Datalink metadata looks about right.">
+			<url ID="ivo://astro.upjs/~?upjs_ts/q/upjs/ts/2309-R"
+				>sdl/dlmeta</url>
+			<code>
+				# to figure out good items to test here, you probably want to
+				# dachs test -k datalink  q
+				# and pprint the by_sem dict
+				# by_sem = self.datalinkBySemantics()
+				# print(by_sem)
+				# self.fail("Fill this in")
+				self.assertHasStrings("Gaia DR3 1704793573437107328 in R")
+			</code>
+		</regTest>
+
+		<regTest title="upjs_ts delivers some data.">
+			<url ID="ivo://astro.upjs/~?upjs_ts/q/upjs/ts/2217-V">
+				sdl/dlget</url>
+			<code>
+				# to figure out some good strings to use here, run
+				# dachs test -k "delivers data" -D tmp.xml q
+				# and look at tmp.xml
+				self.assertHasStrings('Gaia DR3 1704791992889145344', 'utype="ssa:DataID.Bandpass" value="V"')
+			</code>
+		</regTest>
+	</regSuite>
 </resource>
