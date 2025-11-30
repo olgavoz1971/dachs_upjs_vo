@@ -140,13 +140,11 @@
       description="Declination"
       required="True"/>
 
-<!--
     <column name="coordequ" type="spoint"
-      ucd="pos.eq;meta.main"
+      ucd="pos.eq"
       tablehead="Coordequ"
       description="Equatorial coordiantes, ICRS"
       required="False"/>
--->
 
     <column name="gaia_name" type="text"
       ucd="meta.id"
@@ -183,7 +181,7 @@
     <make table="objects">
       <script lang="python" type="postCreation" name="Load dump">
         table.connection.commit()
-        src = table.tableDef.rd.getAbsPath("dumps/objects_2.dump")
+        src = table.tableDef.rd.getAbsPath("dumps/objects_3.dump")
         with open(src) as f:
           cursor = table.connection.cursor()
           cursor.copy_expert(
@@ -265,6 +263,20 @@
       </code>
     </regTest>
 
+    <regTest title="upjs_ts objects table seems to contain the correct number of rows">
+      <url parSet="TAP"
+        QUERY="SELECT COUNT(*) AS nrows FROM upjs_ts.objects"
+      >/tap/sync</url>
+      <code>
+        # The actual assertions are pyUnit-like.  Obviously, you want to
+        # remove the print statement once you've worked out what to test
+        # against.
+        row = self.getFirstVOTableRow()
+        # print(row)
+        self.assertTrue(row["nrows"] == 14331)
+      </code>
+    </regTest>
+
     <regTest title="upjs_ts lightcurves table serves some data">
       <url parSet="TAP"
         QUERY="select l.dateobs, l.image_filename FROM upjs_ts.lightcurves l join upjs_ts.objects o on l.object_id = o.id  WHERE o.gaia_name='1656754192432536832' and l.dateobs='2021-10-22 22:37:08.832'"
@@ -274,7 +286,7 @@
         # remove the print statement once you've worked out what to test
         # against.
         row = self.getFirstVOTableRow()
-        print(row)
+        # print(row)
         self.assertEqual(row["image_filename"], 'upjs_img/data/Alica/2021-10-22/2021-10-22T20:36:42_r.fit.fz')
       </code>
     </regTest>
