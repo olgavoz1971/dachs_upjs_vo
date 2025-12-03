@@ -207,6 +207,9 @@
 			oUCD="'phot.mag'"
 			createDIDIndex="True"
 		>//obscore#publishSSAPMIXC</mixin>	<!-- publish this through ObsCore to -->
+
+		<!-- Change the column type from text to unicode to allow our Slovak diacritic symbols -->
+		<column original="ssa_publisher" type="unicode"/>
 	</table>
 
 	<data id="make-ssa-view" auto="False">		<!-- also stolen from carmenes t.rd auto=False "don't build this on an unadorned dachs imp" -->
