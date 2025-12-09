@@ -90,10 +90,10 @@
       description="Path to the fits image"
       required="False"/>
 
-    <column name="comp_stars" type="text[]"
+    <column name="comp_stars" type="bigint[]"
       ucd="meta.id"
       tablehead="Comparison stars"
-      description="Comparison stars for the photomery point"
+      description="Gaia DR3 ids of comparison stars for the photomery point"
       required="False"/>
 
   </table>
