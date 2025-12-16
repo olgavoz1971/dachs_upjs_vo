@@ -2,10 +2,22 @@
   <meta name="creationDate">2025-11-24T08:21:08Z</meta>
 
   <meta name="title">Images From Kolonica Observatory</meta>
-  <meta name="description">
-    These images were taken to monitor selected areas around eclipsing binaries at the Kolonica Observatory, Slovakia, using two telescopes.
-    The first, called ZIGA (PlaneWave CDK20 – Corrected Dall–Kirkham), has a 508 mm aperture and is equipped with a Moravian Instruments G4-16000 CCD camera with UBVRI Bessell photometric filters.
-    The second, called Alica (Explore Scientific MN-152 – Maksutov–Newton), has a 152 mm aperture and is equipped with a Moravian Instruments G2-8300 CCD camera with g′ r′ i′ Sloan photometric filters.
+  <meta name="description" format "rst">
+    The images in this collection were acquired to monitor selected sky fields around 
+    eclipsing binary stars at the Kolonica Observatory, Slovakia. 
+
+    The Kolonica Observatory is located on the Kolonica Saddle and is operated by the Vihorlat
+    Observatory in Humenné. It lies in the northeastern part of Slovakia, within the Poloniny Dark-Sky Park, 
+    a location with the darkest night skies in Slovakia and among the darkest in Europe.
+
+    Two small telescopes were used to obtain the images in this collection.
+    The first telescope, named ZIGA (PlaneWave CDK20 — Corrected Dall–Kirkham), has a 508 mm aperture
+    and is equipped with a Moravian Instruments G4-16000 CCD camera and UBVRI Bessell photometric filters.
+    The second telescope, named Alica (Explore Scientific MN-152 — Maksutov–Newton), has a 152 mm aperture
+    and is equipped with a Moravian Instruments G2-8300 CCD camera and g′ r′ i′ Sloan photometric filters.
+    Both telescopes are currently in operation, and the archive is expected to be updated with new data.
+
+    We publish the photometric time series derived from these images in the upjs_ts collection.
   </meta>
 
   <meta name="subject">observational-astronomy</meta>
@@ -116,7 +128,7 @@
     don't want to serve a browser service, just remove the following
     element. -->
   <service id="browse" allowed="form">
-    <meta name="shortName">upjs ts imgs form</meta>
+    <meta name="shortName">Kolonica web form</meta>
     <meta name="title">Browser interface for searching Kolonica fits images</meta>
     <dbCore queriedTable="main">
       <condDesc original="//siap2#humanInput"/>
@@ -134,7 +146,8 @@
   </service>
 
   <service id="i" allowed="form,siap2.xml">
-    <meta name="shortName">upjs ts imgs</meta>
+    <meta name="shortName">Kolonica siap2</meta>
+    <meta name="title">Kolonica images</meta>
 
     <!-- other sia.types: Cutout, Mosaic, Atlas -->
     <meta name="sia.type">Pointed</meta>
