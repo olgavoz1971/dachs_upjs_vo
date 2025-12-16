@@ -2,8 +2,29 @@
   <meta name="creationDate">2025-11-25T12:38:44Z</meta>
 
   <meta name="title">External Tables with Lightcurves From Kolonica Observatory</meta>
-  <meta name="description">
-    Lightcurves of variable stars were produced at Kolonica Observatory, Slovakia, with two telescopes TBD.
+  <meta name="description" format="rst" >
+    Time series in this collection were derived from CCD images obtained at the Kolonica Observatory, Slovakia.
+
+    The observations were carried out to monitor selected fields centred on eclipsing binary
+    stars with two small telescopes.
+
+    The first instrument, ZIGA (PlaneWave CDK20, Corrected Dall–Kirkham), has a 508 mm aperture
+    and is equipped with a Moravian Instruments G4-16000 CCD camera with UBVRI Bessell photometric filters.
+    The second instrument, Alica (Explore Scientific MN-152, Maksutov–Newton), has a 152 mm aperture and
+    is equipped with a Moravian Instruments G2-8300 CCD camera with Sloan g′ r′ i′ photometric filters.
+    Both telescopes are currently in operation at the observatory.
+
+    The time series were produced with a custom photometric pipeline (Parimicha, Š., in preparation).
+    Differential photometry is performed using comparison star magnitudes from APASS DR9.
+
+    Beyond the primary target (typically an eclipsing binary), the pipeline derives calibrated magnitudes
+    for all stars in the field with sufficient signal-to-noise ratio.
+    This approach, we believe, may help researchers follow the behaviour of other interesting objects over time.
+
+    For each photometric point, we provide the list of comparison stars used in its calculation
+    (which may vary for each star and each image) via a DataLink service with #auxiliary semantics.
+
+    The corresponding calibrated images are published separately in the upjs_img image collection.
   </meta>
   <!-- Take keywords from
     http://www.ivoa.net/rdf/uat

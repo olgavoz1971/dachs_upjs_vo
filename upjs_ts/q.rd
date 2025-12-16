@@ -4,11 +4,31 @@
 	<meta name="creationDate">2025-09-03T09:40:33Z</meta>
 
 	<meta name="title"> Timeseries originating from small telescopes in Kolonica Observatory, Slovakia</meta>
-	<meta name="description">
-		Kolonica observatory is situated in the areal of Astronomical Observatory on Kolonica Saddle operated by Vihorlat Observatory in Humenné.
-		The observatory is located in the northeastern part of Slovakia, in the area of Dark-Sky Park Poloniny, 
-		a place with the best conditions for astronomical observations in Slovakia.
-	</meta>
+
+	<meta name="description" format="rst">
+		Time series in this collection were derived from CCD images obtained at the Kolonica Observatory, Slovakia.
+
+		The observations were carried out to monitor selected fields centred on eclipsing binary
+		stars with two small telescopes.
+
+		The first instrument, ZIGA (PlaneWave CDK20, Corrected Dall–Kirkham), has a 508 mm aperture
+		and is equipped with a Moravian Instruments G4-16000 CCD camera with UBVRI Bessell photometric filters.
+		The second instrument, Alica (Explore Scientific MN-152, Maksutov–Newton), has a 152 mm aperture and
+		is equipped with a Moravian Instruments G2-8300 CCD camera with Sloan g′ r′ i′ photometric filters.
+		Both telescopes are currently in operation at the observatory.
+
+		The time series were produced with a custom photometric pipeline (Parimicha, Š., in preparation).
+		Differential photometry is performed using comparison star magnitudes from APASS DR9.
+
+		Beyond the primary target (typically an eclipsing binary), the pipeline derives calibrated magnitudes
+		for all stars in the field with sufficient signal-to-noise ratio.
+		This approach, we believe, may help researchers follow the behaviour of other interesting objects over time.
+
+		For each photometric point, we provide the list of comparison stars used in its calculation
+		(which may vary for each star and each image) via a DataLink service with #auxiliary semantics.
+
+		The corresponding calibrated images are published separately in the upjs_img image collection.
+        </meta>
 
 <!-- Take keywords from
     http://www.ivoa.net/rdf/uat
@@ -171,6 +191,12 @@
 		<meta name="_associatedDatalinkService">		<!-- declared a table as having datalink support -->
 			<meta name="serviceId">sdl</meta>			<!-- JK: this will go to the table metadata, TOPCAT use this sdl to build *sdl/dlmeta* stuff -->
 			<meta name="idColumn">ssa_pubDID</meta>
+		</meta>
+
+		<meta name="description">
+			This table contains metadata about the photometric time
+			series from Kolonica in IVOA SSA format. The actual data is
+			available through a datalink service or in the lightcurves table.
 		</meta>
 
 		<!--
@@ -375,7 +401,7 @@
 
 	<service id="sdl" allowed="dlget,dlmeta,static">
 		<property name="staticData">data/periodograms</property>
-		<meta name="title">\schema Datalink Service</meta>
+		<meta name="title">Kolonica light curves Datalink Service</meta>
 		<meta name="description">
             This service produces time series datasets for Kolonica lightcurves.
         </meta>
@@ -515,6 +541,14 @@
 
 		<publish render="ssap.xml" sets="ivo_managed"/>
 		<publish render="form" sets="ivo_managed,local" service="web"/>
+
+		<meta name="title">Kolonica light curves</meta>
+		<meta name="description">This service exposes photometric light curves obtained
+			with small telescopes at the Kolonica Observatory.
+			The first published dataset covers observations from 2019–2021.
+			The light curves are published per-band and are also discoverable
+			through ObsCore.
+		</meta>
 
 		<ssapCore queriedTable="ts_ssa">
 			<property key="previews">auto</property>
