@@ -10,7 +10,9 @@ _noresultwarning: Your query did not match any data.
 authority.creationDate: 2025-11-25T11:59:49
 authority.shortName: upjs
 
-site.description: We publish timeseries originated from small telescopes. \
+site.description: We publish data originated from small telescopes. \
+Our primary focus is on time series with related images. \
+Spectral data and catalogues of derived parameters will also be included. \
 Our team is from Pavol Josef Šafárik University in Košice, Slovakia
 
 authority.title: UPJŠ Authority

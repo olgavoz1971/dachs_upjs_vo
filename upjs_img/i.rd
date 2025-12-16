@@ -2,7 +2,7 @@
   <meta name="creationDate">2025-11-24T08:21:08Z</meta>
 
   <meta name="title">Images From Kolonica Observatory</meta>
-  <meta name="description" format "rst">
+  <meta name="description" format="rst">
     The images in this collection were acquired to monitor selected sky fields around 
     eclipsing binary stars at the Kolonica Observatory, Slovakia. 
 
@@ -130,6 +130,7 @@
   <service id="browse" allowed="form">
     <meta name="shortName">Kolonica web form</meta>
     <meta name="title">Browser interface for searching Kolonica fits images</meta>
+
     <dbCore queriedTable="main">
       <condDesc original="//siap2#humanInput"/>
       <condDesc>
@@ -148,6 +149,11 @@
   <service id="i" allowed="form,siap2.xml">
     <meta name="shortName">Kolonica siap2</meta>
     <meta name="title">Kolonica images</meta>
+
+    <meta name="description">
+      The images in this collection were acquired to monitor selected sky fields around 
+      eclipsing binary stars at the Kolonica Observatory, Slovakia. 
+    </meta>
 
     <!-- other sia.types: Cutout, Mosaic, Atlas -->
     <meta name="sia.type">Pointed</meta>

@@ -1,0 +1,142 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns:n="http://nevow.com/ns/nevow/0.1"
+		xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title n:render="prependsite"> Home</title>
+    <n:invisible n:render="commonhead"/>
+
+	<style type="text/css">
+		.panel {
+			position: relative;
+			background-color: #EAEBEE;
+			margin-top: 0px;
+			min-height:70ex;
+			margin-left: 5px;
+			padding: 5px;
+		}
+
+		.infolink {
+			text-decoration: none;
+			color: #333;
+			white-space: nowrap;
+			background-color: #eee;
+			border: 1pt solid #aaa;
+			padding: 1pt 3pt 1pt 3pt;
+			font-size: 80%;
+		}
+
+		.srvDesc {
+			margin-top: 4pt;
+			margin-bottom: 4pt;
+		}
+	</style>
+
+	<script type="text/javascript">
+		function makePanelShower(panelId) {
+			return function (){
+				$(".panel").css("display", "none");
+				$("#"+panelId).css("display", "block");
+			}
+		}
+			
+		$(document).ready(function() {
+			$("#tabset_tabs li").bind("click", makeTabCallback({
+				'by-subject': makePanelShower("subject-list"),
+				'by-title': makePanelShower("title-list"),
+			}));
+			$("#tabset_tabs li a").removeAttr("href");
+			makePanelShower("title-list")();
+		});
+	</script>
+
+  </head>
+  <body>
+		<div id="header">
+			<img src="/static/img/upjs_logo_medium.jpg" alt="[operator logo]"
+				n:render="rootlink" class="logo headlinelogo"/>
+			<h1 id="pagehead" n:render="prependsite"/>
+		</div>
+		<div n:render="metahtml">site.description</div>
+
+		<p>Please check out our <a href="/static/help.shtml">site help</a>.
+		<span n:render="ifpublictap">
+		Data <a href="/__system__/dc_tables/list/form">on this site</a> can
+		also be queried through <a href="/tap">TAP</a> and an
+		<a href="/adql">ADQL form</a>.</span></p>
+
+		<hr/>
+		<h2>Services available here</h2>
+
+		<div class="container">
+		<ul id="tabset_tabs">
+        <li class="selected"><a href="#title-list" name="by-title"><span>By Rank</span></a></li>
+        <li><a href="#subject-list" name="by-subject"><span>By Subject</span></a></li>
+		</ul>
+
+		<div id="title-list" class="panel">
+			<ul n:render="sequence" n:data="rankedServiceList">
+				<li n:pattern="item" n:render="mapping">
+					<span n:render="ifprotected">[P]</span>
+
+					<n:invisible n:render="ifslot browseable">
+						<a title="Use the service" class="serviceref"
+							><n:attr name="href"><n:slot name="accessURL"/></n:attr
+							><n:slot name="title"/></a>
+						<span class="sep"> </span>
+						<a title="Resource information" class="infolink"
+							><n:attr name="href"><n:slot name="referenceURL"
+							/></n:attr>Service Info</a>
+					</n:invisible>
+
+					<n:invisible n:render="ifnoslot browseable">
+						<a title="Resource information" class="serviceref"
+							><n:attr name="href"><n:slot name="referenceURL"/></n:attr
+							><n:slot name="title"/></a>
+					</n:invisible>
+
+					<div class="srvDesc"><n:slot name="description"/></div>
+				</li>
+			</ul>
+		</div>
+
+		<div id="subject-list" n:data="subjectServiceList" n:render="sequence"
+				style="position:static" class="panel">
+			<n:invisible n:pattern="item" n:render="mapping">
+				<h3><n:slot name="subject"/></h3>
+				<ul n:data="key chunk" n:render="sequence">
+					<li n:pattern="item" n:render="mapping">
+						<span n:render="ifprotected">[P]</span>
+
+						<n:invisible n:render="ifslot browseable">
+							<a title="Use the service" class="serviceref"
+								><n:attr name="href"><n:slot name="accessURL"/></n:attr
+								><n:slot name="title"/></a>
+							<span class="sep"> </span>
+							<a title="Resource information" class="infolink"
+								><n:attr name="href"><n:slot name="referenceURL"
+								/></n:attr>Service Info</a>
+						</n:invisible>
+
+						<n:invisible n:render="ifnoslot browseable">
+							<a title="Resource information" class="serviceref"
+								><n:attr name="href"><n:slot name="referenceURL"/></n:attr
+								><n:slot name="title"/></a>
+						</n:invisible>
+
+					</li>
+				</ul>
+			</n:invisible>
+		</div>
+		</div>
+
+		<p class="attribution">
+			<a>
+				<n:attr name="href">mailto:<n:invisible render="meta"
+					>contact.address</n:invisible></n:attr
+				>Contact us</a>
+			<a href="/__system__/services/overview/form" n:render="rootlink">[s]</a>
+		</p>
+  </body>
+</html>
