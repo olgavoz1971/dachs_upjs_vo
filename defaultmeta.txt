@@ -13,6 +13,12 @@ authority.shortName: upjs
 site.description: We publish data originated from small telescopes. \
 Our primary focus is on time series with related images. \
 Spectral data and catalogues of derived parameters will also be included. \
+Observations with small and medium-sized telescopes remain meaningful \
+in the era of large surveys and major facilities. Such instruments are \
+widely distributed, and their relatively low operational cost allows \
+long-term high-cadence monitoring of individual variable stars. \
+This makes it possible to detect subtle features, transits, and even \
+evolutionary processes. \
 Our team is from Pavol Josef Šafárik University in Košice, Slovakia
 
 authority.title: UPJŠ Authority
