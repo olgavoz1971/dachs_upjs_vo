@@ -1,0 +1,204 @@
+Received: from DU4PR06MB10410.eurprd06.prod.outlook.com (2603:10a6:10:61d::11)
+ by AM0PR06MB5057.eurprd06.prod.outlook.com with HTTPS; Thu, 18 Dec 2025
+ 20:38:27 +0000
+Received: from DU2PR04CA0018.eurprd04.prod.outlook.com (2603:10a6:10:3b::23)
+ by DU4PR06MB10410.eurprd06.prod.outlook.com (2603:10a6:10:61d::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9434.8; Thu, 18 Dec
+ 2025 20:38:24 +0000
+Received: from DB5PEPF00014B98.eurprd02.prod.outlook.com
+ (2603:10a6:10:3b:cafe::5f) by DU2PR04CA0018.outlook.office365.com
+ (2603:10a6:10:3b::23) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9434.7 via Frontend Transport; Thu,
+ 18 Dec 2025 20:38:23 +0000
+Authentication-Results: spf=pass (sender IP is 193.0.88.1)
+ smtp.mailfrom=astrouw.edu.pl; dkim=pass (signature was verified)
+ header.d=astrouw.edu.pl;dmarc=pass action=none
+ header.from=astrouw.edu.pl;compauth=pass reason=100
+Received-SPF: Pass (protection.outlook.com: domain of astrouw.edu.pl
+ designates 193.0.88.1 as permitted sender) receiver=protection.outlook.com;
+ client-ip=193.0.88.1; helo=sirius.astrouw.edu.pl; pr=C
+Received: from sirius.astrouw.edu.pl (193.0.88.1) by
+ DB5PEPF00014B98.mail.protection.outlook.com (10.167.8.165) with Microsoft
+ SMTP Server (version=TLS1_3, cipher=TLS_AES_256_GCM_SHA384) id 15.20.9434.6
+ via Frontend Transport; Thu, 18 Dec 2025 20:38:23 +0000
+Received: by sirius.astrouw.edu.pl (Postfix, from userid 2100)
+	id 615DE2036D; Thu, 18 Dec 2025 21:38:21 +0100 (CET)
+DKIM-Filter: OpenDKIM Filter v2.11.0 sirius.astrouw.edu.pl 615DE2036D
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=astrouw.edu.pl;
+	s=default; t=1766090301;
+	bh=I1rfogp8fT+/XWv2DGD/V7WS7z9qvy9YyrGkypWrHqc=;
+	h=Date:From:To:Subject:In-Reply-To:References:From;
+	b=mpKkr1+uUTNgDRIr6bAg8MeTxXMjQBceTwivBlvJ4C6A6PwBJO1lu2czH/cB7prEo
+	 +BwbSXOKRMP/LsVc8f3zOj9juCFG5NP1mCEB1d9Kd+8u6Yw2lGEbBcgklqmvc3t0iB
+	 7Gc3e5YTyBbiPy9CuCcYzEVpEraD0Y/mGZ2DYMzE=
+Received: from localhost (localhost [127.0.0.1])
+	by sirius.astrouw.edu.pl (Postfix) with ESMTP id 5B36A202C7
+	for <olga.vozyakova@student.upjs.sk>; Thu, 18 Dec 2025 21:38:21 +0100 (CET)
+Date: Thu, 18 Dec 2025 21:38:21 +0100 (CET)
+From: Igor Soszynski <soszynsk@astrouw.edu.pl>
+To: Olga Vozyakova <olga.vozyakova@student.upjs.sk>
+Subject: Re: Permission inquiry: VO-based re-publication of OGLE light
+ curves
+In-Reply-To: <AM0PR06MB5057C419F45E9823BFDB8F29D4AAA@AM0PR06MB5057.eurprd06.prod.outlook.com>
+Message-ID: <de218559-e122-8297-0b07-9189efed0ecc@sirius.astrouw.edu.pl>
+References: <AM0PR06MB5057C419F45E9823BFDB8F29D4AAA@AM0PR06MB5057.eurprd06.prod.outlook.com>
+Content-Type: multipart/mixed;
+	boundary="12648792-1889539131-1766090301=:1281904"
+X-WarsawObs-MailScanner-Information: Please contact the ISP for more information
+X-WarsawObs-MailScanner-ID: 615DE2036D.A978A
+X-WarsawObs-MailScanner: Found to be clean
+X-WarsawObs-MailScanner-From: soszynsk@astrouw.edu.pl
+X-Spam-Status: No
+Return-Path: soszynsk@astrouw.edu.pl
+X-MS-Exchange-Organization-ExpirationStartTime: 18 Dec 2025 20:38:24.0327
+ (UTC)
+X-MS-Exchange-Organization-ExpirationStartTimeReason: OriginalSubmit
+X-MS-Exchange-Organization-ExpirationInterval: 1:00:00:00.0000000
+X-MS-Exchange-Organization-ExpirationIntervalReason: OriginalSubmit
+X-MS-Exchange-Organization-Network-Message-Id: 15a97e84-2d26-424d-2086-08de3e7563d7
+X-EOPAttributedMessage: 0
+X-EOPTenantAttributedMessage: f5b68cf2-035b-428d-87f6-f7384161306d:0
+X-MS-Exchange-Organization-MessageDirectionality: Incoming
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DB5PEPF00014B98:EE_|DU4PR06MB10410:EE_|AM0PR06MB5057:EE_
+X-MS-Exchange-Organization-AuthSource: DB5PEPF00014B98.eurprd02.prod.outlook.com
+X-MS-Exchange-Organization-AuthAs: Anonymous
+X-MS-Office365-Filtering-Correlation-Id: 15a97e84-2d26-424d-2086-08de3e7563d7
+X-MS-Exchange-AtpMessageProperties: SA|SL
+X-MS-Exchange-Organization-SCL: 1
+X-Microsoft-Antispam: BCL:0;ARA:13230040|13003099007|3613699012;
+X-Forefront-Antispam-Report: CIP:193.0.88.1;CTRY:PL;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:sirius.astrouw.edu.pl;PTR:sirius.astrouw.edu.pl;CAT:NONE;SFS:(13230040)(13003099007)(3613699012);DIR:INB;
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Dec 2025 20:38:23.7717
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 15a97e84-2d26-424d-2086-08de3e7563d7
+X-MS-Exchange-CrossTenant-Id: f5b68cf2-035b-428d-87f6-f7384161306d
+X-MS-Exchange-CrossTenant-AuthSource: DB5PEPF00014B98.eurprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: Internet
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DU4PR06MB10410
+X-MS-Exchange-Transport-EndToEndLatency: 00:00:04.2236229
+X-MS-Exchange-Processed-By-BccFoldering: 15.20.9434.000
+X-Microsoft-Antispam-Mailbox-Delivery:
+	ucf:0;jmr:0;auth:0;dest:I;ENG:(910005)(944506478)(944626604)(920097)(930201)(20251009114)(140003);
+X-Microsoft-Antispam-Message-Info:
+	=?iso-8859-2?Q?hG+j3moRc9RZMjWJ7SOFt8ajAAFikGAvXrPP2XeM/MPYFxRisD9FU/wc0t?=
+ =?iso-8859-2?Q?+b4xjhXzZ/0mu6pFg/B36nkcuS/g/PlDblmKfZuX3qms6Xh3daH6OOW2oZ?=
+ =?iso-8859-2?Q?Gse0PBODkjr2ALLsMk3Niua61oz6A1R14SY72fmQvU7IzkAKMv0tYz51i7?=
+ =?iso-8859-2?Q?iDG0p7aISyKt4tCkyG4T4aylMAmcjbL1Ey5DuVwXk/lZaIdbwpeeCQBfts?=
+ =?iso-8859-2?Q?6qGyKOtDHd0JKheT2TpBAYBq2+Ju0RR2DDQIYEknpBsT1jwL179BRCM0oh?=
+ =?iso-8859-2?Q?RwjOr3Zh0+PEpIuybv4z8FDAQ8I9G8o3qR3jiqzXQybYwpSXYc2l/8dCE/?=
+ =?iso-8859-2?Q?9MNLaqL0YWlIrCl2cYJG3IZ894JwNoseGSCIx56ZYBSVNqI8HgK8fDnpM0?=
+ =?iso-8859-2?Q?P2UMBFx/baAWgzw/LmKz0ak+hKlp2G1TOkhLFq7/hgTsN9/CX2XP/GLeVs?=
+ =?iso-8859-2?Q?rFPKd+ffyuCQq8Mjm8B5eKOmynI0ysdNEI5wNYAaahsixYjJUPfzgrkwxt?=
+ =?iso-8859-2?Q?UNDjZIAfGKH8b38wRxTIPpCO3CsykVJZTF+ZS00OQLg0EAXGrO5ONgNHaQ?=
+ =?iso-8859-2?Q?/3MR6AF4Fq7WydJemz32J6X4lq9t7sgE4WeMwLGDrkYDOJRZt8N0EHLh//?=
+ =?iso-8859-2?Q?2Mga6NNIYqc1xa71+po9czsS9uxjDqgVz5colYG0VkJZ1nCe6YERtFIPYz?=
+ =?iso-8859-2?Q?/wEIrTqAY7pWVOzMMMevKx3VrJqsAXgO/KkgBTiC8DMINkg31mAuRWslEc?=
+ =?iso-8859-2?Q?J4d1qLfKgbKlckO0rx3Tc7JeORArr1paVW3KJKCNrdWyp6hK6EYx44+Dch?=
+ =?iso-8859-2?Q?4soxb/osCt1fsKdCfqIioCZd6VS1t8JRomwD0dlUPPuU1/egGJTcFZyl7m?=
+ =?iso-8859-2?Q?fRi4d7VElSaG6YhJZCHKCaE881naUz02se8ht235OTUaPeyULpfZs2Zswn?=
+ =?iso-8859-2?Q?L9qomX0crhQQnY8Vfah35OWfxu53loTTIuS6MQM0pNH1sdIWtmxiLLDhmD?=
+ =?iso-8859-2?Q?RjwW98E39N+Mk+I1YO4gwtcDZXs/0rP1IrI7xZQjTyCoYpzLqMPe/7MNVy?=
+ =?iso-8859-2?Q?HZcHVUaD8SXHhSl0QYjY+VgaPEljzOLQ7IFqP+uDqXMnoBxK3z1fbfXWgP?=
+ =?iso-8859-2?Q?L4X7lvJzrmfs5D+wCyemJIVazUDKNsd5icQ56P82fRMqOoJjWbJYlbr2HE?=
+ =?iso-8859-2?Q?3qOsd4uQVd1jlwaEX97bJTgC/6x2w72DlpeLamqXglLTVTtCZpAZmY8Umh?=
+ =?iso-8859-2?Q?gqdfa64KTnvV1IfvBP1s/XADOeVLSLPw54EttdCGzqowtWb6xzfxk2M0rJ?=
+ =?iso-8859-2?Q?Vu+N+Q0hXYTu/WFmZhGmpQ+XX5sXKtgJtcUWUdvPSs3ABxkPfp5NEKXR02?=
+ =?iso-8859-2?Q?7pnytnX3jwh2YNDkG0EU0a50qAerYiJHfzgzgHAFr+kk5ToGYY/21Zyav5?=
+ =?iso-8859-2?Q?BF4RDReo6948lYvii+sqsshUEQr6jrVEB8/9+GLe6Lh2jv8yVoGdhSn00f?=
+ =?iso-8859-2?Q?7oLnpXplcf5+3man0y2IzuS+hB2WNxpOfUQQfHkCFuaOm/j45pIhKl12m7?=
+ =?iso-8859-2?Q?9tCfwpH8ZMrXPzRDLXptj74vHwMao+PQ0MYVs6wxitsrcT95gAvu6upCaJ?=
+ =?iso-8859-2?Q?+l6WvRRjkJXaQE273nQXPiF/Rb2BqZyDdA427c+aiQDHiQoTdP2jjreZ1w?=
+ =?iso-8859-2?Q?uV89ia4XT1MD7vnEW8o4rHvYdCSTkeBfYSsUZ8EiBa0wwOw5CK+wle6b8j?=
+ =?iso-8859-2?Q?dAFlrdsrEmwzF57e4aaMpaIzJs9gLEASPktgK6JtjkZfb3MvgKp5gm3FIp?=
+ =?iso-8859-2?Q?10ldHwt81jbZ2blilBjSY8gekEi1wkWqZ2wNhCzJh6yZLyMFeBgTqtwlcG?=
+ =?iso-8859-2?Q?aXLGYiBDin0hgzNg60ToFTgN+GJGi+P85RlFRgSzKGOXy/yd/pKJGrKpjm?=
+ =?iso-8859-2?Q?OPZilNRUK/v0ddSDIIDXu/T3f9brBC9oDOhHPexQ2f52SEhvQBjfjOQNGf?=
+ =?iso-8859-2?Q?ae30zk/nULeAgPQTUubowclpL2VM50A7qmvlyf7OuDI7CV1kMSawWJo37T?=
+ =?iso-8859-2?Q?aO5we8qkeSWdOcd/nufBpST2TxbGZbrzo0YerpYEyHNdj0VBMQ/pMUiHm0?=
+ =?iso-8859-2?Q?Y1/HD/l9+ItiHZHu/yxw+ssqsJxSiCNjQGmsZeVexcTpcEPEMzRy+5o9FB?=
+ =?iso-8859-2?Q?k+2DD2VArTVPX55SsN04x23yyuizM6DDG9QOEAtkAvBfgA+zStKhiumLgL?=
+ =?iso-8859-2?Q?MaOX5NVYTSUyBZ5mDGpGTHuBuZ8DUWfbfGfm7QHEtWRnCgih8tYgkgqaxG?=
+ =?iso-8859-2?Q?KGTE2ELHaLUtGuoXPZuHzzrENLLLKk03vzJQrPZt0QbJ18EbwG4xKUJZ8n?=
+ =?iso-8859-2?Q?Ktx1cUjg6eLRF7J2J7P2oyfqgXslXbrAyhSBXu5CEhUsM6dAF6ZKCtwNpo?=
+ =?iso-8859-2?Q?ncUYWPgLhIUOa+MgiPRZntQij7WtB9hEAb4zgHsWqGWWH7aiFDJgZ3SPBq?=
+ =?iso-8859-2?Q?6cV2vtGuBmcMmbzJuhsnw550keDfqjUCe8CMg/UlYTjoIBiOWRkVtZoCpT?=
+ =?iso-8859-2?Q?8pkIfCgGUmqaE4Yie3e494AYfJlkTOqRl8Wbknt4gO02/hD95bB4HX+8j9?=
+ =?iso-8859-2?Q?3I?=
+MIME-Version: 1.0
+
+--12648792-1889539131-1766090301=:1281904
+Content-Type: text/plain; charset="iso-8859-2"; format=flowed
+Content-Transfer-Encoding: 8BIT
+
+Dear Olga,
+
+The light curves in the OGLE Collection of Variable Stars are publicly 
+available and may be freely republished in your service. Please ensure 
+that you provide links to the original data source and give information 
+about the relevant OGLE papers that should be cited when these light 
+curves are used in any scientific study.
+
+I recommend downloading the data from the FTP version of the OGLE 
+Collection of Variable Stars, as it is more up to date:
+https://www.astrouw.edu.pl/ogle/ogle4/OCVS/
+
+In the subdirectories, you can find files named phot.tar.gz that contain 
+gzipped light curves for all variable stars of a given type.
+
+Best regards,
+Igor
+
+
+On Wed, 17 Dec 2025, Olga Vozyakova wrote:
+
+> Dear Dr. Soszyñski,
+> 
+> My name is Olga Vozyakova, and I am a PhD student at ©afárik University in
+> Ko¹ice, Slovakia. My colleagues and I are very interested in OGLE light
+> curves, which we frequently use in our research, for example, in supervised
+> machine-learning applications.
+> 
+> We access the data via the OGLE website
+>  https://ogledb.astrouw.edu.pl/~ogle/OCVS/ and through VizieR. 
+> 
+> It would be extremely useful to have these data also available through
+> standard Virtual Observatory (VO) protocols. We would like to republish them
+> via our VO services, giving full credit to the OGLE team and properly
+> referencing your publications.
+> 
+> We have already launched VO services at https://skvo.science.upjs.sk using
+> DaCHS and have begun publishing light curves and images obtained with
+> telescopes at the Kolonica Observatory. We plan to extend the set of
+> published resources, with a focus on the variable-star community.
+> 
+> Publishing the OGLE light curves this way would make them directly
+> accessible through standard VO protocols (e.g. TAP, SSAP and cone search),
+> allowing users to query them using ADQL, explore them interactively with
+> tools such as TOPCAT and SPLAT-VO, or access them programmatically via
+> Python (pyVO). This would also enable straightforward cross-matching with
+> other VO resources, facilitating integration with external catalogues.
+> 
+> Would you agree to our republishing the OGLE light curves through our VO
+> services? If so, we can prepare the resource description and references
+> based on the information available on your website
+>  https://ogledb.astrouw.edu.pl/~ogle/OCVS/.
+>  We would, of course, be happy to incorporate any additions or changes you
+> might suggest.
+> 
+> Thank you for your time. We hope for your cooperation and look forward to
+> your reply.
+> 
+> 
+> Best regards,
+> 
+>  Olga Vozyakova
+> 
+> Institute of Physics, Faculty of Science
+> ©afárik University,
+> Ko¹ice, Slovakia
+> 
+> 
+>
+--12648792-1889539131-1766090301=:1281904--
