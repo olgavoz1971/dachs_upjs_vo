@@ -30,7 +30,11 @@
       remove if there are no messengers involved.  -->
   <meta name="coverage.waveband">Optical</meta>
 
-  <FEED source="//procs#license-cc-by" what="OGLE TBD"/>
+  <meta name="copyright" format="rst">
+    If you use or refer to the data obtained from this catalog in your scientific work, please cite the appropriate papers:
+      :bibcode: `2015AcA....65....1U`   (OGLE-IV photometry)
+      :bibcode: `2008AcA....58...69U`   (OGLE-III photometry)
+  </meta>
 
   <meta name="_longdoc" format="rst">
     TBD
@@ -85,7 +89,7 @@
 
   </table>
 
-  <data id="import">
+  <data id="import_blg_cep">
     <sources>data/ident_blg_cep.dat</sources>
 
     <columnGrammar>
@@ -163,7 +167,7 @@
 
   </table>
 
-  <data id="import">
+  <data id="import_blg_lpv">
     <sources>data/ident_blg_lpv.dat</sources>
 
     <columnGrammar>

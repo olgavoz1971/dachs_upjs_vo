@@ -1,4 +1,6 @@
 <resource schema="ogle" resdir=".">
+  <macDef name="pubDIDBase">ivo://\getConfig{ivoa}{authority}/~?\rdId/</macDef>
+
   <meta name="creationDate">2025-12-21T16:24:52Z</meta>
 
   <meta name="title">OGLE Time series</meta>
@@ -19,6 +21,13 @@
   <meta name="facility">OGLE TBD</meta>
 
   <meta name="source">2015AcA....65....1U</meta>
+
+  <meta name="copyright" format="rst">
+    If you use or refer to the data obtained from this catalog in your scientific work, please cite the appropriate papers:
+      :bibcode: `2015AcA....65....1U `  (OGLE-IV photometry)
+      :bibcode: `2008AcA....58...69U`   (OGLE-III photometry)
+  </meta>
+
   <meta name="contentLevel">Research</meta>
   <meta name="type">Survey</meta>  <!-- or Archive, Survey, Simulation -->
 
@@ -33,36 +42,57 @@
   <meta name="productType">timeseries</meta>
   <meta name="ssap.testQuery">MAXREC=1</meta>
 
+  <execute on="loaded" title="define id parse functions"><job>
+    <code><![CDATA[
+        # we have artificial accrefs of the form ogle/<id>_<band>;
+        # what we define here needs to be reflected in the viewStatement
+        # of the raw_data table
+        def unparseIdentifier(object, bandpass):
+            """returns an accref from bandpass and object.
+            """
+            return f"ogle/{object}-{bandpass}"
+
+        def parseIdentifier(id):
+            """returns object and bandpass from an accref or a pubDID.
+            """
+            assert "ogle" in id
+            return id.split("/")[-1].split("-")
+
+            rd.unparseIdentifier = unparseIdentifier
+            rd.parseIdentifier = parseIdentifier
+      ]]></code>
+  </job></execute>
+
+
   <table id="raw_data" onDisk="True" adql="hidden"
       namePath="//ssap#instance">
+    <meta name="description">A united view over original ident tables for SSA/ObsCore ingestion</meta>
+
     <!-- the table with your custom metadata; it is transformed
       to something palatable for SSA and Obscore using the view below -->
+    <!-- JK: We create a Materialised View across different ident.dat tables. 
+      They are non-homogeneous, variable-type specific. But we try to do our best -->
 
     <!-- for an explanation of what columns will be defined in the
-    final view, see http://docs.g-vo.org/DaCHS/ref.html#the-ssap-view-mixin.
-
-    Don't mention anything constant here; fill it in in the view
-    definition.
+      final view, see http://docs.g-vo.org/DaCHS/ref.html#the-ssap-view-mixin.
+      Don't mention anything constant here; fill it in in the view
+      definition.
     -->
-    <!-- metadata actually varies among data sets JK: ssa_collection? add ssa_pubDID(?) -->
-    <LOOP listItems=ssa_dstitle ssa_targname ssa_length ssa_timeExt
-			ssa_bandpass ssa_specmid ssa_collection">
+
+    <!-- metadata actually varies among data sets JK: add ssa_pubDID(?) -->
+    <LOOP listItems="ssa_dstitle ssa_location ssa_targname ssa_length ssa_timeExt ssa_targclass
+        ssa_bandpass ssa_specmid ssa_specstart ssa_specend ssa_specext ssa_collection">
       <events>
         <column original="\item"/>
       </events>
     </LOOP>
     <column original="//obscore#ObsCore.t_min"/>
-		<column original="//obscore#ObsCore.t_max"/>
+    <column original="//obscore#ObsCore.t_max"/>
 
     <mixin>//products#table</mixin>
-    <!-- remove this if your data doesn't have (usable) positions -->
     <mixin>//ssap#plainlocation</mixin>
-    <!-- remove this if you don't have plainlocation or there is no
-      aperture -->
     <mixin>//ssap#simpleCoverage</mixin>
-    <!-- the following adds a q3c index so obscore queries over s_ra
-      and s_dec are fast; again, remove this if you don't have useful
-      positions -->
+
     <FEED source="//scs#splitPosIndex"
       columns="ssa_location"
       long="degrees(long(ssa_location))"
@@ -82,260 +112,124 @@
       <property name="targetTitle">Datalink</property>
     </column>
 
-    <!--add further custom columns if necessary here -->
     <!-- custom columns -->
-      <column name="p_star_id" type="text" ucd="meta.id;meta.main" tablehead="internal id"
+      <column name="p_star_id" type="text" ucd="meta.id;meta.main" tablehead="OGLE star id"
         description="Object id in the original table"
         verbLevel="1"
         required="True"/>
-    <!-- Add there necessary data from ident.dat? -->		
-    
+
+      <column name="p_vartype" type="text" ucd="meta.code.class" tablehead="var type"
+        description="Varibale star type, marks part of survey"
+        verbLevel="1"
+        required="False"/>    
+
+    <!-- ssap#fill-plainlocation mixin converts rd,dec into ssa_location
+      (spoint) and ssa_region, but do not forget add aperture 
+      Unfortunately no, we can not apply this fill-plainlocation because we do not have 
+      rowmaker here, while working with a view-->
+    <viewStatement>
+      CREATE MATERIALIZED VIEW \curtable AS (
+        SELECT
+          star_id AS p_star_id,
+          'OGLE ' || 'V' || ' lightcurve ' || 'for ' || star_id AS ssa_dstitle, 
+          'BLG CEP' AS p_vartype,
+          star_id AS ssa_targname,
+          'Ce*' AS ssa_targclass,
+          spoint(radians(raj2000), radians(dej2000)) as ssa_location,
+          NULL::spoly AS ssa_region,
+          '\getConfig{web}{serverURL}/\rdId/sdl/dlget?ID=' || '\pubDIDBase' || 'ogle' || star_id || '-' || 'V' AS accref,
+          '\pubDIDBase' || 'ogle' || star_id || '-' || 'V' AS ssa_pubdid,
+          'V' AS ssa_bandpass,
+          5.5E-7 AS ssa_specmid,
+          4.8E-7 AS ssa_specstart,
+          7.3E-7 AS ssa_specend,
+          2.5E-7 AS ssa_specext,
+          99 AS ssa_timeExt,
+          99 AS ssa_length,
+          49999.999999 AS t_min,
+          59999.999999 AS t_max,
+          'application/x-votable+xml' AS mime,
+          50000 AS accsize,
+          NULL AS embargo,
+          NULL AS owner,
+          NULL AS datalink,
+          'OGLE-BLG-CEP' AS ssa_collection
+        FROM \schema.ident_blg_cep
+      )
+    </viewStatement>
   </table>
 
-  <!-- if you have data that is continually added to, consider using
-    updating="True" and an ignorePattern here; see also howDoI.html,
-    incremental updating.  -->
-  <data id="import">
-    <recreateAfter>make_view</recreateAfter>
+  <data id="create-raw-view">
+    <recreateAfter>make-ssa-view</recreateAfter>
     <property key="previewDir">previews</property>
-    <sources recurse="True"
-      pattern="%resdir-relative pattern, like data/*.fits%"/>
-
-    <!-- It's quite likely that you will need to be creative with a
-      custom row filter or even an embedded grammar to annotate your
-      time series.  Sorry about that; we need a standard format for
-      these things badly.  The important thing is the rowfilter
-      munging single input files to datalinks.  If you have multiple
-      time series per file, it's likely that you want to manipulate
-      self.sourceToken in a rowfilter in front of products#define. -->
-    <fitsProdGrammar qnd="True">
-      <rowfilter procDef="//products#define">
-        <bind key="table">"\schema.raw_data"</bind>
-        <bind key="path">\fullDLURL{sdl}</bind>
-        <!-- the next item should be estimated (the stuff will
-          be generated on the fly).  Make it something like
-          10000+20*number of data points or so. -->
-        <bind key="fsize">%typical size of an SDM VOTable in bytes%</bind>
-        <bind key="datalink">"\rdId#sdl"</bind>
-        <bind key="mime">"application/x-votable+xml"</bind>
-        <bind key="preview">\standardPreviewPath</bind>
-        <bind key="preview_mime">"image/png"</bind>
-      </rowfilter>
-    </fitsProdGrammar>
-
-    <make table="raw_data">
-      <rowmaker idmaps="*">
-        <!-- put vars here to pre-process FITS keys that you need to
-          re-format in non-trivial ways. -->
-
-        <apply procDef="//ssap#fill-plainlocation">
-          <bind key="ra">%where to get the RA from%</bind>
-          <bind key="dec">%where to get the Dec from%</bind>
-          <bind key="aperture">%the aperture (a constant estimate may just do it)%</bind>
-        </apply>
-
-        <!-- the following maps assume the column list in the LOOP
-          above.  If you changed things there, you'll have to adapt
-          things here, too -->
-        <map key="ssa_dateObs">dateTimeToMJD(parseTimestamp(@%key for dateObs%,
-          "%Y-%m-%d %H:%M:%S"))</map>
-        <map key="ssa_dstitle">"{} {}".format(%make a string halfway human-readable and halfway unique for each data set%)</map>
-        <map key="ssa_targname">%which header to get the target name from%</map>
-        <map key="ssa_specstart">%the min wavelength [m] in your passband</map>
-        <map key="ssa_specend">%the max wavelength [m] in your passband%</map>
-        <map key="ssa_length">%the number of points in the time series%</map>
-        <map key="ssa_timeExt">%t_max-t_min at this point%</map>
-        <map key="t_min">%earliest time stamp, mjd%</map>
-        <map key="t_max">%latest time stamp, mjd%</map>
-
-        <map key="datalink">\dlMetaURI{sdl}</map>
-
-        <!-- add mappings for your own custom columns here. -->
-      </rowmaker>
-    </make>
+    <make table="raw_data"/>
   </data>
 
-
-  <table id="data" onDisk="True" adql="True">
-    <!-- the SSA table (on which the service is based) -->
-
+<!-- JK: todo      <meta name="serviceId">sdl</meta>	-->
+  <table id="ts_ssa" onDisk="True" adql="True">
     <meta name="_associatedDatalinkService">
-      <meta name="serviceId">sdl</meta>
       <meta name="idColumn">ssa_pubDID</meta>
     </meta>
 
-    <!-- again, the full list of things you can pass to the mixin
-      is at http://docs.g-vo.org/DaCHS/ref.html#the-ssap-view-mixin.
+    <meta name="description">
+      This table contains metadata about OGLE the photometric time
+      in IVOA SSA format. The actual data is available through a datalink
+      service.
+    </meta>
 
-      Things you already defined in raw_data are ignored here; you
-      can also (almost always) leave them out altogether here.
-      Defaulted attributes (the doc has "defaults to" for them) you
-      can remove.
-
-      The values for the ssa_ attributes below are SQL expressions – that
-      is, you need to put strings in single quotes.
-    -->
     <mixin
       sourcetable="raw_data"
-      copiedcolumns="*"
+      copiedcolumns="[!p]*"
       ssa_aperture="1/3600."
-      ssa_fluxunit="'%Flux unit in the spectrum instance. Use'' for uncalibrated data.%'"
-      ssa_spectralunit="'%Unit used in the spectrum itself ('Angstrom' or so)%'"
-      ssa_bandpass="'%something like Optical or K; don't sweat it%'"
-      ssa_collection="'%a very terse designation for your dataset%'"
-      ssa_fluxcalib="'%ABSOLUTE|CALIBRATED|RELATIVE|NORMALIZED|UNCALIBRATED%'"
-      ssa_fluxucd="%'phot.mag', perhaps; consider adding band info%"
-      ssa_spectralucd="'%em.wl;obs.atmos or similar for optical spectra%'"
-      ssa_targclass="'%e.g., star; use Simbad object types%'"
+      ssa_dstype="'timeseries'"
+      ssa_fluxcalib="'CALIBRATED'"
+      ssa_fluxucd="'phot.mag'"
+      ssa_spectralucd="NULL"
+      ssa_spectralunit="NULL"
+      ssa_creator="'OGLE Team'"
+      ssa_csysName="'ICRS'"
+      ssa_datasource="'survey'"
     >//ssap#view</mixin>
+    
+    <mixin
+      calibLevel="2"
+      t_min="t_min"
+      t_max="t_max"
+      em_xel="1"
+      t_xel="ssa_length"
+      coverage="ssa_region"
+      oUCD="'phot.mag'"
+    >//obscore#publishSSAPMIXC</mixin>
 
-		<mixin
-		  calibLevel="%likely one of 1 for uncalibrated or 2 for calibrated data%"
-		  coverage="%ssa_region -- or remove this if you have no ssa_region%"
-		  oUCD="ssa_fluxucd"
-		  >//obscore#publishSSAPMIXC</mixin>
+    <column original="ssa_publisher" type="unicode"/>    <!-- unicode allows diacrtric symbols -->
   </table>
 
-  <data id="make_view" auto="False">
-    <make table="data"/>
+  <data id="make-ssa-view" auto="False">
+    <make table="ts_ssa"/>
   </data>
 
   <coverage>
-    <updater sourceTable="data"/>
+    <updater sourceTable="ts_ssa"/>
   </coverage>
-
-  <!-- This is the table definition *for a single time series* as used
-    by datalink.  If you have per-bin errors or whatever else, just
-    add columns as above. -->
-  <table id="instance" onDisk="False">
-    <!-- we use a template for description here; it will be filled
-      out by the datalink service below -->
- 		<meta name="description">The \metaString{source} light curve
-			for {ssa_targname} in the {ssa_bandpass} filter.</meta>
-		<mixin
-			effectiveWavelength="@ssa_specmid"
-			filterIdentifier="@ssa_bandpass"
-			magnitudeSystem="%Vega or AB, perhaps%"
-			phot_description="%make it something like 'Gaia-calibrated magnitude'%"
-			phot_ucd="%phot.mag?%"
-			phot_unit="%mag%"
-			refposition="%pick from http://ivoa.net/rdf/refposition%"
-			refframe="%pick from http://ivoa.net/rdf/refframe%"
-			time0="%JD of your time's zero point, 2400000.5 for MJD%"
-			timescale="%pick from http://ivoa.net/rdf/timescale%"
-			>//timeseries#phot-0</mixin>
-		<param original="data.ssa_bandpass"/>
-		<param original="data.ssa_specstart"/>
-		<param original="data.ssa_specmid"/>
-		<param original="data.ssa_specend"/>
-		<param original="data.ssa_location"/>
-		<!-- %add columns for other dependent values (errors and the like) -->
-	</table>
-
-	<data id="build-ts" auto="False">
-		<!-- The source token is the datalink descriptor from the sdl
-			datalink service, which also has the metadata in ssa_row.
-			This is what our pargetter returns.  If you have sane source
-			material, you don't need that and you can in principle use
-			proper grammars, too. -->
-		<embeddedGrammar>
-			<iterator>
-				<code>
-				  # Example: three-column lines (you could use an reGrammar
-				  # here, but we need a custom pargetter)
-					with open(self.sourceToken.src_name) as f:
-						for ln in f:
-							parts = ln.split()
-							yield {
-								'obs_time': float(parts[0]),
-								'phot': float(parts[1]),
-								'err_phot': float(parts[2]),}
-				</code>
-			</iterator>
-			<pargetter>
-				<code>
-					return self.sourceToken.ssa_row
-				</code>
-			</pargetter>
-		</embeddedGrammar>
-
-		<make table="instance">
-			<rowmaker idmaps="*" id="make-ts"/>
-			<!-- you need explicit idmaps rather than * here because
-			  #phot-0 has "hidden" params that you don't want to fill -->
-			<parmaker id="make-ts-par" idmaps="ssa_bandpass, ssa_specstart,
-				ssa_specend, ssa_location, ssa_specmid">
-			</parmaker>
-		</make>
-	</data>
-
-  <!-- the datalink service spitting out quasi-standard time series -->
-	<service id="sdl" allowed="dlget,dlmeta">
-		<meta name="title">\schema Datalink Service</meta>
-		<datalinkCore>
-			<descriptorGenerator>
-				<code>
-					descriptor = ProductDescriptor.fromAccref(
-						pubDID, pubDID.split("?")[-1])
-					with base.getTableConn() as conn:
-						descriptor.ssa_row = next(conn.queryToDicts(
-							"SELECT * FROM \schema.data"
-							" WHERE ssa_pubdid=%(pubDID)s",
-							{"pubDID": pubDID}))
-					return descriptor
-				</code>
-			</descriptorGenerator>
-			<dataFunction>
-				<setup imports="gavo.rsc"/>
-				<code>
-					descriptor.data = rsc.makeData(
-						rd.getById("build-ts"),
-						forceSource=descriptor)
-
-          # sample code for how to change various pieces of metadata of
-          # the generated table.  The tableDef you see is a copy,
-          # so edit with impunity.
-					tab = descriptor.data.getPrimaryTable()
-					tab.setMeta("description",
-						base.getMetaText(tab, "description").format(**descriptor.ssa_row))
-
-					mag_ucd = "phot.mag;em.opt.V"
-					if descriptor.ssa_row["ssa_bandpass"]=="Bessell R":
-						mag_ucd = "phot.mag;em.opt.R"
-					tab.tableDef.getColumnByName("phot").ucd = mag_ucd
-					tab.tableDef.getColumnByName("err_phot").ucd = "stat.error;"+mag_ucd
-				</code>
-			</dataFunction>
-
-			<dataFormatter>
-				<setup imports="gavo.formats.votablewrite"/>
-				<code>
-					return ("application/x-votable+xml;version=1.5",
-						votablewrite.getAsVOTable(descriptor.data, version=(1,5)))
-				</code>
-			</dataFormatter>
-		</datalinkCore>
-	</service>
-
 
   <!-- a form-based service – this is made totally separate from the
   SSA part because grinding down SSA to something human-consumable and
   still working as SSA is non-trivial -->
+
   <service id="web" defaultRenderer="form">
     <meta name="shortName">\schema Web</meta>
 
-    <dbCore queriedTable="data">
+    <dbCore queriedTable="ts_ssa">
       <condDesc buildFrom="ssa_location"/>
+      <condDesc buildFrom="t_min"/>
       <condDesc buildFrom="t_max"/>
-      <!-- add further condDescs in this pattern; if you have useful target
-      names, you'll probably want to index them and say:
-
+      <condDesc buildFrom="ssa_bandpass"/>
       <condDesc>
-        <inputKey original="data.ssa_targname" tablehead="Target Object">
-          <values fromdb="ssa_targname from \schema.data
+        <inputKey original="ts_ssa.ssa_targname" tablehead="Target Object">
+          <values fromdb="ssa_targname from \schema.raw_data
             order by ssa_targname"/>
         </inputKey>
-      </condDesc> -->
+      </condDesc>
     </dbCore>
 
     <outputTable>
@@ -346,60 +240,22 @@
   </service>
 
   <service id="ssa" allowed="form,ssap.xml">
-    <meta name="shortName">\schema SSAP</meta>
+    <meta name="shortName">\schema TS SSAP</meta>
     <meta name="ssap.complianceLevel">full</meta>
 
     <publish render="ssap.xml" sets="ivo_managed"/>
     <publish render="form" sets="ivo_managed,local" service="web"/>
 
-    <ssapCore queriedTable="data">
-      <property key="previews">auto%delete this line if you have no previews; else delete just this.%</property>
-      <FEED source="//ssap#hcd_condDescs"/>
-    </ssapCore>
-  </service>
+    <meta name="title">OGLE light curves Form</meta>
+    <meta name="description">This service exposes OGLE photometric light curves
+          The light curves are published per-band and are also discoverable
+          through ObsCore.
+    </meta>
 
-  <regSuite title="ogle regression">
-    <!-- see http://docs.g-vo.org/DaCHS/ref.html#regression-testing
-      for more info on these. -->
+        <ssapCore queriedTable="ts_ssa">
+        <property key="previews">auto</property>
+        <FEED source="//ssap#hcd_condDescs"/>
+        </ssapCore>
+    </service>
 
-    <regTest title="ogle SSAP serves some data">
-      <url REQUEST="queryData" PUBDID="%a value you have in ssa_pubDID%"
-        >ssa/ssap.xml</url>
-      <code>
-        <!-- to figure out some good strings to use here, run
-          dachs test -k SSAP -D tmp.xml q
-          and look at tmp.xml -->
-        self.assertHasStrings(
-          "%some characteristic string returned by the query%",
-          "%another characteristic string returned by the query%")
-      </code>
-    </regTest>
-
-    <regTest title="ogle Datalink metadata looks about right.">
-      <url ID="%a value you have in ssa_pubDID%"
-        >sdl/dlmeta</url>
-      <code>
-        <!-- to figure out good items to test here, you probably want to
-          dachs test -k datalink  q
-          and pprint the by_sem dict -->
-          by_sem = self.datalinkBySemantics()
-          print(by_sem)
-          self.fail("Fill this in")
-      </code>
-    </regTest>
-
-    <regTest title="ogle delivers some data.">
-      <url ID="%a value you have in ssa_pubDID%"
-        >sdl/dlget</url>
-      <code>
-        <!-- to figure out some good strings to use here, run
-          dachs test -k "delivers data" -D tmp.xml q
-          and look at tmp.xml -->
-        self.assertHasStrings(
-          "%some characteristic string in the datalink meta%")
-      </code>
-    </regTest>
-
-    <!-- add more tests: form-based service renders custom widgets, etc. -->
-  </regSuite>
 </resource>
