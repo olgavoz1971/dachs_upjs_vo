@@ -246,10 +246,22 @@
       description="Photometric system description"
       required="False"/>
 
+    <column name="specstart" type="real"
+      ucd="em.wl"
+      tablehead="specstart"
+      description="Minimum wavelength of the band"
+      required="False"/>
+
     <column name="specmid" type="real"
       ucd="em.wl.central"
       tablehead="specmid"
-      description="Central wavelength of the band"
+      description="Effective wavelength of the band"
+      required="False"/>
+
+    <column name="specend" type="real"
+      ucd="em.wl"
+      tablehead="specend"
+      description="Maximum wavelength of the band"
       required="False"/>
 
   </table>

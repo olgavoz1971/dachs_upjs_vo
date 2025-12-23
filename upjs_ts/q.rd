@@ -82,7 +82,7 @@
 
 		<!-- list of metadata varying across datasets -->
 		<LOOP listItems="ssa_dstitle ssa_targname ssa_pubDID ssa_length ssa_timeExt ssa_bandpass
-					ssa_specmid ssa_csysName">
+					ssa_specmid ssa_specstart ssa_specend ssa_specext ssa_csysName">
  			<events>
 				<column original="\item"/>
 			</events>
@@ -142,7 +142,7 @@
 		<viewStatement>
 			CREATE MATERIALIZED VIEW \curtable AS (
 			SELECT
-				'Kolonica Gaia DR3 ' || o.gaia_name AS ssa_dstitle,
+				'Kolonica lightcurve for Gaia DR3 ' || o.gaia_name AS ssa_dstitle,
 				o.id AS p_object_id,
 				'Gaia DR3 ' || o.gaia_name AS ssa_targname,
 				o.coordequ AS ssa_location,
@@ -157,6 +157,9 @@
 				q.ssa_timeExt,
 				p.band AS ssa_bandpass,
 				p.specmid AS ssa_specmid,
+				p.specstart AS ssa_specstart,
+				p.specend AS ssa_specend,
+				p.specend - p.specstart AS ssa_specext,
 				q.t_min,
 				q.t_max,
 				q.ssa_length,
@@ -172,7 +175,7 @@
 					MIN(extract(julian from l.dateobs at time zone 'UTC+12'))) AS ssa_timeExt,
 					MIN(extract(julian from l.dateobs at time zone 'UTC+12')) - 2400000.5 AS t_min,
 					MAX(extract(julian from l.dateobs at time zone 'UTC+12')) - 2400000.5 AS t_max,
-			    	AVG(magnitude) AS mean_mag
+			    		AVG(magnitude) AS mean_mag
 				FROM \schema.lightcurves AS l
 					GROUP BY l.object_id, l.photosys_id
 				) AS q
@@ -230,6 +233,10 @@
 
 		<mixin
 			calibLevel="2"
+			t_min="t_min"
+			t_max="t_max"
+			em_xel="1"
+			t_xel="ssa_length"
 			coverage="ssa_region"
 			oUCD="'phot.mag'"
 			createDIDIndex="True"
@@ -285,7 +292,7 @@
 				timescale="TCB"
 			>//timeseries#phot-0</mixin>
 
-    	<param original="ts_ssa.t_min"/>
+    		<param original="ts_ssa.t_min"/>
 	  	<param original="ts_ssa.t_max"/>
 	  	<param original="ts_ssa.ssa_location"/>
 
