@@ -617,7 +617,7 @@
 				>ssa/ssap.xml</url>
 					<code>
 					# print(f'{self.data=}')
-					self.assertHasStrings("Kolonica Gaia DR3 1704796837612266368", "258.65889999999996 76.77089999999973")
+					self.assertHasStrings("Kolonica lightcurve for Gaia DR3 1704796837612266368", "258.65889999999996 76.77089999999973")
 				</code>
 		</regTest>
 
