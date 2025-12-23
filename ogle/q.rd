@@ -24,8 +24,8 @@
 
   <meta name="copyright" format="rst">
     If you use or refer to the data obtained from this catalog in your scientific work, please cite the appropriate papers:
-      :bibcode: `2015AcA....65....1U `  (OGLE-IV photometry)
-      :bibcode: `2008AcA....58...69U`   (OGLE-III photometry)
+      :bibcode: `2015AcA....65....1U`  (OGLE-IV photometry)
+      :bibcode: `2008AcA....58...69U`  (OGLE-III photometry)
   </meta>
 
   <meta name="contentLevel">Research</meta>
@@ -80,7 +80,7 @@
     -->
 
     <!-- metadata actually varies among data sets -->
-    <LOOP listItems="ssa_dstitle ssa_location ssa_targname ssa_length ssa_pubDID ssa_timeExt ssa_targclass
+    <LOOP listItems="ssa_dstitle ssa_targname ssa_length ssa_pubDID ssa_timeExt ssa_targclass
         ssa_bandpass ssa_specmid ssa_specstart ssa_specend ssa_specext ssa_collection">
       <events>
         <column original="\item"/>
@@ -219,18 +219,32 @@
 
   <service id="web" defaultRenderer="form">
     <meta name="shortName">\schema Web</meta>
+    <meta name="title">OGLE Time Series Browser Service</meta>
 
     <dbCore queriedTable="ts_ssa">
       <condDesc buildFrom="ssa_location"/>
       <condDesc buildFrom="t_min"/>
       <condDesc buildFrom="t_max"/>
       <condDesc buildFrom="ssa_bandpass"/>
+      <!-- <condDesc>
+        <inputKey original="ssa_bandpass" tablehead="Filter">
+          <values fromdb="DISTINCT ssa_bandpass from \schema.ts_ssa order by ssa_bandpass"/>
+        </inputKey>
+      </condDesc> -->
+ 
       <condDesc>
-        <inputKey original="ts_ssa.ssa_targname" tablehead="Target Object">
-          <values fromdb="ssa_targname from \schema.raw_data
-            order by ssa_targname"/>
+        <inputKey original="ssa_targname" tablehead="Target Object">
+          <values fromdb="ssa_targname from \schema.ts_ssa order by ssa_targname limit 10"/>
         </inputKey>
       </condDesc>
+
+
+<!--      <condDesc>
+        <inputKey original="ssa_targname" tablehead="Target Object">
+          <values fromdb="ssa_targname from \schema.ts_ssa order by ssa_targname limit 10"/>
+        </inputKey>
+      </condDesc> -->
+
     </dbCore>
 
     <outputTable>
@@ -253,10 +267,10 @@
           through ObsCore.
     </meta>
 
-        <ssapCore queriedTable="ts_ssa">
-        <property key="previews">auto</property>
-        <FEED source="//ssap#hcd_condDescs"/>
-        </ssapCore>
-    </service>
+    <ssapCore queriedTable="ts_ssa">
+      <property key="previews">auto</property>
+      <FEED source="//ssap#hcd_condDescs"/>
+    </ssapCore>
+  </service>
 
 </resource>

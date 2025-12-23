@@ -219,7 +219,6 @@
 			ssa_spectralucd="NULL"
 			ssa_spectralunit="NULL"
 			ssa_targclass="'star'"
-			ssa_specext="NULL"
 		>//ssap#view</mixin>
 
 		<!-- todo: caliblevel:
@@ -410,9 +409,10 @@
 	<service id="sdl" allowed="dlget,dlmeta,static">
 		<property name="staticData">data/periodograms</property>
 		<meta name="title">Kolonica light curves Datalink Service</meta>
+		<meta name="shortName">TS Datalink</meta>
 		<meta name="description">
-            This service produces time series datasets for Kolonica lightcurves.
-        </meta>
+            		This service produces time series datasets for Kolonica lightcurves.
+		</meta>
 
 		<datalinkCore>
 			<descriptorGenerator procDef="//datalink#fromtable">
@@ -521,7 +521,7 @@
 
 			<condDesc>	
 				<inputKey original="ssa_bandpass" tablehead="Filter">
-<!--				<values fromdb="ssa_bandpass from \schema.ts_ssa order by ssa_bandpass"/> -->
+<!--					<values fromdb="ssa_bandpass from \schema.ts_ssa order by ssa_bandpass"/> -->
 					<values fromdb="band from \schema.photosys order by band"/>
 				</inputKey>
 			</condDesc>
@@ -530,8 +530,7 @@
 					names, you'll probably want to index them and say: -->
 			<condDesc>
 				<inputKey original="ssa_targname" tablehead="Target Object">
-					<values fromdb="ssa_targname from \schema.ts_ssa
-						order by ssa_targname limit 10"/>
+					<values fromdb="ssa_targname from \schema.ts_ssa order by ssa_targname limit 10"/>
 				</inputKey>
 			</condDesc>
 
@@ -568,9 +567,10 @@
 	<service id="preview" allowed="qp">
 		<property name="queryField">obs_id</property>
 		<meta name="title">Kolonica timeseries previews</meta>
-        <meta name="description">
+		<meta name="shortName">TS previews</meta>
+	        <meta name="description">
 			A service returning PNG thumbnails for time series. It takes the obs id for which to generate a preview.
-        </meta>
+        	</meta>
 		<pythonCore>
 			<inputTable>
 				<inputKey name="obs_id" type="text"
