@@ -5,7 +5,7 @@
 
   <meta name="title">OGLE Time series</meta>
   <meta name="description" format="rst">
-    I promis, I[ll fill this properly befire publisjing any data from this
+    I promis, I'll fill this properly before publishing any data from this
     collection
     this should be a paragraph or two (take care to mention salient terms)
   </meta>
@@ -79,8 +79,8 @@
       definition.
     -->
 
-    <!-- metadata actually varies among data sets JK: add ssa_pubDID(?) -->
-    <LOOP listItems="ssa_dstitle ssa_location ssa_targname ssa_length ssa_timeExt ssa_targclass
+    <!-- metadata actually varies among data sets -->
+    <LOOP listItems="ssa_dstitle ssa_location ssa_targname ssa_length ssa_pubDID ssa_timeExt ssa_targclass
         ssa_bandpass ssa_specmid ssa_specstart ssa_specend ssa_specext ssa_collection">
       <events>
         <column original="\item"/>
@@ -199,6 +199,7 @@
       t_xel="ssa_length"
       coverage="ssa_region"
       oUCD="'phot.mag'"
+      createDIDIndex="True"
     >//obscore#publishSSAPMIXC</mixin>
 
     <column original="ssa_publisher" type="unicode"/>    <!-- unicode allows diacrtric symbols -->
