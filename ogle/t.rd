@@ -196,7 +196,7 @@
     </make>
   </data>
 
-  <service id="q" allowed="form">
+  <service id="web" allowed="form">
     <!-- if you want a browser-based service in addition to TAP, use
     this.  Otherwise, delete this and just write <publish/> into
     the table element above to publish the table as such.  With a
