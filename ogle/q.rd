@@ -46,9 +46,7 @@
 
   <execute on="loaded" title="define id parse functions"><job>
     <code><![CDATA[
-        # we have artificial accrefs of the form ogle/<id>_<band>;
-        # what we define here needs to be reflected in the viewStatement
-        # of the raw_data table
+        # we have artificial accrefs of the form ogle/<id>-<band>;
         def unparseIdentifier(object, bandpass):
             """returns an accref from bandpass and object.
             """
@@ -175,9 +173,9 @@
     <make table="raw_data"/>
   </data>
 
-<!-- JK: todo      <meta name="serviceId">sdl</meta>	-->
   <table id="ts_ssa" onDisk="True" adql="True">
     <meta name="_associatedDatalinkService">
+      <meta name="serviceId">sdl</meta>
       <meta name="idColumn">ssa_pubDID</meta>
     </meta>
 
@@ -222,6 +220,209 @@
   <coverage>
     <updater sourceTable="ts_ssa"/>
   </coverage>
+
+  <STREAM id="instance-template">
+    <table id="instance_\band_short" onDisk="False">
+      <!-- metadata modified by sdl's dataFunction -->
+      <meta name="description">The \metaString{source} lightcurve in the \band_human filter </meta>
+
+      <!-- JK: define them _before_ mentioning them the mixin -->
+      <param original="ts_ssa.ssa_bandpass"/>
+      <param original="ts_ssa.ssa_specmid"/>
+        <mixin
+          effectiveWavelength="\effective_wavelength"
+          filterIdentifier='"\band_human"'
+          magnitudeSystem="Vega"
+          zeroPointFlux="\zero_point_flux"
+          phot_description="OGLE magnitude in \band_human"
+          phot_ucd='phot.mag;\band_ucd'
+          phot_unit="mag"
+          refposition="BARYCENTER"
+          refframe="ICRS"
+          time0="2400000.5"
+          timescale="TCB"
+        >//timeseries#phot-0</mixin>
+
+        <param original="ts_ssa.t_min"/>
+        <param original="ts_ssa.t_max"/>
+        <param original="ts_ssa.ssa_location"/>
+
+        <!-- Add my column -->
+        <column name="mag_err" type="double precision"
+          ucd="stat.error;phot.mag"
+          unit="mag"
+          tablehead="magnitude"
+          description="stellar magnitude error"
+          verbLevel="1"
+          required="False"/>
+    </table>
+  </STREAM>
+
+  <!-- instantiate for a few bands - take names from https://svo2.cab.inta-csic.es/theory/fps/ -->
+  <!-- zero point are from https://svo2.cab.inta-csic.es/theory/fps -->
+  <LOOP source="instance-template">
+    <csvItems>
+            band_short, band_human, band_ucd, effective_wavelength, zero_point_flux
+            V,          Bessell/V, em.opt.V, 5.4e-7, 3630.22
+            I,          Bessell/I, em.opt.I, 8.3e-7, 2415.65
+    </csvItems>
+  </LOOP>
+
+  <data id="build-ts" auto="False">
+    <embeddedGrammar>
+      <iterator>
+        <code>
+          object, passband = rd.parseIdentifier(
+          self.sourceToken.metadata["ssa_pubdid"])    # in embeddedGrammar input is available as self.sourceToken
+
+          with base.getTableConn() as conn:
+            yield from conn.queryToDicts(
+                   "SELECT l.dateobs as dateobs, l.magnitude AS phot, l.mag_err"
+                   " FROM \schema.blg_cep_lc AS l"
+                   " WHERE object_id=%(object)s AND l.passband=%(passband)s"
+                   " ORDER BY l.dateobs",
+                   {"object": object, "passband": passband})
+        </code>
+      </iterator>
+      <pargetter>
+        <code>
+          return self.sourceToken.metadata
+        </code>
+      </pargetter>
+    </embeddedGrammar>
+
+    <make table="instance_V">   <!-- just a placeholder, we don't have the bare "instance" table. But we need a name from the LOOP -->
+      <rowmaker idmaps="*" id="make-ts"/>
+
+      <!-- parmaker can get parameters, provided by pargetter and write them as a metadata in the instance table -->
+      <parmaker id="make-ts-par" idmaps="ssa_bandpass, ssa_specmid, t_min, t_max, ssa_location">
+         <!--tut: touch manually the instance table metadata -->
+         <apply name="update_metadata">
+           <code>
+             sourceId = vars["ssa_targname"]     # in apply the current input fields are available in the vars dictionary
+             targetTable.setMeta("description", base.getMetaText(targetTable, "description") +
+                 " for {}".format(sourceId))
+             targetTable.setMeta("name", str(sourceId))
+           </code>
+         </apply>
+      </parmaker>
+    </make>
+  </data>
+
+  <service id="sdl" allowed="dlget,dlmeta,static">
+    <meta name="title">OGLE light curves Datalink Service</meta>
+    <meta name="shortName">TS Datalink</meta>
+    <meta name="description">
+      This service produces time series datasets for OGLE lightcurves.
+    </meta>
+
+    <!-- The datalink#fromtable descriptor generator simply pulling a row from a database table.
+            This row is made available as the .metadata attribute -->
+    <datalinkCore>
+      <descriptorGenerator procDef="//datalink#fromtable">
+        <bind key="tableName">"\schema.ts_ssa"</bind>
+        <bind key="idColumn">"ssa_pubdid"</bind>
+        <!-- <bind key="didPrefix">"\pubDIDBase/upjs/ts/"</bind>  -->
+      </descriptorGenerator>
+
+      <!-- We should make #this and #preview explicitly without products table (using //datalink#fromtable) -->
+      <metaMaker semantics="#this">
+        <code>
+          targname = descriptor.metadata["ssa_targname"]
+          passband = descriptor.metadata["ssa_bandpass"]
+          yield descriptor.makeLink(
+              descriptor.metadata["accref"],
+              description=f"OGLE time series for {targname} in {passband}",
+              contentType="application/x-votable+xml",
+              contentLength="15000",
+              contentQualifier="#timeseries")
+        </code>
+      </metaMaker>
+
+      <metaMaker semantics="#preview">
+        <code>
+            pubdid = descriptor.metadata['ssa_pubdid']
+            target = descriptor.metadata['ssa_targname']
+            band = descriptor.metadata['ssa_bandpass']
+            path_ending = "/".join(pubdid.split("/")[-3:])
+            url = makeAbsoluteURL(f"\rdId/preview/qp/{path_ending}")
+            yield descriptor.makeLink(
+                url,
+                description=f"Preview for {target} in {band}",
+                contentType="image/png",
+                contentLength="2000"
+            )
+        </code>
+      </metaMaker>
+
+      <dataFunction>
+        <setup imports="gavo.rsc"/>
+        <code>
+            _, bandid = rd.parseIdentifier(descriptor.metadata["ssa_pubdid"])
+            dd = rd.getById("build-ts")
+            descriptor.data = rsc.Data.createWithTable(dd,
+                rd.getById("instance_"+bandid))
+            descriptor.data = rsc.makeData(
+                dd,
+                data=descriptor.data,
+                forceSource=descriptor)
+        </code>
+      </dataFunction>
+
+      <dataFormatter>
+        <!-- to VOTable -->
+        <setup imports="gavo.formats.votablewrite"/>
+        <code>
+            return ("application/x-votable+xml;version=1.5",
+                votablewrite.getAsVOTable(descriptor.data, version=(1,5)))
+        </code>
+      </dataFormatter>
+    </datalinkCore>
+  </service>
+
+  <service id="preview" allowed="qp">
+    <property name="queryField">obs_id</property>
+    <meta name="title">OGLE timeseries previews</meta>
+    <meta name="shortName">TS previews</meta>
+    <meta name="description">
+        A service returning PNG thumbnails for time series. It takes the obs id for which to generate a preview.
+    </meta>
+    <pythonCore>
+        <inputTable>
+          <inputKey name="obs_id" type="text"
+              tablehead="Obs. Id"
+              description="Observation id (a combination of an object id and a passband) to create the preview for."/>
+        </inputTable>
+        <coreProc>
+            <setup>
+                <code>
+                    from gavo.svcs import UnknownURI
+                    from gavo.helpers.processing import SpectralPreviewMaker
+                    # from astropy.stats import sigma_clip
+                    from numpy import nan
+                </code>
+            </setup>
+            <code>
+              objId, passband = rd.parseIdentifier(inputTable.getParam("obs_id"))
+              with base.getUntrustedConn() as conn:
+                    res = list(conn.query(
+                        "SELECT l.obs_time, l.magnitude "
+                        "FROM \schema.blg_cep_lc AS l "
+                        "WHERE object_id=%(obj_id)s AND l.passband=%(passband)s",
+                        {"obj_id": objId, "passband": passband}
+                    ))
+              if not res:
+                raise UnknownURI(f'No time series for {objId} {passband}')
+                  # Try to clean data, kind of:
+                  # jds, mags = zip(*res)
+                  # clipped_mags = sigma_clip(mags, sigma=3)
+                  # cleaned_data = list(zip(jds, -1*clipped_mags.filled(nan)))  # How to invert y-axis?
+                  # return "image/png", SpectralPreviewMaker.get2DPlot(cleaned_data, linear=True, connectPoints=False)
+              return "image/png", SpectralPreviewMaker.get2DPlot(res, linear=True, connectPoints=False)
+            </code>
+        </coreProc>
+    </pythonCore>
+  </service>
 
   <!-- a form-based service – this is made totally separate from the
   SSA part because grinding down SSA to something human-consumable and
