@@ -167,6 +167,7 @@
 
   </table>
 
+<!--
   <data id="import_blg_lpv">
     <sources>data/ident_blg_lpv.dat</sources>
 
@@ -195,6 +196,60 @@
       </rowmaker>
     </make>
   </data>
+-->
+
+  <table id="blg_cep_lc" onDisk="True" adql="True">
+    <meta name="description">The original table with photometric points of the Galactic bulge Cepheids</meta>
+    <index columns="object_id"/>
+    <index columns="passband"/>
+    <index columns="obs_time"/>
+
+    <column name="object_id" type="text"
+      ucd="meta.id"
+      tablehead="Object id"
+      description="Object identifier for this photometry point"
+      required="True"/>
+
+    <column name="passband" type="text"
+      utype="ssa:DataID.Bandpass" ucd="instr.bandpass"
+      tablehead="Filter" verbLevel="15"
+      description="Bandpass (i.e., rough spectral location) of this dataset"/>
+
+    <column name="obs_time" type="double precision"
+      unit="d" ucd="time.epoch"
+      tablehead="Obs Time"
+      description="mjd of the photometric point"/>
+
+    <column name="magnitude" type="double precision"
+      ucd="phot.mag"
+      unit="mag"
+      tablehead="Magnitude"
+      description="Stellar magnitude"
+      required="False"/>
+
+    <column name="mag_err" type="double precision"
+      ucd="stat.error;phot.mag"
+      unit="mag"
+      tablehead="Magnitude error"
+      description="Estimation of magnitude error"
+      required="False"/>
+
+  </table>
+
+  <data id="import_blg_cep_lc">
+    <sources pattern="data/blg_cep/[VI]/*.dat"/>
+
+    <csvGrammar delimiter=" " names="dateobs_jd, magnitude, mag_err"/>
+
+    <make table="blg_cep_lc">
+      <rowmaker idmaps="*">
+        <var name="obs_time">float(@dateobs_jd)-JD_MJD</var>
+        <map key="object_id">\srcstem</map>
+        <map key="passband">\rootlessPath.split("/")[-2]</map>
+      </rowmaker>
+    </make>
+  </data>
+
 
   <service id="web" allowed="form">
     <!-- if you want a browser-based service in addition to TAP, use

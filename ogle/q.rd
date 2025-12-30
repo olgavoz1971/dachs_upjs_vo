@@ -16,7 +16,9 @@
   <meta name="subject">variable-stars</meta>
   <meta name="subject">surveys</meta>
 
-  <meta name="creator">Soszyński, I.; Udalski, A.; Szymański, M.K.; Szymański, G.;  Poleski, R.; Pawlak, M.; Pietrukowicz, P.; Wrona, M.; Iwanek, P.; Mróz, M.</meta>
+  <meta name="creator">Soszyński, I.; Udalski, A.; Szymański, M.K.; Szymański, G.;  
+    Poleski, R.; Pawlak, M.; Pietrukowicz, P.; Wrona, M.; Iwanek, P.; Mróz, M.
+  </meta>
   <meta name="instrument">TBD</meta>
   <meta name="facility">OGLE TBD</meta>
 
@@ -80,8 +82,13 @@
     -->
 
     <!-- metadata actually varies among data sets -->
-    <LOOP listItems="ssa_dstitle ssa_targname ssa_length ssa_pubDID ssa_timeExt ssa_targclass
-        ssa_bandpass ssa_specmid ssa_specstart ssa_specend ssa_specext ssa_collection">
+    <!-- JK: ssa_region comes from ssap#simpleCoverage mixin, and does not reside in ssap#instance.
+         accref, mime, owner, embargo come from products#table mixin
+         ssa_location resides in both, ssap#instance and ssap#plainlocation
+    -->
+    <LOOP listItems="ssa_dstitle ssa_targname ssa_targclass
+      ssa_pubDID ssa_bandpass ssa_specmid ssa_specstart ssa_specend ssa_specext 
+      ssa_timeExt ssa_length ssa_collection">
       <events>
         <column original="\item"/>
       </events>
@@ -97,6 +104,9 @@
       columns="ssa_location"
       long="degrees(long(ssa_location))"
       lat="degrees(lat(ssa_location))"/>
+
+    <!-- JK: We create two different spatial indexes on the same column ssa_location - gist and q3c. 
+      Are they for different kinds of queries? -->  
 
     <!-- the datalink column is mainly useful if you have a form-based
       service.  You can dump this (and the mapping rule filling it below)
