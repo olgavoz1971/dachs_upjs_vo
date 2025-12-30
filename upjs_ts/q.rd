@@ -1,5 +1,5 @@
 <resource schema="upjs_ts" resdir=".">
-    <macDef name="pubDIDBase">ivo://\getConfig{ivoa}{authority}/~?\rdId/</macDef>	<!-- bgds l2 -->
+    <macDef name="pubDIDBase">ivo://\getConfig{ivoa}{authority}/~?\rdId/</macDef>	<!-- from bgds l2 -->
 
 	<meta name="creationDate">2025-09-03T09:40:33Z</meta>
 
@@ -58,7 +58,7 @@
 
 	<execute on="loaded" title="define id parse functions"><job>
 		<code><![CDATA[
-			# we have artificial accrefs of the form upjs/ts/<id>_<band>;
+			# we have artificial accrefs of the form upjs/ts/<id>-<band>;
 			# what we define here needs to be reflected in the viewStatement
 			# of the raw_data table
 			def unparseIdentifier(object, bandpass):
@@ -90,6 +90,7 @@
 
 		<column original="//obscore#ObsCore.t_min"/>
 		<column original="//obscore#ObsCore.t_max"/>
+		<column original="//products#products.accref"/>
 
 		<mixin>//ssap#plainlocation</mixin>		<!-- injects ssa_location -->
 		<mixin>//ssap#simpleCoverage</mixin>	<!-- ssa_region -->
@@ -187,11 +188,11 @@
 
 	<data id="create-raw-view">
 		<recreateAfter>make-ssa-view</recreateAfter>
-		<property key="previewDir">previews</property>
+		<!-- <property key="previewDir">previews</property> We make previews on the fly, so we don't need this directory -->
 		<make table="raw_data"/>		
 	</data>
 
-	<table id="ts_ssa" onDisk="True" adql="True">		<!-- also stolen from carmenes t.rd  -->
+	<table id="ts_ssa" onDisk="True" adql="True">
 		<meta name="_associatedDatalinkService">		<!-- declared a table as having datalink support -->
 			<meta name="serviceId">sdl</meta>			<!-- JK: this will go to the table metadata, TOPCAT use this sdl to build *sdl/dlmeta* stuff -->
 			<meta name="idColumn">ssa_pubDID</meta>
@@ -221,7 +222,7 @@
 			ssa_targclass="'star'"
 		>//ssap#view</mixin>
 
-		<!-- todo: caliblevel:
+		<!-- caliblevel:
 			0 - Raw instrumental data, in a proprietary or internal data-provider defined format
 			1 - Instrumental data in a standard format (FITS, VOTable, etc )
 			2 - Calibrated, science ready data with the instrument signature removed
@@ -239,9 +240,10 @@
 			coverage="ssa_region"
 			oUCD="'phot.mag'"
 			createDIDIndex="True"
-		>//obscore#publishSSAPMIXC</mixin>	<!-- publish this through ObsCore to -->
+		>//obscore#publishSSAPMIXC</mixin>	<!-- JK: Note: We need to pass t_min/t_max parameters explicitly
+			in the case of timeseries: defaults are appropriate for spectra only -->
 
-		<!-- Change the column type from text to unicode to allow our Slovak diacritic symbols -->
+		<!-- JK: Change the column type from text to unicode to allow our Slovak diacritic symbols -->
 		<column original="ssa_publisher" type="unicode"/>
 	</table>
 
@@ -249,12 +251,12 @@
 		<make table="ts_ssa"/>
 	</data>
 	
-	 <coverage>
+	<coverage>
 		<updater sourceTable="ts_ssa"/>
 	</coverage>
 
 
-	<!-- JK: Try to build separate templates for different bands
+	<!-- JK: Build separate templates for different bands
 		stolen from bgds/l
 		This template is for the table definition *for a single time series* as used
 		by datalink.
@@ -266,7 +268,7 @@
 		TODO: ssa_targname is not seen there, do something to fix that issue
 		TODO: add zeropints to the photosys table
 		TODO: take bands parameters from to photosys table, do not doule them here
-		TODO: check region, I den't have it yet
+		TODO: check region, I don't have it yet
 	-->
 	<STREAM id="instance-template">
 		<table id="instance_\band_short" onDisk="False">
@@ -275,13 +277,13 @@
 			\band_human filter </meta>
 
     	<!-- JK: define them _before_ mentioning them the mixin -->
-	  	<param original="ts_ssa.ssa_bandpass"/>
-	  	<param original="ts_ssa.ssa_specmid"/>
+		<param original="ts_ssa.ssa_bandpass"/>
+		<param original="ts_ssa.ssa_specmid"/>
 			<mixin
 				effectiveWavelength="\effective_wavelength"
 				filterIdentifier='"\band_human"'
 				magnitudeSystem="Vega"
-				zeroPointFlux="3636"
+				zeroPointFlux="\zero_point_flux"
 				phot_description="Kolonica magnitude in \band_human"
 				phot_ucd='phot.mag;\band_ucd'
 				phot_unit="mag"
@@ -291,56 +293,57 @@
 				timescale="TCB"
 			>//timeseries#phot-0</mixin>
 
-    		<param original="ts_ssa.t_min"/>
-	  	<param original="ts_ssa.t_max"/>
-	  	<param original="ts_ssa.ssa_location"/>
+		<param original="ts_ssa.t_min"/>
+		<param original="ts_ssa.t_max"/>
+		<param original="ts_ssa.ssa_location"/>
 
-	      	<!-- Add my columns -->
-			<column name="mag_err" type="double precision"
-				ucd="stat.error;phot.mag"
-				unit="mag"
-				tablehead="magnitude"
-				description="stellar magnitude error"
-				verbLevel="1"
-				required="False"/>
+		<!-- Add my columns -->
+		<column name="mag_err" type="double precision"
+			ucd="stat.error;phot.mag"
+			unit="mag"
+			tablehead="magnitude"
+			description="stellar magnitude error"
+			verbLevel="1"
+			required="False"/>
 
-			<column name="origin_image" type="text"
-				ucd="meta.ref.url"
-				tablehead="access_url"
-				description="Path to access fits image"
-				verbLevel="1"
-				required="False"
-				displayHint="type=product"/>
+		<column name="origin_image" type="text"
+			ucd="meta.ref.url"
+			tablehead="access_url"
+			description="Path to access fits image"
+			verbLevel="1"
+			required="False"
+			displayHint="type=product"/>
 
-			<column name="airmass"
-				ucd="obs.airMass"
-				description="Airmass of the target"
-				verbLevel="18"/>
+		<column name="airmass"
+			ucd="obs.airMass"
+			description="Airmass of the target"
+			verbLevel="18"/>
 
-	      	<!-- JK: Add also something kind of:
-	      	<column original="lightcurves.process_info"/>   my jsonb from lc_metadata
-	      	-->
+		<!-- JK: Add also something kind of:
+			<column original="lightcurves.process_info"/>   my jsonb from lc_metadata
+		-->
 
-			</table>
-		</STREAM>
+		</table>
+	</STREAM>
 
-	<!-- instantiate for a few bands - take names from https://svo2.cab.inta-csic.es/theory/fps/ ??? -->
+	<!-- instantiate for a few bands - take names from https://svo2.cab.inta-csic.es/theory/fps/ -->
+	<!-- zero point are from https://svo2.cab.inta-csic.es/theory/fps -->
 	<LOOP source="instance-template">
 		<csvItems>
-			band_short, band_human, band_ucd, effective_wavelength
-			U, 			Bessell/U, em.opt.U, 3.6e-7
-			B, 			Bessell/B, em.opt.B, 4.4e-7
-			V, 			Bessell/V, em.opt.V, 5.4e-7
-			R, 			Bessell/R, em.opt.R, 6.2e-7
-			I, 			Bessell/I, em.opt.I, 8.3e-7
-			u_sdss,		   u/sdss, em.opt.U, 3.56e-7
-			g_sdss,		   g/sdss, em.opt.B, 4.71e-7
-			r_sdss,		   r/sdss, em.opt.R, 6.18e-7
-			i_sdss,		   i/sdss, em.opt.I, 7.49e-7
-			z_sdss,		   z/sdss, em.opt.I, 8.96e-7
+			band_short, band_human, band_ucd, effective_wavelength, zero_point_flux
+			U, 			Bessell/U, em.opt.U, 3.6e-7, 1699.71
+			B, 			Bessell/B, em.opt.B, 4.4e-7, 3908.46
+			V, 			Bessell/V, em.opt.V, 5.4e-7, 3630.22
+			R, 			Bessell/R, em.opt.R, 6.2e-7, 3056.93
+			I, 			Bessell/I, em.opt.I, 8.3e-7, 2415.65
+			u_sdss,		   u/sdss, em.opt.U, 3.56e-7, 1456.61
+			g_sdss,		   g/sdss, em.opt.B, 4.71e-7, 3996.23
+			r_sdss,		   r/sdss, em.opt.R, 6.18e-7, 3148.77
+			i_sdss,		   i/sdss, em.opt.I, 7.49e-7, 2508.91
+			z_sdss,		   z/sdss, em.opt.I, 8.96e-7, 1909.06
 		</csvItems>
 	</LOOP>
-		
+
 	<data id="build-ts" auto="False">
 		<!--
 		note 1: parmaker copies values from the SSA input row to the params in the
@@ -350,7 +353,7 @@
 			<iterator>
 				<code>
 					object, passband = rd.parseIdentifier(
-						self.sourceToken.metadata["ssa_pubdid"])
+						self.sourceToken.metadata["ssa_pubdid"])	# in embeddedGrammar input is available as self.sourceToken
 
 					with base.getTableConn() as conn:
 						for row in conn.queryToDicts(
@@ -385,7 +388,7 @@
 				<apply name="update_metadata">
 					<code>
 						# sourceId = vars["parser_"].sourceToken["ssa_targname"]	does not work
-						sourceId = vars["ssa_targname"]		# works
+						sourceId = vars["ssa_targname"]		# works: in apply The current input fields are available in the vars dictionary
 						targetTable.setMeta("description", base.getMetaText(targetTable, "description") +
 							" for {}".format(sourceId))
 						targetTable.setMeta("name", str(sourceId))
@@ -407,24 +410,36 @@
 	-->
 
 	<service id="sdl" allowed="dlget,dlmeta,static">
-		<property name="staticData">data/periodograms</property>
+		<!-- <property name="staticData">data/periodograms</property> -->
 		<meta name="title">Kolonica light curves Datalink Service</meta>
 		<meta name="shortName">TS Datalink</meta>
 		<meta name="description">
-            		This service produces time series datasets for Kolonica lightcurves.
+			This service produces time series datasets for Kolonica lightcurves.
 		</meta>
 
+		<!-- The datalink#fromtable descriptor generator simply pulling a row from a database table.
+			This row is made available as the .metadata attribute -->
 		<datalinkCore>
 			<descriptorGenerator procDef="//datalink#fromtable">
 				<bind key="tableName">"\schema.ts_ssa"</bind>
 				<bind key="idColumn">"ssa_pubdid"</bind>
+				<bind key="didPrefix">"\pubDIDBase/upjs/ts/"</bind>
+				<setup>
+					<code>
+						def addExtras(desc):	# since DaCHS 2.13 ;(
+							parts = desc.metadata["ssa_pubdid"].split("/")
+							desc.object, desc.passband = rd.parseIdentifier(desc.metadata["ssa_pubdid"])
+					</code>
+				</setup>
 			</descriptorGenerator>
 
-			<!-- We should do #this explicitly without products table -->
+			<!-- We should do #this explicitly without products table (using //datalink#fromtable) -->
 			<metaMaker semantics="#this">
 				<code>
 					targname = descriptor.metadata["ssa_targname"]
 					passband = descriptor.metadata["ssa_bandpass"]
+					# targname = descriptor.object		since 2.13
+					# passband = descriptor.passband
 					yield descriptor.makeLink(
 						descriptor.metadata["accref"],
 						description=f"Kolonica time series for {targname} in {passband}",
@@ -484,6 +499,7 @@
 				<setup imports="gavo.rsc"/>
 				<code>
 					_, bandid = rd.parseIdentifier(descriptor.metadata["ssa_pubdid"])
+					# bandid = descriptor.passband	# since 2.13
 					dd = rd.getById("build-ts")
 					descriptor.data = rsc.Data.createWithTable(dd,
 						rd.getById("instance_"+bandid))
