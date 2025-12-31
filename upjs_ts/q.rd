@@ -70,7 +70,9 @@
 				"""returns object and bandpass from an accref or a pubDID.
 				"""
 				assert "upjs/ts" in id
-				return id.split("/")[-1].split("-")
+				tail = id.split("/")[-1]
+				object, bandpass = tail.rsplit("-", 1)	# object may contain "-"
+				return object, bandpass
 
 			rd.unparseIdentifier = unparseIdentifier
 			rd.parseIdentifier = parseIdentifier
