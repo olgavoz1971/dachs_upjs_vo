@@ -56,10 +56,12 @@
             """returns object and bandpass from an accref or a pubDID.
             """
             assert "ogle" in id
-            return id.split("/")[-1].split("-")
+            tail = id.split("/")[-1]
+            object, bandpass = tail.rsplit("-", 1)	# object may contain "-"
+            return object, bandpass
 
-            rd.unparseIdentifier = unparseIdentifier
-            rd.parseIdentifier = parseIdentifier
+        rd.unparseIdentifier = unparseIdentifier
+        rd.parseIdentifier = parseIdentifier
       ]]></code>
   </job></execute>
 
@@ -145,8 +147,8 @@
           'Ce*' AS ssa_targclass,
           spoint(radians(raj2000), radians(dej2000)) as ssa_location,
           NULL::spoly AS ssa_region,
-          '\getConfig{web}{serverURL}/\rdId/sdl/dlget?ID=' || '\pubDIDBase' || 'ogle' || star_id || '-' || 'V' AS accref,
-          '\pubDIDBase' || 'ogle' || star_id || '-' || 'V' AS ssa_pubdid,
+          '\getConfig{web}{serverURL}/\rdId/sdl/dlget?ID=' || '\pubDIDBase' || 'ogle/' || star_id || '-' || 'V' AS accref,
+          '\pubDIDBase' || 'ogle/' || star_id || '-' || 'V' AS ssa_pubdid,
           'V' AS ssa_bandpass,
           5.5E-7 AS ssa_specmid,
           4.8E-7 AS ssa_specstart,
@@ -277,10 +279,10 @@
 
           with base.getTableConn() as conn:
             yield from conn.queryToDicts(
-                   "SELECT l.dateobs as dateobs, l.magnitude AS phot, l.mag_err"
+                   "SELECT l.obs_time, l.magnitude AS phot, l.mag_err"
                    " FROM \schema.blg_cep_lc AS l"
                    " WHERE object_id=%(object)s AND l.passband=%(passband)s"
-                   " ORDER BY l.dateobs",
+                   " ORDER BY l.obs_time",
                    {"object": object, "passband": passband})
         </code>
       </iterator>
