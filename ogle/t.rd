@@ -41,7 +41,7 @@
   </meta>
 
   <table id="ident_blg_cep" onDisk="True" adql="True">
-    <column name="star_id" type="text" ucd="meta.id;meta.main"
+    <column name="object_id" type="text" ucd="meta.id;meta.main"
       tablehead="Star ID" verbLevel="1" 
       description="Star identifier"
       required="True">
@@ -94,7 +94,7 @@
 
     <columnGrammar>
       <colDefs>
-        star_id:    1-16
+        object_id:   1-16
         pulse_mode: 18-25
         alphaHMS:   28-38
         deltaDMS:   40-50
@@ -119,7 +119,7 @@
   </data>
 
   <table id="ident_blg_lpv" onDisk="True" adql="True">
-    <column name="star_id" type="text" ucd="meta.id;meta.main"
+    <column name="object_id" type="text" ucd="meta.id;meta.main"
       tablehead="Star ID" verbLevel="1" 
       description="Star identifier"
       required="True">
@@ -167,14 +167,13 @@
 
   </table>
 
-<!--
   <data id="import_blg_lpv">
     <sources>data/ident_blg_lpv.dat</sources>
 
     <columnGrammar>
       <colDefs>
-        star_id:    1-19
-        type: 22-25
+        object_id:   1-19
+        type:       22-25
         alphaHMS:   28-38
         deltaDMS:   40-50
         ogle4_id:   53-68
@@ -196,7 +195,6 @@
       </rowmaker>
     </make>
   </data>
--->
 
   <table id="blg_cep_lc" onDisk="True" adql="True">
     <meta name="description">The original table with photometric points of the Galactic bulge Cepheids</meta>

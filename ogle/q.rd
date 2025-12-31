@@ -123,15 +123,31 @@
     </column>
 
     <!-- custom columns -->
-      <column name="p_star_id" type="text" ucd="meta.id;meta.main" tablehead="OGLE star id"
+    <!--
+    <column name="p_object_id" type="text"
+        ucd="meta.id;meta.main"
+        tablehead="OGLE star id"
         description="Object id in the original table"
         verbLevel="1"
         required="True"/>
+    -->
 
-      <column name="p_vartype" type="text" ucd="meta.code.class" tablehead="var type"
+    <column name="p_mean_mag" type="real"
+        ucd="phot.mag;stat.mean"
+        unit="mag"
+        tablehead="Mean magnitude"
+        description="Stellar magnitude"
+        verbLevel="1"
+        required="False"/>   <!-- And this column is worth showing to users -->
+
+    <!--
+    <column name="p_vartype" type="text"
+        ucd="meta.code.class"
+        tablehead="Var type"
         description="Varibale star type, marks part of survey"
         verbLevel="1"
-        required="False"/>    
+        required="False"/>
+    -->
 
     <!-- ssap#fill-plainlocation mixin converts rd,dec into ssa_location
       (spoint) and ssa_region, but do not forget add aperture 
@@ -140,31 +156,43 @@
     <viewStatement>
       CREATE MATERIALIZED VIEW \curtable AS (
         SELECT
-          star_id AS p_star_id,
-          'OGLE ' || 'V' || ' lightcurve ' || 'for ' || star_id AS ssa_dstitle, 
-          'BLG CEP' AS p_vartype,
-          star_id AS ssa_targname,
+          'OGLE ' || q.passband || ' lightcurve ' || 'for ' || q.object_id AS ssa_dstitle,
+          q.object_id AS ssa_targname,
+          -- 'BLG CEP' AS p_vartype,
           'Ce*' AS ssa_targclass,
-          spoint(radians(raj2000), radians(dej2000)) as ssa_location,
+          spoint(radians(o.raj2000), radians(o.dej2000)) as ssa_location,
           NULL::spoly AS ssa_region,
-          '\getConfig{web}{serverURL}/\rdId/sdl/dlget?ID=' || '\pubDIDBase' || 'ogle/' || star_id || '-' || 'V' AS accref,
-          '\pubDIDBase' || 'ogle/' || star_id || '-' || 'V' AS ssa_pubdid,
-          'V' AS ssa_bandpass,
+          '\getConfig{web}{serverURL}/\rdId/sdl/dlget?ID=' || '\pubDIDBase' || 'ogle/' || q.object_id || '-' || q.passband AS accref,
+          '\pubDIDBase' || 'ogle/' || q.object_id || '-' || q.passband AS ssa_pubdid,
+          q.passband AS ssa_bandpass,
           5.5E-7 AS ssa_specmid,
           4.8E-7 AS ssa_specstart,
           7.3E-7 AS ssa_specend,
           2.5E-7 AS ssa_specext,
-          99 AS ssa_timeExt,
-          99 AS ssa_length,
-          49999.999999 AS t_min,
-          59999.999999 AS t_max,
+          ssa_timeExt,
+          t_min,
+          t_max,
+          q.ssa_length,
+          mean_mag AS p_mean_mag,
+          'ICRS' AS ssa_csysName,
           'application/x-votable+xml' AS mime,
           50000 AS accsize,
           NULL AS embargo,
           NULL AS owner,
           NULL AS datalink,
           'OGLE-BLG-CEP' AS ssa_collection
-        FROM \schema.ident_blg_cep
+        FROM (
+          SELECT
+            l.object_id, l.passband,
+            count(*) AS ssa_length,
+            MAX(l.obs_time) - MIN(l.obs_time) AS ssa_timeExt,
+            MIN(l.obs_time) AS t_min,
+            MAX(l.obs_time) AS t_max,
+            AVG(magnitude) AS mean_mag
+          FROM \schema.blg_cep_lc AS l
+            GROUP BY l.object_id, l.passband
+        ) AS q
+        JOIN \schema.ident_blg_cep AS o USING (object_id)
       )
     </viewStatement>
   </table>
