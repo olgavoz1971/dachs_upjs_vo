@@ -160,8 +160,12 @@
     </make>
   </data>
 
-  <STREAM id="CommonColumnsLc">
-    <meta name="description">The original table with photometry points of \name</meta>
+
+<!-- ######################################################################## -->
+
+
+  <table id="lightcurves" onDisk="True" adql="True">
+    <meta name="description">The united table with photometry points of all OGLE Lightcurves</meta>
     <index columns="object_id"/>
     <index columns="passband"/>
     <index columns="obs_time"/>
@@ -195,33 +199,25 @@
       tablehead="Magnitude error"
       description="Estimation of magnitude error"
       required="False"/>
-  </STREAM>
+  </table>
 
-  <STREAM id="ddLcTable">
+  <data id="import_lightcurves" updating="True">
+
+    <sources pattern="data/blg_???/phot*/[VI]/*.dat"/>
+
     <csvGrammar delimiter=" " strip="True" names="dateobs_jd, magnitude, mag_err"/>
-    <make table="\table_name">
+
+    <make table="lightcurves">
       <rowmaker idmaps="*">
-        <var name="obs_time">float(@dateobs_jd)-\to_mjd</var>
-        <map key="object_id">\\srcstem</map>
-        <map key="passband">\\rootlessPath.split("/")[-2]</map>
+        <!-- OGLE jds come with different "time zero-points" unfortunately -->
+        <var name="to_mjd">
+          2400000.5 if "blg_cep" in \rootlessPath else -49999.5
+        </var>
+        <var name="obs_time">float(@dateobs_jd)-@to_mjd</var>
+        <map key="object_id">\srcstem</map>
+        <map key="passband">\rootlessPath.split("/")[-2]</map>
       </rowmaker>
     </make>
-  </STREAM>
-
-  <table id="blg_cep_lc" onDisk="True" adql="True">
-    <FEED source="CommonColumnsLc" name="Classical Cepheids toward the Galactic bulge"/>
-  </table>
-  <data id="import_blg_cep_lc">
-    <sources pattern="data/blg_cep/phot/[VI]/*.dat"/>
-    <FEED source="ddLcTable" table_name="blg_cep_lc" to_mjd="JD_MJD"/>
-  </data>
-
-  <table id="blg_lpv_lc" onDisk="True" adql="True">
-    <FEED source="CommonColumnsLc" name="Mira stars toward the Galactic Bulge"/>
-  </table>
-  <data id="import_blg_lpv_lc">
-    <sources pattern="data/blg_lpv/phot_ogle2/[VI]/*.dat"/>
-    <FEED source="ddLcTable" table_name="blg_lpv_lc" to_mjd="-49999.5"/>
   </data>
 
 <!-- ################################################################# -->

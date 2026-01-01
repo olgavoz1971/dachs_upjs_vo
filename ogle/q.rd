@@ -50,13 +50,15 @@
         def unparseIdentifier(object, bandpass):
             """returns an accref from bandpass and object.
             """
-            return f"ogle/{object}-{bandpass}"
+            return f"{object}-{bandpass}"
 
         def parseIdentifier(id):
             """returns object and bandpass from an accref or a pubDID.
             """
-            assert "ogle" in id
+            # assert "ogle" in id
+            print(f'parseIdentifier: ------------------ {id=} -----------------')
             tail = id.split("/")[-1]
+            print(f'parseIdentifier: ------------------ {tail=} -----------------')
             object, bandpass = tail.rsplit("-", 1)	# object may contain "-"
             return object, bandpass
 
@@ -65,7 +67,7 @@
       ]]></code>
   </job></execute>
 
-
+  <!-- TODO add SCS or build united objects view? -->
   <table id="raw_data" onDisk="True" adql="hidden"
       namePath="//ssap#instance">
     <meta name="description">A united view over original ident tables for SSA/ObsCore ingestion</meta>
@@ -123,14 +125,6 @@
     </column>
 
     <!-- custom columns -->
-    <!--
-    <column name="p_object_id" type="text"
-        ucd="meta.id;meta.main"
-        tablehead="OGLE star id"
-        description="Object id in the original table"
-        verbLevel="1"
-        required="True"/>
-    -->
 
     <column name="p_mean_mag" type="real"
         ucd="phot.mag;stat.mean"
@@ -140,30 +134,29 @@
         verbLevel="1"
         required="False"/>   <!-- And this column is worth showing to users -->
 
-    <!--
-    <column name="p_vartype" type="text"
-        ucd="meta.code.class"
-        tablehead="Var type"
-        description="Varibale star type, marks part of survey"
-        verbLevel="1"
-        required="False"/>
-    -->
-
     <!-- ssap#fill-plainlocation mixin converts rd,dec into ssa_location
       (spoint) and ssa_region, but do not forget add aperture 
       Unfortunately no, we can not apply this fill-plainlocation because we do not have 
       rowmaker here, while working with a view-->
+
     <viewStatement>
+
       CREATE MATERIALIZED VIEW \curtable AS (
+
+        WITH objects AS (
+          SELECT object_id, raj2000, dej2000, 'Ce*' AS vartype, 'OGLE-BLG-CEP' AS collection FROM \schema.ident_blg_cep
+          UNION ALL
+          SELECT object_id, raj2000, dej2000, 'LP*' AS vartype, 'OGLE-BLG-LPV' AS collection FROM \schema.ident_blg_lpv
+        )
+
         SELECT
           'OGLE ' || q.passband || ' lightcurve ' || 'for ' || q.object_id AS ssa_dstitle,
           q.object_id AS ssa_targname,
-          -- 'BLG CEP' AS p_vartype,
-          'Ce*' AS ssa_targclass,
+          vartype AS ssa_targclass,
           spoint(radians(o.raj2000), radians(o.dej2000)) as ssa_location,
           NULL::spoly AS ssa_region,
-          '\getConfig{web}{serverURL}/\rdId/sdl/dlget?ID=' || '\pubDIDBase' || 'ogle/' || q.object_id || '-' || q.passband AS accref,
-          '\pubDIDBase' || 'ogle/' || q.object_id || '-' || q.passband AS ssa_pubdid,
+          '\getConfig{web}{serverURL}/\rdId/sdl/dlget?ID=' || '\pubDIDBase' || q.object_id || '-' || q.passband AS accref,
+          '\pubDIDBase' || q.object_id || '-' || q.passband AS ssa_pubdid,
           q.passband AS ssa_bandpass,
           5.5E-7 AS ssa_specmid,
           4.8E-7 AS ssa_specstart,
@@ -180,7 +173,7 @@
           NULL AS embargo,
           NULL AS owner,
           NULL AS datalink,
-          'OGLE-BLG-CEP' AS ssa_collection
+          collection AS ssa_collection
         FROM (
           SELECT
             l.object_id, l.passband,
@@ -189,11 +182,12 @@
             MIN(l.obs_time) AS t_min,
             MAX(l.obs_time) AS t_max,
             AVG(magnitude) AS mean_mag
-          FROM \schema.blg_cep_lc AS l
+          FROM \schema.lightcurves AS l
             GROUP BY l.object_id, l.passband
         ) AS q
-        JOIN \schema.ident_blg_cep AS o USING (object_id)
+        JOIN objects AS o USING (object_id)
       )
+
     </viewStatement>
   </table>
 
@@ -302,13 +296,13 @@
     <embeddedGrammar>
       <iterator>
         <code>
-          object, passband = rd.parseIdentifier(
-          self.sourceToken.metadata["ssa_pubdid"])    # in embeddedGrammar input is available as self.sourceToken
+          print(self.sourceToken.metadata)
+          object, passband = rd.parseIdentifier(self.sourceToken.metadata["ssa_pubdid"])    # in embeddedGrammar input is available as self.sourceToken
 
           with base.getTableConn() as conn:
             yield from conn.queryToDicts(
                    "SELECT l.obs_time, l.magnitude AS phot, l.mag_err"
-                   " FROM \schema.blg_cep_lc AS l"
+                   " FROM \schema.lightcurves AS l"
                    " WHERE object_id=%(object)s AND l.passband=%(passband)s"
                    " ORDER BY l.obs_time",
                    {"object": object, "passband": passband})
@@ -371,6 +365,7 @@
 
       <metaMaker semantics="#preview">
         <code>
+            print('#preview', descriptor.metadata)            
             pubdid = descriptor.metadata['ssa_pubdid']
             target = descriptor.metadata['ssa_targname']
             band = descriptor.metadata['ssa_bandpass']
@@ -388,6 +383,7 @@
       <dataFunction>
         <setup imports="gavo.rsc"/>
         <code>
+
             _, bandid = rd.parseIdentifier(descriptor.metadata["ssa_pubdid"])
             dd = rd.getById("build-ts")
             descriptor.data = rsc.Data.createWithTable(dd,
@@ -437,7 +433,7 @@
               with base.getUntrustedConn() as conn:
                     res = list(conn.query(
                         "SELECT l.obs_time, l.magnitude "
-                        "FROM \schema.blg_cep_lc AS l "
+                        "FROM \schema.lightcurves AS l "
                         "WHERE object_id=%(obj_id)s AND l.passband=%(passband)s",
                         {"obj_id": objId, "passband": passband}
                     ))
