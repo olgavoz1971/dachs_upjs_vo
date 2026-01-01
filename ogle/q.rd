@@ -267,7 +267,7 @@
           phot_description="OGLE magnitude in \band_human"
           phot_ucd='phot.mag;\band_ucd'
           phot_unit="mag"
-          refposition="BARYCENTER"
+          refposition="HELIOCENTER"
           refframe="ICRS"
           time0="2400000.5"
           timescale="TCB"

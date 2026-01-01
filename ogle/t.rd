@@ -17,7 +17,8 @@
   <meta name="subject">variable-stars</meta>
   <meta name="subject">surveys</meta>
 
-  <meta name="creator">Soszyński, I.; Udalski, A.; Szymański, M.K.; Szymański, G.;  Poleski, R.; Pawlak, M.; Pietrukowicz, P.; Wrona, M.; Iwanek, P.; Mróz, M.</meta>
+  <meta name="creator">Soszyński, I.; Udalski, A.; Szymański, M.K.; Szymański, G.;  Poleski, R.; Pawlak, M.; 
+                       Pietrukowicz, P.; Wrona, M.; Iwanek, P.; Mróz, M.</meta>
   <meta name="instrument">TBD</meta>
   <meta name="facility">OGLE TBD</meta>
 
@@ -40,17 +41,13 @@
     TBD
   </meta>
 
-  <table id="ident_blg_cep" onDisk="True" adql="True">
+  <STREAM id="basicColumnsIdent">
+    <meta name="description">The original table with identification of stars from \name collection</meta>
+
     <column name="object_id" type="text" ucd="meta.id;meta.main"
       tablehead="Star ID" verbLevel="1" 
       description="Star identifier"
       required="True">
-    </column>
-
-    <column name="pulse_mode" type="text" ucd="meta.id;meta.main"
-      tablehead="Pulsation Mode" verbLevel="15"
-      description="Cepheid Mode(s) of pulsation"
-      required="False">
     </column>
 
     <column name="raj2000" type="double precision" ucd="pos.eq.ra;meta.main"
@@ -64,19 +61,19 @@
       required="True" displayHint="sf=10"/>
 
     <column name="ogle4_id" type="text" ucd="meta.id"
-      tablehead="OGLE-IV ID" verbLevel="15"
+      tablehead="OGLE-IV ID" verbLevel="25"
       description="OGLE-IV Identifier"
       required="False">
     </column>
 
     <column name="ogle3_id" type="text" ucd="meta.id"
-      tablehead="OGLE-III ID" verbLevel="15"
+      tablehead="OGLE-III ID" verbLevel="25"
       description="OGLE-III Identifier"
       required="False">
     </column>
 
     <column name="ogle2_id" type="text" ucd="meta.id"
-      tablehead="OGLE-II ID" verbLevel="15"
+      tablehead="OGLE-II ID" verbLevel="25"
       description="OGLE-II Identifier"
       required="False">
     </column>
@@ -86,7 +83,24 @@
       description="VSX designation"
       required="False">
     </column>
+  </STREAM>
 
+  <STREAM id="makeCommonRowsIdent">
+        <var name="raj2000">hmsToDeg(@alphaHMS, ":")</var>
+        <var name="dej2000">dmsToDeg(@deltaDMS, ":")</var>
+        <map dest="ogle4_id">parseWithNull(@ogle4_id, str, "")</map>
+        <map dest="ogle3_id">parseWithNull(@ogle3_id, str, "")</map>
+        <map dest="ogle2_id">parseWithNull(@ogle2_id, str, "")</map>
+        <map dest="vsx">parseWithNull(@vsx, str, "")</map>    
+  </STREAM>
+
+  <table id="ident_blg_cep" onDisk="True" adql="True">
+    <FEED source="basicColumnsIdent" name="Classical Cepheids toward the Galactic bulge"/>
+    <column name="pulse_mode" type="text" ucd="meta.code.class"
+      tablehead="Pulsation Mode" verbLevel="15"
+      description="Cepheid Mode(s) of pulsation"
+      required="False">
+    </column>
   </table>
 
   <data id="import_blg_cep">
@@ -107,64 +121,19 @@
 
     <make table="ident_blg_cep">
       <rowmaker idmaps="*">
-        <var name="raj2000">hmsToDeg(@alphaHMS, ":")</var>
-        <var name="dej2000">dmsToDeg(@deltaDMS, ":")</var>
+        <FEED source="makeCommonRowsIdent"/>
         <map dest="pulse_mode">parseWithNull(@pulse_mode, str, "")</map>
-        <map dest="ogle4_id">parseWithNull(@ogle4_id, str, "")</map>
-        <map dest="ogle3_id">parseWithNull(@ogle3_id, str, "")</map>
-        <map dest="ogle2_id">parseWithNull(@ogle2_id, str, "")</map>
-        <map dest="vsx">parseWithNull(@vsx, str, "")</map>
       </rowmaker>
     </make>
   </data>
 
   <table id="ident_blg_lpv" onDisk="True" adql="True">
-    <column name="object_id" type="text" ucd="meta.id;meta.main"
-      tablehead="Star ID" verbLevel="1" 
-      description="Star identifier"
-      required="True">
-    </column>
-
-    <column name="type" type="text" ucd="meta.id;meta.main"
+    <FEED source="basicColumnsIdent" name="Mira stars toward the Galactic Bulge"/>
+    <column name="type" type="text" ucd="meta.code.class"
       tablehead="Type of Variable Star" verbLevel="15"
       description="Type of Variable Star (Mira)"
       required="False">
     </column>
-
-    <column name="raj2000" type="double precision" ucd="pos.eq.ra;meta.main"
-      tablehead="RA" verbLevel="1" unit="deg"
-      description="Right ascension"
-      required="True" displayHint="sf=10"/>
-
-    <column name="dej2000" type="double precision" ucd="pos.eq.dec;meta.main"
-      tablehead="Dec" verbLevel="1" unit="deg"
-      description="Declination"
-      required="True" displayHint="sf=10"/>
-
-    <column name="ogle4_id" type="text" ucd="meta.id"
-      tablehead="OGLE-IV ID" verbLevel="15"
-      description="OGLE-IV Identifier"
-      required="False">
-    </column>
-
-    <column name="ogle3_id" type="text" ucd="meta.id"
-      tablehead="OGLE-III ID" verbLevel="15"
-      description="OGLE-III Identifier"
-      required="False">
-    </column>
-
-    <column name="ogle2_id" type="text" ucd="meta.id"
-      tablehead="OGLE-II ID" verbLevel="15"
-      description="OGLE-II Identifier"
-      required="False">
-    </column>
-
-    <column name="vsx" type="text" ucd="meta.id"
-      tablehead="VSX" verbLevel="1"
-      description="VSX designation"
-      required="False">
-    </column>
-
   </table>
 
   <data id="import_blg_lpv">
@@ -185,19 +154,14 @@
 
     <make table="ident_blg_lpv">
       <rowmaker idmaps="*">
-        <var name="raj2000">hmsToDeg(@alphaHMS, ":")</var>
-        <var name="dej2000">dmsToDeg(@deltaDMS, ":")</var>
+        <FEED source="makeCommonRowsIdent"/>
         <map dest="type">parseWithNull(@type, str, "")</map>
-        <map dest="ogle4_id">parseWithNull(@ogle4_id, str, "")</map>
-        <map dest="ogle3_id">parseWithNull(@ogle3_id, str, "")</map>
-        <map dest="ogle2_id">parseWithNull(@ogle2_id, str, "")</map>
-        <map dest="vsx">parseWithNull(@vsx, str, "")</map>
       </rowmaker>
     </make>
   </data>
 
-  <table id="blg_cep_lc" onDisk="True" adql="True">
-    <meta name="description">The original table with photometric points of the Galactic bulge Cepheids</meta>
+  <STREAM id="CommonColumnsLc">
+    <meta name="description">The original table with photometry points of \name</meta>
     <index columns="object_id"/>
     <index columns="passband"/>
     <index columns="obs_time"/>
@@ -216,7 +180,7 @@
     <column name="obs_time" type="double precision"
       unit="d" ucd="time.epoch"
       tablehead="Obs Time"
-      description="mjd of the photometric point"/>
+      description="mjd of the photometry point"/>
 
     <column name="magnitude" type="double precision"
       ucd="phot.mag"
@@ -231,23 +195,36 @@
       tablehead="Magnitude error"
       description="Estimation of magnitude error"
       required="False"/>
+  </STREAM>
 
-  </table>
-
-  <data id="import_blg_cep_lc">
-    <sources pattern="data/blg_cep/[VI]/*.dat"/>
-
-    <csvGrammar delimiter=" " names="dateobs_jd, magnitude, mag_err"/>
-
-    <make table="blg_cep_lc">
+  <STREAM id="ddLcTable">
+    <csvGrammar delimiter=" " strip="True" names="dateobs_jd, magnitude, mag_err"/>
+    <make table="\table_name">
       <rowmaker idmaps="*">
-        <var name="obs_time">float(@dateobs_jd)-JD_MJD</var>
-        <map key="object_id">\srcstem</map>
-        <map key="passband">\rootlessPath.split("/")[-2]</map>
+        <var name="obs_time">float(@dateobs_jd)-\to_mjd</var>
+        <map key="object_id">\\srcstem</map>
+        <map key="passband">\\rootlessPath.split("/")[-2]</map>
       </rowmaker>
     </make>
+  </STREAM>
+
+  <table id="blg_cep_lc" onDisk="True" adql="True">
+    <FEED source="CommonColumnsLc" name="Classical Cepheids toward the Galactic bulge"/>
+  </table>
+  <data id="import_blg_cep_lc">
+    <sources pattern="data/blg_cep/phot/[VI]/*.dat"/>
+    <FEED source="ddLcTable" table_name="blg_cep_lc" to_mjd="JD_MJD"/>
   </data>
 
+  <table id="blg_lpv_lc" onDisk="True" adql="True">
+    <FEED source="CommonColumnsLc" name="Mira stars toward the Galactic Bulge"/>
+  </table>
+  <data id="import_blg_lpv_lc">
+    <sources pattern="data/blg_lpv/phot_ogle2/[VI]/*.dat"/>
+    <FEED source="ddLcTable" table_name="blg_lpv_lc" to_mjd="-49999.5"/>
+  </data>
+
+<!-- ################################################################# -->
 
   <service id="web" allowed="form">
     <!-- if you want a browser-based service in addition to TAP, use
