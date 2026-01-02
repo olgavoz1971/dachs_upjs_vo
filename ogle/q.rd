@@ -132,6 +132,14 @@
         verbLevel="1"
         required="False"/>   <!-- And this column is worth showing to users -->
 
+    <column name="p_period" type="double precision"
+      ucd="src.var;time.period"
+      unit="d"
+      tablehead="Period"
+      description="Primary or Fundamental mode period"
+      required="False"/>
+
+
     <!-- ssap#fill-plainlocation mixin converts rd,dec into ssa_location
       (spoint) and ssa_region, but do not forget add aperture 
       Unfortunately no, we can not apply this fill-plainlocation because we do not have 
@@ -165,6 +173,7 @@
           t_max,
           q.ssa_length,
           mean_mag AS p_mean_mag,
+          p.period AS p_period,
           'ICRS' AS ssa_csysName,
           'application/x-votable+xml' AS mime,
           50000 AS accsize,
@@ -184,6 +193,7 @@
             GROUP BY l.object_id, l.passband
         ) AS q
         JOIN objects AS o USING (object_id)
+        LEFT JOIN \schema.aux_blg_lpv_miras AS p USING (object_id)
       )
 
     </viewStatement>
@@ -206,10 +216,13 @@
       in IVOA SSA format. The actual data is available through a datalink
       service.
     </meta>
+<!--
+      copiedcolumns="[!p]*"
+-->
 
     <mixin
       sourcetable="raw_data"
-      copiedcolumns="[!p]*"
+      copiedcolumns="*"
       ssa_aperture="1/3600."
       ssa_dstype="'timeseries'"
       ssa_fluxcalib="'CALIBRATED'"
@@ -365,8 +378,13 @@
             pubdid = descriptor.metadata['ssa_pubdid']
             target = descriptor.metadata['ssa_targname']
             band = descriptor.metadata['ssa_bandpass']
+            period = descriptor.metadata['p_period']
             path_ending = "/".join(pubdid.split("/")[-2:])
             url = makeAbsoluteURL(f"\rdId/preview/qp/{path_ending}")
+            print(f'metaMaker semantics="#preview" {period=}')
+            print(f'metaMaker semantics="#preview" {path_ending=}')
+            if period:
+                print('Period!')
             yield descriptor.makeLink(
                 url,
                 description=f"Preview for {target} in {band}",
@@ -421,7 +439,7 @@
                     from gavo.svcs import UnknownURI
                     from gavo.helpers.processing import SpectralPreviewMaker
                     # from astropy.stats import sigma_clip
-                    from numpy import nan
+                    # from numpy import nan
                 </code>
             </setup>
             <code>
@@ -433,13 +451,43 @@
                         "WHERE object_id=%(obj_id)s AND l.passband=%(passband)s",
                         {"obj_id": objId, "passband": passband}
                     ))
+
+                    period = list(conn.query(
+                      "WITH periods AS ("
+                        "SELECT object_id, period FROM \schema.aux_blg_lpv_miras "
+                        "UNION ALL "
+                        "SELECT object_id, period FROM \schema.aux_blg_cep_cepf "
+                        "UNION ALL "
+                        "SELECT object_id, period FROM \schema.aux_blg_cep_cepf1o "
+                        "UNION ALL "
+                        "SELECT object_id, period FROM \schema.aux_blg_cep_cep1o2o3o)"
+                      "SELECT period "
+                        "FROM periods "
+                        "WHERE object_id=%(obj_id)s LIMIT 1",
+                        {"obj_id": objId}
+                    ))
+
               if not res:
                 raise UnknownURI(f'No time series for {objId} {passband}')
-                  # Try to clean data, kind of:
-                  # jds, mags = zip(*res)
-                  # clipped_mags = sigma_clip(mags, sigma=3)
-                  # cleaned_data = list(zip(jds, -1*clipped_mags.filled(nan)))  # How to invert y-axis?
-                  # return "image/png", SpectralPreviewMaker.get2DPlot(cleaned_data, linear=True, connectPoints=False)
+
+              print(f'--- qp renderer for previews {period=}')
+              period = period[0][0] if len(period) > 0 else None
+              print(f'--- qp renderer for previews {period=}')
+              if period is not None:
+                jd0 = res[0][0]
+                print(f'--- qp renderer for previews {jd0=}')
+                folded = [
+                     ((jd - jd0) / period % 1.0, mag)
+                     for jd, mag in res
+                ]
+                # print(f'--- qp renderer for previews {folded=}')
+                # print(f'--- qp renderer for previews {res=}')
+                res = folded
+                # print(f'--- qp renderer for previews {res=}')
+
+                # Invert y-axis:
+                jds, mags = zip(*res)
+                lc = list(zip(jds, -1*mags))	# TODO: use this lc in get2DPlot
               return "image/png", SpectralPreviewMaker.get2DPlot(res, linear=True, connectPoints=False)
             </code>
         </coreProc>

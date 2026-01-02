@@ -41,6 +41,8 @@
     TBD
   </meta>
 
+<!-- ====================== ident tables (base for objects view) ==========  -->
+
   <STREAM id="basicColumnsIdent">
     <meta name="description">The original table with identification of stars from \name collection</meta>
 
@@ -160,8 +162,190 @@
     </make>
   </data>
 
+<!-- ================== auxiliary tables ============================= -->
 
-<!-- ######################################################################## -->
+  <table id="aux_blg_lpv_miras" onDisk="True" adql="True">
+    <meta name="description">The table from original Miras.dat from OGLE Mira stars toward the
+                Galactic bulge collection</meta>
+
+    <column name="object_id" type="text" ucd="meta.id;meta.main"
+      tablehead="Star ID" verbLevel="1" 
+      description="Star identifier"
+      required="True">
+    </column>
+
+    <column name="mean_I" type="real"
+      ucd="phot.mag"
+      unit="mag"
+      tablehead="Mean I"
+      description="Intensity mean I-band magnitude"
+      required="False"/>
+
+    <column name="mean_V" type="real"
+      ucd="phot.mag"
+      unit="mag"
+      tablehead="Mean V"
+      description="Intensity mean V-band magnitude"
+      required="False"/>
+
+    <column name="period" type="double precision"
+      ucd="src.var;time.period"
+      unit="d"
+      tablehead="Period"
+      description="Primary period"
+      required="False"/>
+
+    <column name="ampl_I" type="double precision"
+      ucd="phot.mag"
+      unit="mag"
+      tablehead="Ampl I"
+      description="I-band amplitude of the primary period"
+      required="False"/>
+
+  </table>
+
+  <data id="import_aux_blg_lpv_miras">
+    <sources>data/blg_lpv/Miras.dat</sources>
+
+    <columnGrammar>
+      <colDefs>
+        object_id:   1-19
+        mean_I:     22-27
+        mean_V:     29-34
+        period:     36-44
+        ampl_I:     46-50
+      </colDefs>
+    </columnGrammar>
+
+    <make table="aux_blg_lpv_miras">
+      <rowmaker idmaps="*">
+        <map dest="mean_I">parseWithNull(@mean_I, str, "-")</map>
+        <map dest="mean_V">parseWithNull(@mean_V, str, "-")</map>
+      </rowmaker>
+    </make>
+  </data>
+
+  <STREAM id="basicColumnsCep">
+    <column name="object_id" type="text" ucd="meta.id;meta.main"
+      tablehead="Star ID" verbLevel="1" 
+      description="Star identifier"
+      required="True">
+    </column>
+
+    <column name="mean_I" type="real"
+      ucd="phot.mag"
+      unit="mag"
+      tablehead="Mean I"
+      description="Intensity mean I-band magnitude"
+      required="False"/>
+
+    <column name="mean_V" type="real"
+      ucd="phot.mag"
+      unit="mag"
+      tablehead="Mean V"
+      description="Intensity mean V-band magnitude"
+      required="False"/>
+
+    <column name="ampl_I" type="double precision"
+      ucd="phot.mag"
+      unit="mag"
+      tablehead="Ampl I"
+      description="I-band amplitude of the primary period"
+      required="False"/>
+
+    <column name="period" type="double precision"
+      ucd="src.var;time.period"
+      unit="d"
+      tablehead="Period"
+      description="Primary/longest period"
+      required="False"/>
+
+    <column name="period_err" type="double precision"
+      ucd="src.var;time.period"
+      unit="d"
+      tablehead="Period err"
+      description="Uncertainty of period"
+      required="False"/>
+  </STREAM>
+
+
+  <table id="aux_blg_cep_cepf" onDisk="True" adql="True">
+    <meta name="description">The table from the base of original cepF.dat from OGLE classical Cepheids toward
+                the Galactic bulge collection</meta>
+    <FEED source="basicColumnsCep"/>
+  </table>
+  <data id="import_blg_cep_cepf">
+    <sources>data/blg_cep/cepF.dat</sources>
+    <columnGrammar>
+      <colDefs>
+        object_id:   1-16
+        mean_I:     19-24
+        mean_V:     26-31
+        period:     34-43
+        period_err: 45-53
+        ampl_I:     70-74
+      </colDefs>
+    </columnGrammar>
+    <make table="aux_blg_cep_cepf">
+      <rowmaker idmaps="*">
+        <map dest="mean_I">parseWithNull(@mean_I, str, "-")</map>
+        <map dest="mean_V">parseWithNull(@mean_V, str, "-")</map>
+      </rowmaker>
+    </make>
+  </data>
+
+  <table id="aux_blg_cep_cepf1o" onDisk="True" adql="True">
+    <meta name="description">The table from the base of original cepF1O.dat from OGLE classical Cepheids toward
+                the Galactic bulge collection</meta>
+    <FEED source="basicColumnsCep"/>
+  </table>
+  <data id="import_blg_cep_cepf1o">
+    <sources>data/blg_cep/cepF1O.dat</sources>
+    <columnGrammar>
+      <colDefs>
+        object_id:   1-16
+        mean_I:     19-24
+        mean_V:     26-31
+        period:     34-43
+        period_err: 45-53
+        ampl_I:     70-74
+      </colDefs>
+    </columnGrammar>
+    <make table="aux_blg_cep_cepf1o">
+      <rowmaker idmaps="*">
+        <map dest="mean_I">parseWithNull(@mean_I, str, "-")</map>
+        <map dest="mean_V">parseWithNull(@mean_V, str, "-")</map>
+      </rowmaker>
+    </make>
+  </data>
+
+  <table id="aux_blg_cep_cep1o2o3o" onDisk="True" adql="True">
+    <meta name="description">The table from the base of original cep1O2O3O.dat from OGLE classical Cepheids
+                toward the Galactic bulge collection</meta>
+    <FEED source="basicColumnsCep"/>
+  </table>
+  <data id="import_blg_cep_cep1o2o3o">
+    <sources>data/blg_cep/cep1O2O3O.dat</sources>
+    <columnGrammar>
+      <colDefs>
+        object_id:   1-16
+        mean_I:     19-24
+        mean_V:     26-31
+        period:     34-43
+        period_err: 45-53
+        ampl_I:     70-74
+      </colDefs>
+    </columnGrammar>
+    <make table="aux_blg_cep_cep1o2o3o">
+      <rowmaker idmaps="*">
+        <map dest="mean_I">parseWithNull(@mean_I, str, "-")</map>
+        <map dest="mean_V">parseWithNull(@mean_V, str, "-")</map>
+      </rowmaker>
+    </make>
+  </data>
+
+
+<!-- ########################## lightcurves ############################################## -->
 
 
   <table id="lightcurves" onDisk="True" adql="True">
