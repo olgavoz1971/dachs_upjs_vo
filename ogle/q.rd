@@ -56,9 +56,7 @@
             """returns object and bandpass from an accref or a pubDID.
             """
             # assert "ogle" in id
-            print(f'parseIdentifier: ------------------ {id=} -----------------')
             tail = id.split("/")[-1]
-            print(f'parseIdentifier: ------------------ {tail=} -----------------')
             object, bandpass = tail.rsplit("-", 1)	# object may contain "-"
             return object, bandpass
 
@@ -296,7 +294,6 @@
     <embeddedGrammar>
       <iterator>
         <code>
-          print(self.sourceToken.metadata)
           object, passband = rd.parseIdentifier(self.sourceToken.metadata["ssa_pubdid"])    # in embeddedGrammar input is available as self.sourceToken
 
           with base.getTableConn() as conn:
@@ -365,11 +362,10 @@
 
       <metaMaker semantics="#preview">
         <code>
-            print('#preview', descriptor.metadata)            
             pubdid = descriptor.metadata['ssa_pubdid']
             target = descriptor.metadata['ssa_targname']
             band = descriptor.metadata['ssa_bandpass']
-            path_ending = "/".join(pubdid.split("/")[-3:])
+            path_ending = "/".join(pubdid.split("/")[-2:])
             url = makeAbsoluteURL(f"\rdId/preview/qp/{path_ending}")
             yield descriptor.makeLink(
                 url,
