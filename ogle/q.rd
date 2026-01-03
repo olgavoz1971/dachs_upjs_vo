@@ -65,8 +65,93 @@
       ]]></code>
   </job></execute>
 
-  <!-- TODO add SCS or build united objects view? -->
-  <table id="raw_data" onDisk="True" adql="hidden"
+<!-- ======================= United Objects View ============================= -->
+
+  <macDef name="object_common_cols">
+   object_id, raj2000, dej2000,period, ampl_I, mean_I, mean_V, vsx
+  </macDef>
+
+  <macDef name="aux_common_cols">
+    object_id, period, period_err, ampl_I, mean_I, mean_V
+  </macDef>
+
+
+<!-- Supposed to be serviced by scs -->
+<!-- Check uniqueness of object_id in the Regression test 
+     select object_id, count(*) AS n
+       from ogle.objects_all
+       group by object_id
+       having count(*) > 1;
+-->
+  <table id="objects_all" adql="True" onDisk="True"
+         mixin="//scs#pgs-pos-index">
+
+    <meta name="description">The united table with basic information
+                about all objects in the OGLE lightcurves collection</meta>
+
+
+    <index columns="object_id"/>
+    <index columns="ssa_collection"/>
+
+    <column original="ogle/t#ident_blg_cep.object_id"/>
+    <column original="ogle/t#ident_blg_cep.raj2000"/>
+    <column original="ogle/t#ident_blg_cep.dej2000"/>
+    <column original="ogle/t#aux_blg_cep_cepf.period"/>
+    <column original="ogle/t#aux_blg_cep_cepf.period_err"/> 
+    <column original="ogle/t#aux_blg_cep_cepf.ampl_I"/>
+    <column original="ogle/t#aux_blg_cep_cepf.mean_I"/>
+    <column original="ogle/t#aux_blg_cep_cepf.mean_V"/>
+    <column original="ogle/t#ident_blg_cep.vsx"/>
+    <column original="//ssap#instance.ssa_collection"/>
+
+    <column name="vartype" type="text" ucd="meta.code.class"
+      tablehead="Type of Variable Star" verbLevel="15"
+      description="Type of Variable Star"
+      required="False">
+    </column>
+
+    <column name="subtype" type="text" ucd="meta.code.class"
+      tablehead="Subtype of Variable Star" verbLevel="15"
+      description="Subtype of Variable Star"
+      required="False">
+    </column>
+
+    <viewStatement>
+      CREATE MATERIALIZED VIEW \curtable AS (
+        SELECT \colNames FROM (
+          WITH aux_cep_all AS (
+            SELECT \aux_common_cols, 'cepf' AS subtype FROM \schema.aux_blg_cep_cepf
+            UNION ALL
+            SELECT \aux_common_cols, 'cepf1o' AS subtype FROM \schema.aux_blg_cep_cepf1o
+            UNION ALL
+            SELECT \aux_common_cols, 'cep1o' AS subtype FROM \schema.aux_blg_cep_cep1o
+            UNION ALL
+            SELECT \aux_common_cols, 'cep1o2o' AS subtype FROM \schema.aux_blg_cep_cep1o2o
+            UNION ALL
+            SELECT \aux_common_cols, 'cep1o2o3o' AS subtype FROM \schema.aux_blg_cep_cep1o2o3o
+            UNION ALL
+            SELECT \aux_common_cols, 'cep2p3o' AS subtype FROM \schema.aux_blg_cep_cep2o3o
+          )
+          SELECT \object_common_cols, period_err, 'Ce*' AS vartype, subtype, 'OGLE-BLG-CEP' AS ssa_collection
+          FROM \schema.ident_blg_cep
+          LEFT JOIN aux_cep_all AS c USING (object_id)
+        UNION ALL
+          SELECT \object_common_cols, NULL AS period_err, 'LP*' AS vartype, NULL AS subtype, 
+                 'OGLE-BLG-LPV' AS ssa_collection
+          FROM \schema.ident_blg_lpv
+          LEFT JOIN \schema.aux_blg_lpv_miras AS m USING (object_id)
+        ) AS all_objects)           
+
+    </viewStatement>
+  </table>
+
+  <data id="create-objects_all-view">
+    <make table="objects_all"/>
+  </data>
+
+<!--   =========================== raw_data ======================== -->
+
+  <table id="raw_data" onDisk="True" adql="True"
       namePath="//ssap#instance">
     <meta name="description">A united view over original ident tables for SSA/ObsCore ingestion</meta>
 
@@ -132,13 +217,7 @@
         verbLevel="1"
         required="False"/>   <!-- And this column is worth showing to users -->
 
-    <column name="p_period" type="double precision"
-      ucd="src.var;time.period"
-      unit="d"
-      tablehead="Period"
-      description="Primary or Fundamental mode period"
-      required="False"/>
-
+    <column original="objects_all.period" name="p_period"/>
 
     <!-- ssap#fill-plainlocation mixin converts rd,dec into ssa_location
       (spoint) and ssa_region, but do not forget add aperture 
@@ -148,13 +227,6 @@
     <viewStatement>
 
       CREATE MATERIALIZED VIEW \curtable AS (
-
-        WITH objects AS (
-          SELECT object_id, raj2000, dej2000, 'Ce*' AS vartype, 'OGLE-BLG-CEP' AS collection FROM \schema.ident_blg_cep
-          UNION ALL
-          SELECT object_id, raj2000, dej2000, 'LP*' AS vartype, 'OGLE-BLG-LPV' AS collection FROM \schema.ident_blg_lpv
-        )
-
         SELECT
           'OGLE ' || q.passband || ' lightcurve ' || 'for ' || q.object_id AS ssa_dstitle,
           q.object_id AS ssa_targname,
@@ -173,14 +245,14 @@
           t_max,
           q.ssa_length,
           mean_mag AS p_mean_mag,
-          p.period AS p_period,
+          o.period AS p_period,
           'ICRS' AS ssa_csysName,
           'application/x-votable+xml' AS mime,
           50000 AS accsize,
           NULL AS embargo,
           NULL AS owner,
           NULL AS datalink,
-          collection AS ssa_collection
+          ssa_collection
         FROM (
           SELECT
             l.object_id, l.passband,
@@ -192,8 +264,7 @@
           FROM \schema.lightcurves AS l
             GROUP BY l.object_id, l.passband
         ) AS q
-        JOIN objects AS o USING (object_id)
-        LEFT JOIN \schema.aux_blg_lpv_miras AS p USING (object_id)
+        JOIN \schema.objects_all AS o USING (object_id)
       )
 
     </viewStatement>
@@ -201,7 +272,7 @@
 
   <data id="create-raw-view">
     <recreateAfter>make-ssa-view</recreateAfter>
-    <property key="previewDir">previews</property>
+    <!-- <property key="previewDir">previews</property> -->
     <make table="raw_data"/>
   </data>
 
@@ -378,13 +449,8 @@
             pubdid = descriptor.metadata['ssa_pubdid']
             target = descriptor.metadata['ssa_targname']
             band = descriptor.metadata['ssa_bandpass']
-            period = descriptor.metadata['p_period']
             path_ending = "/".join(pubdid.split("/")[-2:])
             url = makeAbsoluteURL(f"\rdId/preview/qp/{path_ending}")
-            print(f'metaMaker semantics="#preview" {period=}')
-            print(f'metaMaker semantics="#preview" {path_ending=}')
-            if period:
-                print('Period!')
             yield descriptor.makeLink(
                 url,
                 description=f"Preview for {target} in {band}",
@@ -394,10 +460,34 @@
         </code>
       </metaMaker>
 
+      <metaMaker semantics="#preview-plot">
+        <code>
+            # TODO raise something reasonable in case of absent information about the period
+            pubdid = descriptor.metadata['ssa_pubdid']
+            target = descriptor.metadata['ssa_targname']
+            band = descriptor.metadata['ssa_bandpass']
+            period = descriptor.metadata['p_period']
+            print(f'metaMaker semantics="#preview-plot" {period=}')
+            if period is None:
+              # yield None
+              yield DatalinkFault.NotFoundFault(target, "No period for this star known here")
+            else:
+              path_ending = "/".join(pubdid.split("/")[-2:])
+              url = makeAbsoluteURL(f"\rdId/preview-plot/qp/{path_ending}")
+              if period:
+                  print('Period!')
+              yield descriptor.makeLink(
+                url,
+                description=f"Preview of folded lightcurve for {target} in {band}",
+                contentType="image/png",
+                contentLength="2000"
+              )
+        </code>
+      </metaMaker>
+
       <dataFunction>
         <setup imports="gavo.rsc"/>
         <code>
-
             _, bandid = rd.parseIdentifier(descriptor.metadata["ssa_pubdid"])
             dd = rd.getById("build-ts")
             descriptor.data = rsc.Data.createWithTable(dd,
@@ -420,6 +510,68 @@
     </datalinkCore>
   </service>
 
+  <service id="preview-plot" allowed="qp">
+    <property name="queryField">obs_id</property>
+    <meta name="title">OGLE folded lightcurve previews</meta>
+    <meta name="shortName">TS previews</meta>
+    <meta name="description">
+        A service returning PNG thumbnails for folded time series. It takes the obs_id for which to generate a preview. 
+        To calculate phases, period from objects_all view is used.
+    </meta>
+    <pythonCore>
+        <inputTable>
+          <inputKey name="obs_id" type="text"
+              tablehead="Obs. Id"
+              description="Observation id (a combination of an object id and a passband) to create the preview for."/>
+        </inputTable>
+        <coreProc>
+            <setup>
+                <code>
+                    from gavo.svcs import UnknownURI
+                    from gavo.helpers.processing import SpectralPreviewMaker
+                </code>
+            </setup>
+            <code>
+              objId, passband = rd.parseIdentifier(inputTable.getParam("obs_id"))
+              with base.getUntrustedConn() as conn:
+                    res = list(conn.query(
+                        "SELECT l.obs_time, l.magnitude "
+                        "FROM \schema.lightcurves AS l "
+                        "WHERE object_id=%(obj_id)s AND l.passband=%(passband)s "
+                        "ORDER BY l.obs_time",
+                        {"obj_id": objId, "passband": passband}
+                    ))
+
+                    period = list(conn.query(
+                      "SELECT period "
+                        "FROM \schema.objects_all "
+                        "WHERE object_id=%(obj_id)s LIMIT 1",
+                        {"obj_id": objId}
+                    ))
+
+              if not res:
+                raise UnknownURI(f'No time series for {objId} {passband}')
+
+              print(f'--- qp renderer for previews {period=}')
+              period = period[0][0] if len(period) > 0 else None
+              print(f'--- qp renderer for previews {period=}')
+              if period is None:
+                raise UnknownURI(f'We have no period for {objId}')
+              jd0 = res[0][0]
+              folded = [
+                     ((jd - jd0) / period % 1.0, mag)
+                     for jd, mag in res
+              ]
+
+              # Invert y-axis:
+              jds, mags = zip(*folded)
+              lc = list(zip(jds, [-m for m in mags]))
+              return "image/png", SpectralPreviewMaker.get2DPlot(lc, linear=True, connectPoints=False)
+            </code>
+        </coreProc>
+    </pythonCore>
+  </service>
+
   <service id="preview" allowed="qp">
     <property name="queryField">obs_id</property>
     <meta name="title">OGLE timeseries previews</meta>
@@ -438,8 +590,6 @@
                 <code>
                     from gavo.svcs import UnknownURI
                     from gavo.helpers.processing import SpectralPreviewMaker
-                    # from astropy.stats import sigma_clip
-                    # from numpy import nan
                 </code>
             </setup>
             <code>
@@ -448,47 +598,18 @@
                     res = list(conn.query(
                         "SELECT l.obs_time, l.magnitude "
                         "FROM \schema.lightcurves AS l "
-                        "WHERE object_id=%(obj_id)s AND l.passband=%(passband)s",
+                        "WHERE object_id=%(obj_id)s AND l.passband=%(passband)s "
+                        "ORDER BY l.obs_time",
                         {"obj_id": objId, "passband": passband}
-                    ))
-
-                    period = list(conn.query(
-                      "WITH periods AS ("
-                        "SELECT object_id, period FROM \schema.aux_blg_lpv_miras "
-                        "UNION ALL "
-                        "SELECT object_id, period FROM \schema.aux_blg_cep_cepf "
-                        "UNION ALL "
-                        "SELECT object_id, period FROM \schema.aux_blg_cep_cepf1o "
-                        "UNION ALL "
-                        "SELECT object_id, period FROM \schema.aux_blg_cep_cep1o2o3o)"
-                      "SELECT period "
-                        "FROM periods "
-                        "WHERE object_id=%(obj_id)s LIMIT 1",
-                        {"obj_id": objId}
                     ))
 
               if not res:
                 raise UnknownURI(f'No time series for {objId} {passband}')
 
-              print(f'--- qp renderer for previews {period=}')
-              period = period[0][0] if len(period) > 0 else None
-              print(f'--- qp renderer for previews {period=}')
-              if period is not None:
-                jd0 = res[0][0]
-                print(f'--- qp renderer for previews {jd0=}')
-                folded = [
-                     ((jd - jd0) / period % 1.0, mag)
-                     for jd, mag in res
-                ]
-                # print(f'--- qp renderer for previews {folded=}')
-                # print(f'--- qp renderer for previews {res=}')
-                res = folded
-                # print(f'--- qp renderer for previews {res=}')
-
-                # Invert y-axis:
-                jds, mags = zip(*res)
-                lc = list(zip(jds, -1*mags))	# TODO: use this lc in get2DPlot
-              return "image/png", SpectralPreviewMaker.get2DPlot(res, linear=True, connectPoints=False)
+              # Invert y-axis:
+              jds, mags = zip(*res)
+              lc = list(zip(jds, [-m for m in mags]))
+              return "image/png", SpectralPreviewMaker.get2DPlot(lc, linear=True, connectPoints=False)
             </code>
         </coreProc>
     </pythonCore>

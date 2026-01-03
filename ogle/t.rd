@@ -96,7 +96,7 @@
         <map dest="vsx">parseWithNull(@vsx, str, "")</map>    
   </STREAM>
 
-  <table id="ident_blg_cep" onDisk="True" adql="True">
+  <table id="ident_blg_cep" onDisk="True" adql="hidden">
     <FEED source="basicColumnsIdent" name="Classical Cepheids toward the Galactic bulge"/>
     <column name="pulse_mode" type="text" ucd="meta.code.class"
       tablehead="Pulsation Mode" verbLevel="15"
@@ -129,7 +129,7 @@
     </make>
   </data>
 
-  <table id="ident_blg_lpv" onDisk="True" adql="True">
+  <table id="ident_blg_lpv" onDisk="True" adql="hidden">
     <FEED source="basicColumnsIdent" name="Mira stars toward the Galactic Bulge"/>
     <column name="type" type="text" ucd="meta.code.class"
       tablehead="Type of Variable Star" verbLevel="15"
@@ -164,7 +164,7 @@
 
 <!-- ================== auxiliary tables ============================= -->
 
-  <table id="aux_blg_lpv_miras" onDisk="True" adql="True">
+  <table id="aux_blg_lpv_miras" onDisk="True" adql="hidden">
     <meta name="description">The table from original Miras.dat from OGLE Mira stars toward the
                 Galactic bulge collection</meta>
 
@@ -221,9 +221,12 @@
       <rowmaker idmaps="*">
         <map dest="mean_I">parseWithNull(@mean_I, str, "-")</map>
         <map dest="mean_V">parseWithNull(@mean_V, str, "-")</map>
+        <map dest="period">parseWithNull(@period, str, "-")</map>
       </rowmaker>
     </make>
   </data>
+
+  <!-- =============== BLG Cephewids ======================== -->
 
   <STREAM id="basicColumnsCep">
     <column name="object_id" type="text" ucd="meta.id;meta.main"
@@ -268,82 +271,92 @@
       required="False"/>
   </STREAM>
 
+  <STREAM id="blg_cep_dd">
+    <columnGrammar>
+      <colDefs>
+        object_id:   1-16
+        mean_I:     19-24
+        mean_V:     26-31
+        period:     34-43
+        period_err: 45-53
+        ampl_I:     70-74
+      </colDefs>
+    </columnGrammar>
+    <make table="\table_name">
+      <rowmaker idmaps="*">
+        <map dest="mean_I">parseWithNull(@mean_I, str, "-")</map>
+        <map dest="mean_V">parseWithNull(@mean_V, str, "-")</map>
+        <map dest="period">parseWithNull(@period, str, "-")</map>
+        <map dest="period_err">parseWithNull(@period_err, str, "-")</map>
+      </rowmaker>
+    </make>
+  </STREAM>
 
-  <table id="aux_blg_cep_cepf" onDisk="True" adql="True">
-    <meta name="description">The table from the base of original cepF.dat from OGLE classical Cepheids toward
-                the Galactic bulge collection</meta>
+  <table id="aux_blg_cep_cepf" onDisk="True" adql="hidden">
+    <meta name="description">The table from the base of original cepF.dat 
+                with parameters of fundamental-mode (F) Cepheids
+                from OGLE classical Cepheids toward the Galactic bulge collection</meta>
     <FEED source="basicColumnsCep"/>
   </table>
   <data id="import_blg_cep_cepf">
     <sources>data/blg_cep/cepF.dat</sources>
-    <columnGrammar>
-      <colDefs>
-        object_id:   1-16
-        mean_I:     19-24
-        mean_V:     26-31
-        period:     34-43
-        period_err: 45-53
-        ampl_I:     70-74
-      </colDefs>
-    </columnGrammar>
-    <make table="aux_blg_cep_cepf">
-      <rowmaker idmaps="*">
-        <map dest="mean_I">parseWithNull(@mean_I, str, "-")</map>
-        <map dest="mean_V">parseWithNull(@mean_V, str, "-")</map>
-      </rowmaker>
-    </make>
+    <FEED source="blg_cep_dd" table_name="aux_blg_cep_cepf"/>
   </data>
 
-  <table id="aux_blg_cep_cepf1o" onDisk="True" adql="True">
-    <meta name="description">The table from the base of original cepF1O.dat from OGLE classical Cepheids toward
-                the Galactic bulge collection</meta>
+  <table id="aux_blg_cep_cep1o" onDisk="True" adql="hidden">
+    <meta name="description">The table from the base of original cep1O.dat 
+                with parameters of first-overtone (1O) Cepheids
+                from OGLE classical Cepheids toward the Galactic bulge collection</meta>
+    <FEED source="basicColumnsCep"/>
+  </table>
+  <data id="import_blg_cep_cep1o">
+    <sources>data/blg_cep/cep1O.dat</sources>
+    <FEED source="blg_cep_dd" table_name="aux_blg_cep_cep1o"/>
+  </data>
+
+  <table id="aux_blg_cep_cepf1o" onDisk="True" adql="hidden">
+    <meta name="description">The table from the base of original cepF1O.dat 
+                with parameters of double-mode (F/1O) Cepheids
+                from OGLE classical Cepheids toward the Galactic bulge collection</meta>
     <FEED source="basicColumnsCep"/>
   </table>
   <data id="import_blg_cep_cepf1o">
     <sources>data/blg_cep/cepF1O.dat</sources>
-    <columnGrammar>
-      <colDefs>
-        object_id:   1-16
-        mean_I:     19-24
-        mean_V:     26-31
-        period:     34-43
-        period_err: 45-53
-        ampl_I:     70-74
-      </colDefs>
-    </columnGrammar>
-    <make table="aux_blg_cep_cepf1o">
-      <rowmaker idmaps="*">
-        <map dest="mean_I">parseWithNull(@mean_I, str, "-")</map>
-        <map dest="mean_V">parseWithNull(@mean_V, str, "-")</map>
-      </rowmaker>
-    </make>
+    <FEED source="blg_cep_dd" table_name="aux_blg_cep_cepf1o"/>
   </data>
 
-  <table id="aux_blg_cep_cep1o2o3o" onDisk="True" adql="True">
-    <meta name="description">The table from the base of original cep1O2O3O.dat from OGLE classical Cepheids
-                toward the Galactic bulge collection</meta>
+  <table id="aux_blg_cep_cep1o2o" onDisk="True" adql="hidden">
+    <meta name="description">The table from the base of original cep1O2O.dat
+                with parameters of double-mode 1O/2O Cepheids
+                from OGLE classical Cepheids toward the Galactic bulge collection</meta>
+    <FEED source="basicColumnsCep"/>
+  </table>
+  <data id="import_blg_cep_cep1o2o">
+    <sources>data/blg_cep/cep1O2O.dat</sources>
+    <FEED source="blg_cep_dd" table_name="aux_blg_cep_cep1o2o"/>
+  </data>
+
+  <table id="aux_blg_cep_cep1o2o3o" onDisk="True" adql="hidden">
+    <meta name="description">The table from the base of original cep1O2O3O.dat
+                with parameters of triple-mode 1O/2O/3O Cepheids
+                from OGLE classical Cepheids toward the Galactic bulge collection</meta>
     <FEED source="basicColumnsCep"/>
   </table>
   <data id="import_blg_cep_cep1o2o3o">
     <sources>data/blg_cep/cep1O2O3O.dat</sources>
-    <columnGrammar>
-      <colDefs>
-        object_id:   1-16
-        mean_I:     19-24
-        mean_V:     26-31
-        period:     34-43
-        period_err: 45-53
-        ampl_I:     70-74
-      </colDefs>
-    </columnGrammar>
-    <make table="aux_blg_cep_cep1o2o3o">
-      <rowmaker idmaps="*">
-        <map dest="mean_I">parseWithNull(@mean_I, str, "-")</map>
-        <map dest="mean_V">parseWithNull(@mean_V, str, "-")</map>
-      </rowmaker>
-    </make>
+    <FEED source="blg_cep_dd" table_name="aux_blg_cep_cep1o2o3o"/>
   </data>
 
+  <table id="aux_blg_cep_cep2o3o" onDisk="True" adql="hidden">
+    <meta name="description">The table from the base of original cep2O3O.dat
+                with parameters of 2O/3O Cepheids
+                from OGLE classical Cepheids toward the Galactic bulge collection</meta>
+    <FEED source="basicColumnsCep"/>
+  </table>
+  <data id="import_blg_cep_cep2o3o">
+    <sources>data/blg_cep/cep2O3O.dat</sources>
+    <FEED source="blg_cep_dd" table_name="aux_blg_cep_cep2o3o"/>
+  </data>
 
 <!-- ########################## lightcurves ############################################## -->
 
