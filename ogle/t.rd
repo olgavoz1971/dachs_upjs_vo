@@ -19,7 +19,7 @@
 
   <meta name="creator">Soszyński, I.; Udalski, A.; Szymański, M.K.; Szymański, G.;  Poleski, R.; Pawlak, M.; 
                        Pietrukowicz, P.; Wrona, M.; Iwanek, P.; Mróz, M.</meta>
-  <meta name="instrument">TBD</meta>
+  <meta name="instrument">1.0-1.3-meter telescopes. TBD</meta>
   <meta name="facility">OGLE TBD</meta>
 
   <meta name="source">2015AcA....65....1U</meta>
