@@ -1,4 +1,5 @@
 <resource schema="ogle" resdir=".">
+  <meta name="schema-rank">50</meta>
   <macDef name="pubDIDBase">ivo://\getConfig{ivoa}{authority}/~?\rdId/</macDef>
 
   <meta name="creationDate">2025-12-21T16:24:52Z</meta>
@@ -86,12 +87,17 @@
   <table id="objects_all" adql="True" onDisk="True"
          mixin="//scs#pgs-pos-index">
 
+    <meta name="table-rank">100</meta>
     <meta name="description">The united table with basic information
                 about all objects in the OGLE lightcurves collection</meta>
 
 
     <index columns="object_id"/>
     <index columns="ssa_collection"/>
+
+    <stc>
+      Position ICRS "raj2000" "dej2000"
+    </stc>
 
     <column original="ogle/t#ident_blg_cep.object_id"/>
     <column original="ogle/t#ident_blg_cep.raj2000"/>
@@ -277,6 +283,7 @@
   </data>
 
   <table id="ts_ssa" onDisk="True" adql="True">
+    <meta name="table-rank">50</meta>
     <meta name="_associatedDatalinkService">
       <meta name="serviceId">sdl</meta>
       <meta name="idColumn">ssa_pubDID</meta>
@@ -287,6 +294,11 @@
       in IVOA SSA format. The actual data is available through a datalink
       service.
     </meta>
+
+    <stc>
+      TimeInterval UTC HELIOCENTER "t_min" "t_max"
+    </stc>
+
 <!--
       copiedcolumns="[!p]*"
 -->

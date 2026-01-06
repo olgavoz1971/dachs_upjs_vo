@@ -1,4 +1,5 @@
 <resource schema="upjs_ts" resdir=".">
+    <meta name="schema-rank">100</meta>
     <macDef name="pubDIDBase">ivo://\getConfig{ivoa}{authority}/~?\rdId/</macDef>	<!-- from bgds l2 -->
 
 	<meta name="creationDate">2025-09-03T09:40:33Z</meta>
@@ -195,6 +196,7 @@
 	</data>
 
 	<table id="ts_ssa" onDisk="True" adql="True">
+        <meta name="table-rank">50</meta>
 		<meta name="_associatedDatalinkService">		<!-- declared a table as having datalink support -->
 			<meta name="serviceId">sdl</meta>			<!-- JK: this will go to the table metadata, TOPCAT use this sdl to build *sdl/dlmeta* stuff -->
 			<meta name="idColumn">ssa_pubDID</meta>

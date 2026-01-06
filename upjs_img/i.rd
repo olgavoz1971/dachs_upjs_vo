@@ -1,4 +1,5 @@
 <resource schema="upjs_img" resdir=".">
+  <meta name="schema-rank">150</meta>
   <meta name="creationDate">2025-11-24T08:21:08Z</meta>
 
   <meta name="title">Images From Kolonica Observatory</meta>

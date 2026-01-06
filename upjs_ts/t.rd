@@ -134,6 +134,7 @@
   </data>
 
   <table id="objects" onDisk="True" adql="True">
+    <meta name="table-rank">100</meta>
     <index columns="id"/>
     <mixin>//scs#pgs-pos-index</mixin>
     <meta name="description">The external table with objects</meta>
