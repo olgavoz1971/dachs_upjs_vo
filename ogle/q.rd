@@ -293,10 +293,10 @@
           '\getConfig{web}{serverURL}/\rdId/sdl/dlget?ID=' || '\pubDIDBase' || q.object_id || '-' || q.passband AS accref,
           '\pubDIDBase' || q.object_id || '-' || q.passband AS ssa_pubdid,
           q.passband AS ssa_bandpass,
-          5.5E-7 AS ssa_specmid,
-          4.8E-7 AS ssa_specstart,
-          7.3E-7 AS ssa_specend,
-          2.5E-7 AS ssa_specext,
+          p.specmid AS ssa_specmid,
+          p.specstart AS ssa_specstart,
+          p.specend AS ssa_specend,
+          p.specend-p.specstart AS ssa_specext,
           ssa_timeExt,
           t_min,
           t_max,
@@ -322,6 +322,7 @@
             GROUP BY l.object_id, l.passband
         ) AS q
         JOIN \schema.objects_all AS o USING (object_id)
+        JOIN \schema.photosys AS p ON p.band_short = q.passband
       )
 
     </viewStatement>
@@ -433,11 +434,13 @@
           description="stellar magnitude error"
           verbLevel="1"
           required="False"/>
+        <column original="ogle/t#lightcurves.ogle_phase"/>
     </table>
   </STREAM>
 
   <!-- instantiate for a few bands - take names from https://svo2.cab.inta-csic.es/theory/fps/ -->
   <!-- zero point are from https://svo2.cab.inta-csic.es/theory/fps -->
+  <!-- TODO How to read it from the database????  -->
   <LOOP source="instance-template">
     <csvItems>
             band_short, band_human, band_ucd, effective_wavelength, zero_point_flux
@@ -454,7 +457,7 @@
 
           with base.getTableConn() as conn:
             yield from conn.queryToDicts(
-                   "SELECT l.obs_time, l.magnitude AS phot, l.mag_err"
+                   "SELECT l.obs_time, l.magnitude AS phot, l.mag_err, l.ogle_phase"
                    " FROM \schema.lightcurves AS l"
                    " WHERE object_id=%(object)s AND l.passband=%(passband)s"
                    " ORDER BY l.obs_time",

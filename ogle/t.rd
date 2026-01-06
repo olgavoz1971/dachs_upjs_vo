@@ -41,6 +41,74 @@
     TBD
   </meta>
 
+<!-- ==============  photometric system ===================== -->
+
+  <table id="photosys" onDisk="True" adql="Hidden">
+    <meta name="description">The external table with photometric systems</meta>
+
+    <column name="band_short" type="text"
+      ucd="meta.id;instr.filter;meta.main"
+      tablehead="Bandpass"
+      description="Short bandpass name"
+      required="True"/>
+
+    <column name="band_human" type="text"
+      ucd="meta.id;instr.filter"
+      tablehead="Bandpass Human"
+      description="Human readable bandpass name"
+      required="True"/>
+
+    <column name="band_ucd" type="text"
+      ucd="meta.ucd"
+      tablehead="Band ucd"
+      description="UCD of the photometric band"
+      required="True"/>
+
+    <column name="specstart" type="real"
+      ucd="em.wl"
+      tablehead="specstart"
+      description="Minimum wavelength of the band"
+      required="True"/>
+
+    <column name="specmid" type="real"
+      ucd="em.wl.central"
+      tablehead="specmid"
+      description="Effective wavelength of the band"
+      required="True"/>
+
+    <column name="specend" type="real"
+      ucd="em.wl"
+      tablehead="specend"
+      description="Maximum wavelength of the band"
+      required="True"/>
+
+    <column name="zero_point_flux" type="real"
+      ucd="phot.flux"
+      tablehead="Zero Point"
+      description="Flux at the given zero point, in Jy;"
+      required="False"/>
+
+    <column name="description" type="text"
+      ucd="meta.note"
+      tablehead="Description"
+      description="Photometric system description"
+      required="False"/>
+  </table>
+
+ <data id="import_photosys">
+    <make table="photosys">
+      <script lang="python" type="postCreation" name="Load dump">
+        table.connection.commit()
+        src = table.tableDef.rd.getAbsPath("dumps/photosys.dump")
+        with open(src) as f:
+          cursor = table.connection.cursor()
+          cursor.copy_expert(
+            "COPY {} FROM STDIN".format(table.tableDef.getQName()),
+            f)
+      </script>
+    </make>
+  </data>
+
 <!-- ====================== ident tables (base for objects view) ==========  -->
 
   <STREAM id="basicColumnsIdent">
@@ -396,11 +464,18 @@
       tablehead="Magnitude error"
       description="Estimation of magnitude error"
       required="False"/>
+
+    <column name="ogle_phase" type="integer"
+      ucd="meta.id;meta.dataset"
+      tablehead="Project Phase"
+      description="OGLE project phase code (0–4): 2 = OGLE II, 3 = OGLE III, 
+                   4 = OGLE IV; 0 = not specified"
+      required="True"/>
   </table>
 
   <data id="import_lightcurves" updating="True">
 
-    <sources pattern="data/blg_x???/phot*/[VI]/*.dat"/>
+    <sources pattern="data/blg_lpv/phot_ogle3/[VI]/*.dat"/>
 
     <csvGrammar delimiter=" " strip="True" names="dateobs_jd, magnitude, mag_err"/>
 
@@ -413,6 +488,12 @@
         <var name="obs_time">float(@dateobs_jd)-@to_mjd</var>
         <map key="object_id">\srcstem</map>
         <map key="passband">\rootlessPath.split("/")[-2]</map>
+
+        <!-- OGLE phase: phot -> 0, phot_ogle2 -> 2, etc. -->
+        <map key="ogle_phase">
+          0 if \rootlessPath.split("/")[-3] == "phot" \
+          else int(\rootlessPath.split("/")[-3].replace("phot_ogle", ""))
+        </map>
       </rowmaker>
     </make>
   </data>
