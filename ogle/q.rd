@@ -68,6 +68,16 @@
 
 <!-- ======================= United Objects View ============================= -->
 
+  <macDef name="objects_description">
+    This table is a unified catalogue of objects from the OGLE Collection of Variable Star Light Curves.
+    It was constructed by merging variable-type–specific ident.dat tables with selected columns 
+    from tables containing parameters: cep.dat, cepF.dat, cep1O.dat, cepF1O.dat, cep1O2O.dat, cep1O2O3O.dat, 
+    cep2O3O.dat, Miras.dat, and others.
+
+    The corresponding light curves can be discovered via TAP through the ts_ssa or obscore tables, 
+    or through the SSA service. Light curves can be extracted using the associated DataLink services.
+  </macDef>
+
   <macDef name="object_common_cols">
    object_id, raj2000, dej2000,period, ampl_I, mean_I, mean_V, vsx
   </macDef>
@@ -88,9 +98,9 @@
          mixin="//scs#pgs-pos-index">
 
     <meta name="table-rank">100</meta>
-    <meta name="description">The united table with basic information
-                about all objects in the OGLE lightcurves collection</meta>
-
+    <meta name="description">
+      \objects_description
+     </meta>
 
     <index columns="object_id"/>
     <index columns="ssa_collection"/>
@@ -154,6 +164,47 @@
   <data id="create-objects_all-view">
     <make table="objects_all"/>
   </data>
+
+<!--
+  <coverage>   
+    <updater spaceTable="objects_all"/>
+    <spatial/>
+  </coverage>
+-->
+
+<!--   Cone Search  -->
+  <service id="ogle-objects" allowed="form,scs.xml">
+    <publish render="scs.xml" sets="ivo_managed"/>
+    <publish render="form" sets="local,ivo_managed"/>
+
+    <meta name="shortName">All OGLE Objects</meta>
+    <meta name="title">OGLE objects Cone Search</meta>
+    <meta name="description">
+      \objects_description
+    </meta>
+    <meta name="_related" title="OGLE Varable Stars Time series"
+            >\internallink{\rdId/ts-web/info}
+    </meta>
+
+    <meta>
+      testQuery.ra: 263.562625
+      testQuery.dec: -27.398250
+      testQuery.sr:   0.0001
+    </meta>
+
+    <scsCore queriedTable="objects_all">
+      <FEED source="//scs#coreDescs"/>
+        <condDesc buildFrom="mean_I"/>
+        <condDesc buildFrom="mean_V"/>
+        <condDesc buildFrom="period"/>
+        <condDesc buildFrom="vsx"/>
+        <condDesc>
+          <inputKey original="vsx">
+            <values fromdb="vsx from \schema.objects_all"/>
+          </inputKey>
+        </condDesc>
+    </scsCore>
+  </service>
 
 <!--   =========================== raw_data ======================== -->
 
@@ -290,7 +341,7 @@
     </meta>
 
     <meta name="description">
-      This table contains metadata about OGLE the photometric time
+      This table contains metadata about the OGLE the photometric time series
       in IVOA SSA format. The actual data is available through a datalink
       service.
     </meta>
@@ -338,6 +389,15 @@
   <coverage>
     <updater sourceTable="ts_ssa"/>
   </coverage>
+
+<!--
+  <coverage>
+    <updater timeTable="ts_ssa"/>
+    <temporal/>
+    <updater spaceTable="objects_all"/>
+    <spatial/>
+  </coverage>
+-->
 
   <STREAM id="instance-template">
     <table id="instance_\band_short" onDisk="False">
@@ -631,7 +691,7 @@
   SSA part because grinding down SSA to something human-consumable and
   still working as SSA is non-trivial -->
 
-  <service id="web" defaultRenderer="form">
+  <service id="ts-web" defaultRenderer="form">
     <meta name="shortName">\schema Web</meta>
     <meta name="title">OGLE Time Series Browser Service</meta>
 
@@ -673,7 +733,7 @@
     <meta name="ssap.complianceLevel">full</meta>
 
     <publish render="ssap.xml" sets="ivo_managed"/>
-    <publish render="form" sets="ivo_managed,local" service="web"/>
+    <publish render="form" sets="ivo_managed,local" service="ts-web"/>
 
     <meta name="title">OGLE light curves Form</meta>
     <meta name="description">This service exposes OGLE photometric light curves

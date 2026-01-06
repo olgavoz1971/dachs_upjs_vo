@@ -226,7 +226,7 @@
     </make>
   </data>
 
-  <!-- =============== BLG Cephewids ======================== -->
+  <!-- =============== BLG Cepheids ======================== -->
 
   <STREAM id="basicColumnsCep">
     <column name="object_id" type="text" ucd="meta.id;meta.main"
@@ -400,7 +400,7 @@
 
   <data id="import_lightcurves" updating="True">
 
-    <sources pattern="data/blg_???/phot*/[VI]/*.dat"/>
+    <sources pattern="data/blg_x???/phot*/[VI]/*.dat"/>
 
     <csvGrammar delimiter=" " strip="True" names="dateobs_jd, magnitude, mag_err"/>
 
@@ -419,7 +419,11 @@
 
 <!-- ################################################################# -->
 
-  <service id="web" allowed="form">
+  <service id="cep-web" allowed="form">
+    <meta name="title">OGLE BLG CEP united table</meta>
+    <meta name="description">
+      This form allows to select OGLE Galactic bulge Cepheids TBD
+    </meta>
     <!-- if you want a browser-based service in addition to TAP, use
     this.  Otherwise, delete this and just write <publish/> into
     the table element above to publish the table as such.  With a
@@ -434,7 +438,13 @@
     <dbCore queriedTable="ident_blg_cep">
       <!-- to add query constraints on table columns, add condDesc
       elements built from the column -->
-      <condDesc buildFrom="pulse_mode"/>
+      <!-- <condDesc buildFrom="pulse_mode"/>  -->
+      <condDesc>
+        <inputKey original="pulse_mode">
+          <values fromdb="pulse_mode from \schema.ident_blg_cep"/>
+        </inputKey>
+      </condDesc>
+
     </dbCore>
   </service>
 
