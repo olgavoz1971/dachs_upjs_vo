@@ -289,6 +289,7 @@
       <rowmaker idmaps="*">
         <map dest="mean_I">parseWithNull(@mean_I, str, "-")</map>
         <map dest="mean_V">parseWithNull(@mean_V, str, "-")</map>
+        <map dest="ampl_I">parseWithNull(@ampl_I, str, "-")</map>
         <map dest="period">parseWithNull(@period, str, "-")</map>
       </rowmaker>
     </make>
@@ -426,6 +427,99 @@
     <FEED source="blg_cep_dd" table_name="aux_blg_cep_cep2o3o"/>
   </data>
 
+<!-- ==================== M54 stars  =========================================== -->
+
+  <table id="m54" onDisk="True" adql="hidden">
+    <meta name="description">The (almost) original table M54variables.dat with identification and parameters of stars
+                   from Sagittarius Dwarf Spheroidal Galaxy and its M54 Globular Cluster</meta>
+
+    <column name="object_id" type="text" ucd="meta.id;meta.main"
+      tablehead="Star ID" verbLevel="1" 
+      description="Star identifier"
+      required="True">
+    </column>
+
+    <column name="raj2000" type="double precision" ucd="pos.eq.ra;meta.main"
+      tablehead="RA" verbLevel="1" unit="deg"
+      description="Right ascension"
+      required="True" displayHint="sf=10"/>
+
+    <column name="dej2000" type="double precision" ucd="pos.eq.dec;meta.main"
+      tablehead="Dec" verbLevel="1" unit="deg"
+      description="Declination"
+      required="True" displayHint="sf=10"/>
+
+    <column name="period" type="double precision"
+      ucd="src.var;time.period"
+      unit="d"
+      tablehead="Period"
+      description="Period of variable star"
+      required="False"/>
+
+    <column name="period_err" type="double precision"
+      ucd="src.var;time.period"
+      unit="d"
+      tablehead="Period err"
+      description="Uncertainty of period"
+      required="False"/>
+
+    <column name="ogle_vartype" type="text" ucd="meta.code.class"
+      tablehead="Variability type" verbLevel="15"
+      description="OGLE Type of Variable Star"
+      required="False">
+    </column>
+
+    <column name="mean_I" type="real"
+      ucd="phot.mag"
+      unit="mag"
+      tablehead="Mean I"
+      description="Intensity mean I-band magnitude"
+      required="False"/>
+
+    <column name="mean_V" type="real"
+      ucd="phot.mag"
+      unit="mag"
+      tablehead="Mean V"
+      description="Intensity mean V-band magnitude"
+      required="False"/>
+
+    <column name="ampl_I" type="double precision"
+      ucd="phot.mag"
+      unit="mag"
+      tablehead="Ampl I"
+      description="I-band amplitude of the primary period"
+      required="False"/>
+  </table>
+
+  <!-- JK: there is an error in column format description in the README file; corrected -->
+  <data id="import_m54">
+    <sources>data/m54/M54variables_cleaned.dat</sources>
+    <columnGrammar topIgnoredLines="3">
+      <colDefs>
+        object_id:   1-4
+        alphaHMS:   13-23
+        deltaDMS:   26-36
+        period:     110-121
+        period_err: 124-134
+        ogle_vartype: 147-153
+        mean_I:     179-184
+        mean_V:     155-160
+        ampl_I:     203-207
+      </colDefs>
+    </columnGrammar>
+    <make table="m54">
+      <rowmaker idmaps="*">
+        <var name="raj2000">hmsToDeg(@alphaHMS, ":")</var>
+        <var name="dej2000">dmsToDeg(@deltaDMS, ":")</var>
+        <map dest="mean_I">parseWithNull(@mean_I, str, "-")</map>
+        <map dest="mean_V">parseWithNull(@mean_V, str, "-")</map>
+        <map dest="ampl_I">parseWithNull(@ampl_I, str, "-")</map>
+        <map dest="period">parseWithNull(@period, str, "-")</map>
+        <map dest="period_err">parseWithNull(@period_err, str, "-")</map>
+      </rowmaker>
+    </make>
+  </data>
+
 <!-- ########################## lightcurves ############################################## -->
 
 
@@ -475,7 +569,8 @@
 
   <data id="import_lightcurves" updating="True">
 
-    <sources pattern="data/blg_lpv/phot_ogle3/[VI]/*.dat"/>
+    <!-- <sources pattern="data/blgx_lpv/phot_ogle3/[VI]/*.dat"/>  -->
+    <sources pattern="data/m54/phot/I/*.dat"/>
 
     <csvGrammar delimiter=" " strip="True" names="dateobs_jd, magnitude, mag_err"/>
 
@@ -486,7 +581,10 @@
           2400000.5 if "blg_cep" in \rootlessPath else -49999.5
         </var>
         <var name="obs_time">float(@dateobs_jd)-@to_mjd</var>
-        <map key="object_id">\srcstem</map>
+        <map key="object_id">
+          \srcstem[:-2] if \srcstem.endswith(("_V", "_I")) else \srcstem
+        </map>
+        <!-- <map key="object_id">\srcstem</map> -->
         <map key="passband">\rootlessPath.split("/")[-2]</map>
 
         <!-- OGLE phase: phot -> 0, phot_ogle2 -> 2, etc. -->
