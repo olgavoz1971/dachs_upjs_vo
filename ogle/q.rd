@@ -79,7 +79,7 @@
   </macDef>
 
   <macDef name="object_common_cols">
-   object_id, raj2000, dej2000,period, ampl_I, mean_I, mean_V, vsx
+   object_id, raj2000, dej2000,period, ampl_I, mean_I, mean_V
   </macDef>
 
   <macDef name="aux_common_cols">
@@ -95,7 +95,7 @@
        having count(*) > 1;
 -->
   <table id="objects_all" adql="True" onDisk="True"
-         mixin="//scs#pgs-pos-index">
+         mixin="//scs#pgs-pos-index" namePath="ogle/aux#object">
 
     <meta name="table-rank">100</meta>
     <meta name="description">
@@ -109,28 +109,13 @@
       Position ICRS "raj2000" "dej2000"
     </stc>
 
-    <column original="ogle/t#ident_blg_cep.object_id"/>
-    <column original="ogle/t#ident_blg_cep.raj2000"/>
-    <column original="ogle/t#ident_blg_cep.dej2000"/>
-    <column original="ogle/t#aux_blg_cep_cepf.period"/>
-    <column original="ogle/t#aux_blg_cep_cepf.period_err"/> 
-    <column original="ogle/t#aux_blg_cep_cepf.ampl_I"/>
-    <column original="ogle/t#aux_blg_cep_cepf.mean_I"/>
-    <column original="ogle/t#aux_blg_cep_cepf.mean_V"/>
-    <column original="ogle/t#ident_blg_cep.vsx"/>
+    <LOOP listItems="object_id raj2000 dej2000 period period_err ampl_I
+                     mean_I mean_V vsx vartype subtype">
+      <events>
+        <column original="\item"/>
+      </events>
+    </LOOP>
     <column original="//ssap#instance.ssa_collection"/>
-
-    <column name="vartype" type="text" ucd="meta.code.class"
-      tablehead="Type of Variable Star" verbLevel="15"
-      description="Type of Variable Star"
-      required="False">
-    </column>
-
-    <column name="subtype" type="text" ucd="meta.code.class"
-      tablehead="Subtype of Variable Star" verbLevel="15"
-      description="Subtype of Variable Star"
-      required="False">
-    </column>
 
     <viewStatement>
       CREATE MATERIALIZED VIEW \curtable AS (
@@ -148,14 +133,18 @@
             UNION ALL
             SELECT \aux_common_cols, 'cep2p3o' AS subtype FROM \schema.aux_blg_cep_cep2o3o
           )
-          SELECT \object_common_cols, period_err, 'Ce*' AS vartype, subtype, 'OGLE-BLG-CEP' AS ssa_collection
+          SELECT \object_common_cols, vsx, period_err, 'Ce*' AS vartype, subtype, 'OGLE-BLG-CEP' AS ssa_collection
           FROM \schema.ident_blg_cep
           LEFT JOIN aux_cep_all AS c USING (object_id)
         UNION ALL
-          SELECT \object_common_cols, NULL AS period_err, 'LP*' AS vartype, NULL AS subtype, 
+          SELECT \object_common_cols, vsx, NULL AS period_err, 'LP*' AS vartype, NULL AS subtype, 
                  'OGLE-BLG-LPV' AS ssa_collection
           FROM \schema.ident_blg_lpv
           LEFT JOIN \schema.aux_blg_lpv_miras AS m USING (object_id)
+        UNION ALL
+          SELECT \object_common_cols, NULL AS vsx, period_err, ogle_vartype AS vartype, NULL AS subtype, 
+                 'OGLE-M54' AS ssa_collection
+          FROM \schema.m54
         ) AS all_objects)           
 
     </viewStatement>

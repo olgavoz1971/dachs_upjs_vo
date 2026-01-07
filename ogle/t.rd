@@ -111,50 +111,6 @@
 
 <!-- ====================== ident tables (base for objects view) ==========  -->
 
-  <STREAM id="basicColumnsIdent">
-    <meta name="description">The original table with identification of stars from \name collection</meta>
-
-    <column name="object_id" type="text" ucd="meta.id;meta.main"
-      tablehead="Star ID" verbLevel="1" 
-      description="Star identifier"
-      required="True">
-    </column>
-
-    <column name="raj2000" type="double precision" ucd="pos.eq.ra;meta.main"
-      tablehead="RA" verbLevel="1" unit="deg"
-      description="Right ascension"
-      required="True" displayHint="sf=10"/>
-
-    <column name="dej2000" type="double precision" ucd="pos.eq.dec;meta.main"
-      tablehead="Dec" verbLevel="1" unit="deg"
-      description="Declination"
-      required="True" displayHint="sf=10"/>
-
-    <column name="ogle4_id" type="text" ucd="meta.id"
-      tablehead="OGLE-IV ID" verbLevel="25"
-      description="OGLE-IV Identifier"
-      required="False">
-    </column>
-
-    <column name="ogle3_id" type="text" ucd="meta.id"
-      tablehead="OGLE-III ID" verbLevel="25"
-      description="OGLE-III Identifier"
-      required="False">
-    </column>
-
-    <column name="ogle2_id" type="text" ucd="meta.id"
-      tablehead="OGLE-II ID" verbLevel="25"
-      description="OGLE-II Identifier"
-      required="False">
-    </column>
-
-    <column name="vsx" type="text" ucd="meta.id"
-      tablehead="VSX" verbLevel="1"
-      description="VSX designation"
-      required="False">
-    </column>
-  </STREAM>
-
   <STREAM id="makeCommonRowsIdent">
         <var name="raj2000">hmsToDeg(@alphaHMS, ":")</var>
         <var name="dej2000">dmsToDeg(@deltaDMS, ":")</var>
@@ -164,8 +120,16 @@
         <map dest="vsx">parseWithNull(@vsx, str, "")</map>    
   </STREAM>
 
-  <table id="ident_blg_cep" onDisk="True" adql="hidden">
-    <FEED source="basicColumnsIdent" name="Classical Cepheids toward the Galactic bulge"/>
+  <table id="ident_blg_cep" onDisk="True" adql="hidden" namePath="ogle/aux#object">
+    <meta name="description">The original table with identification of stars from 
+                       Classical Cepheids toward the Galactic bulge collection</meta>
+
+    <LOOP listItems="object_id raj2000 dej2000 ogle4_id ogle3_id ogle2_id vsx">
+      <events>
+        <column original="\item"/>
+      </events>
+    </LOOP>
+
     <column name="pulse_mode" type="text" ucd="meta.code.class"
       tablehead="Pulsation Mode" verbLevel="15"
       description="Cepheid Mode(s) of pulsation"
@@ -197,13 +161,16 @@
     </make>
   </data>
 
-  <table id="ident_blg_lpv" onDisk="True" adql="hidden">
-    <FEED source="basicColumnsIdent" name="Mira stars toward the Galactic Bulge"/>
-    <column name="type" type="text" ucd="meta.code.class"
-      tablehead="Type of Variable Star" verbLevel="15"
-      description="Type of Variable Star (Mira)"
-      required="False">
-    </column>
+  <table id="ident_blg_lpv" onDisk="True" adql="hidden" namePath="ogle/aux#object">
+    <meta name="description">The original table with identification of stars from 
+                       the Mira stars toward the Galactic Bulge collection</meta>
+
+    <LOOP listItems="object_id  raj2000 dej2000 ogle4_id ogle3_id ogle2_id
+                     vsx ogle_vartype">
+      <events>
+        <column original="\item"/>
+      </events>
+    </LOOP>
   </table>
 
   <data id="import_blg_lpv">
@@ -211,21 +178,21 @@
 
     <columnGrammar>
       <colDefs>
-        object_id:   1-19
-        type:       22-25
-        alphaHMS:   28-38
-        deltaDMS:   40-50
-        ogle4_id:   53-68
-        ogle3_id:   70-84
-        ogle2_id:   86-101
-        vsx:        103-150
+        object_id:    1-19
+        type: 22-25
+        alphaHMS:     28-38
+        deltaDMS:     40-50
+        ogle4_id:     53-68
+        ogle3_id:     70-84
+        ogle2_id:     86-101
+        vsx:         103-150
       </colDefs>
     </columnGrammar>
 
     <make table="ident_blg_lpv">
       <rowmaker idmaps="*">
         <FEED source="makeCommonRowsIdent"/>
-        <map dest="type">parseWithNull(@type, str, "")</map>
+        <map dest="ogle_vartype">parseWithNull(@type, str, "")</map>
       </rowmaker>
     </make>
   </data>
@@ -297,49 +264,6 @@
 
   <!-- =============== BLG Cepheids ======================== -->
 
-  <STREAM id="basicColumnsCep">
-    <column name="object_id" type="text" ucd="meta.id;meta.main"
-      tablehead="Star ID" verbLevel="1" 
-      description="Star identifier"
-      required="True">
-    </column>
-
-    <column name="mean_I" type="real"
-      ucd="phot.mag"
-      unit="mag"
-      tablehead="Mean I"
-      description="Intensity mean I-band magnitude"
-      required="False"/>
-
-    <column name="mean_V" type="real"
-      ucd="phot.mag"
-      unit="mag"
-      tablehead="Mean V"
-      description="Intensity mean V-band magnitude"
-      required="False"/>
-
-    <column name="ampl_I" type="double precision"
-      ucd="phot.mag"
-      unit="mag"
-      tablehead="Ampl I"
-      description="I-band amplitude of the primary period"
-      required="False"/>
-
-    <column name="period" type="double precision"
-      ucd="src.var;time.period"
-      unit="d"
-      tablehead="Period"
-      description="Primary/longest period"
-      required="False"/>
-
-    <column name="period_err" type="double precision"
-      ucd="src.var;time.period"
-      unit="d"
-      tablehead="Period err"
-      description="Uncertainty of period"
-      required="False"/>
-  </STREAM>
-
   <STREAM id="blg_cep_dd">
     <columnGrammar>
       <colDefs>
@@ -361,66 +285,93 @@
     </make>
   </STREAM>
 
-  <table id="aux_blg_cep_cepf" onDisk="True" adql="hidden">
+  <table id="aux_blg_cep_cepf" onDisk="True" adql="hidden" namePath="ogle/aux#object">
     <meta name="description">The table from the base of original cepF.dat 
                 with parameters of fundamental-mode (F) Cepheids
                 from OGLE classical Cepheids toward the Galactic bulge collection</meta>
-    <FEED source="basicColumnsCep"/>
+
+    <LOOP listItems="object_id mean_I mean_V ampl_I period_err">
+      <events>
+        <column original="\item"/>
+      </events>
+    </LOOP>
+    <column original="period" description="Period"/>
   </table>
+
   <data id="import_blg_cep_cepf">
     <sources>data/blg_cep/cepF.dat</sources>
     <FEED source="blg_cep_dd" table_name="aux_blg_cep_cepf"/>
   </data>
 
-  <table id="aux_blg_cep_cep1o" onDisk="True" adql="hidden">
+  <table id="aux_blg_cep_cep1o" onDisk="True" adql="hidden" namePath="ogle/aux#object">
     <meta name="description">The table from the base of original cep1O.dat 
                 with parameters of first-overtone (1O) Cepheids
                 from OGLE classical Cepheids toward the Galactic bulge collection</meta>
-    <FEED source="basicColumnsCep"/>
+    <LOOP listItems="object_id mean_I mean_V ampl_I period period_err">
+      <events>
+        <column original="\item"/>
+      </events>
+    </LOOP>
   </table>
   <data id="import_blg_cep_cep1o">
     <sources>data/blg_cep/cep1O.dat</sources>
     <FEED source="blg_cep_dd" table_name="aux_blg_cep_cep1o"/>
   </data>
 
-  <table id="aux_blg_cep_cepf1o" onDisk="True" adql="hidden">
+  <table id="aux_blg_cep_cepf1o" onDisk="True" adql="hidden" namePath="ogle/aux#object">
     <meta name="description">The table from the base of original cepF1O.dat 
                 with parameters of double-mode (F/1O) Cepheids
                 from OGLE classical Cepheids toward the Galactic bulge collection</meta>
-    <FEED source="basicColumnsCep"/>
+    <LOOP listItems="object_id mean_I mean_V ampl_I period period_err">
+      <events>
+        <column original="\item"/>
+      </events>
+    </LOOP>
   </table>
   <data id="import_blg_cep_cepf1o">
     <sources>data/blg_cep/cepF1O.dat</sources>
     <FEED source="blg_cep_dd" table_name="aux_blg_cep_cepf1o"/>
   </data>
 
-  <table id="aux_blg_cep_cep1o2o" onDisk="True" adql="hidden">
+  <table id="aux_blg_cep_cep1o2o" onDisk="True" adql="hidden" namePath="ogle/aux#object">
     <meta name="description">The table from the base of original cep1O2O.dat
                 with parameters of double-mode 1O/2O Cepheids
                 from OGLE classical Cepheids toward the Galactic bulge collection</meta>
-    <FEED source="basicColumnsCep"/>
+    <LOOP listItems="object_id mean_I mean_V ampl_I period period_err">
+      <events>
+        <column original="\item"/>
+      </events>
+    </LOOP>
   </table>
   <data id="import_blg_cep_cep1o2o">
     <sources>data/blg_cep/cep1O2O.dat</sources>
     <FEED source="blg_cep_dd" table_name="aux_blg_cep_cep1o2o"/>
   </data>
 
-  <table id="aux_blg_cep_cep1o2o3o" onDisk="True" adql="hidden">
+  <table id="aux_blg_cep_cep1o2o3o" onDisk="True" adql="hidden" namePath="ogle/aux#object">
     <meta name="description">The table from the base of original cep1O2O3O.dat
                 with parameters of triple-mode 1O/2O/3O Cepheids
                 from OGLE classical Cepheids toward the Galactic bulge collection</meta>
-    <FEED source="basicColumnsCep"/>
+    <LOOP listItems="object_id mean_I mean_V ampl_I period period_err">
+      <events>
+        <column original="\item"/>
+      </events>
+    </LOOP>
   </table>
   <data id="import_blg_cep_cep1o2o3o">
     <sources>data/blg_cep/cep1O2O3O.dat</sources>
     <FEED source="blg_cep_dd" table_name="aux_blg_cep_cep1o2o3o"/>
   </data>
 
-  <table id="aux_blg_cep_cep2o3o" onDisk="True" adql="hidden">
+  <table id="aux_blg_cep_cep2o3o" onDisk="True" adql="hidden" namePath="ogle/aux#object">
     <meta name="description">The table from the base of original cep2O3O.dat
                 with parameters of 2O/3O Cepheids
                 from OGLE classical Cepheids toward the Galactic bulge collection</meta>
-    <FEED source="basicColumnsCep"/>
+    <LOOP listItems="object_id mean_I mean_V ampl_I period period_err">
+      <events>
+        <column original="\item"/>
+      </events>
+    </LOOP>
   </table>
   <data id="import_blg_cep_cep2o3o">
     <sources>data/blg_cep/cep2O3O.dat</sources>
@@ -429,66 +380,16 @@
 
 <!-- ==================== M54 stars  =========================================== -->
 
-  <table id="m54" onDisk="True" adql="hidden">
+  <table id="m54" onDisk="True" adql="hidden" namePath="ogle/aux#object">
     <meta name="description">The (almost) original table M54variables.dat with identification and parameters of stars
                    from Sagittarius Dwarf Spheroidal Galaxy and its M54 Globular Cluster</meta>
 
-    <column name="object_id" type="text" ucd="meta.id;meta.main"
-      tablehead="Star ID" verbLevel="1" 
-      description="Star identifier"
-      required="True">
-    </column>
-
-    <column name="raj2000" type="double precision" ucd="pos.eq.ra;meta.main"
-      tablehead="RA" verbLevel="1" unit="deg"
-      description="Right ascension"
-      required="True" displayHint="sf=10"/>
-
-    <column name="dej2000" type="double precision" ucd="pos.eq.dec;meta.main"
-      tablehead="Dec" verbLevel="1" unit="deg"
-      description="Declination"
-      required="True" displayHint="sf=10"/>
-
-    <column name="period" type="double precision"
-      ucd="src.var;time.period"
-      unit="d"
-      tablehead="Period"
-      description="Period of variable star"
-      required="False"/>
-
-    <column name="period_err" type="double precision"
-      ucd="src.var;time.period"
-      unit="d"
-      tablehead="Period err"
-      description="Uncertainty of period"
-      required="False"/>
-
-    <column name="ogle_vartype" type="text" ucd="meta.code.class"
-      tablehead="Variability type" verbLevel="15"
-      description="OGLE Type of Variable Star"
-      required="False">
-    </column>
-
-    <column name="mean_I" type="real"
-      ucd="phot.mag"
-      unit="mag"
-      tablehead="Mean I"
-      description="Intensity mean I-band magnitude"
-      required="False"/>
-
-    <column name="mean_V" type="real"
-      ucd="phot.mag"
-      unit="mag"
-      tablehead="Mean V"
-      description="Intensity mean V-band magnitude"
-      required="False"/>
-
-    <column name="ampl_I" type="double precision"
-      ucd="phot.mag"
-      unit="mag"
-      tablehead="Ampl I"
-      description="I-band amplitude of the primary period"
-      required="False"/>
+    <LOOP listItems="object_id raj2000 dej2000 period period_err ogle_vartype
+                     mean_I mean_V ampl_I period period_err">
+      <events>
+        <column original="\item"/>
+      </events>
+    </LOOP>
   </table>
 
   <!-- JK: there is an error in column format description in the README file; corrected -->
@@ -511,11 +412,12 @@
       <rowmaker idmaps="*">
         <var name="raj2000">hmsToDeg(@alphaHMS, ":")</var>
         <var name="dej2000">dmsToDeg(@deltaDMS, ":")</var>
-        <map dest="mean_I">parseWithNull(@mean_I, str, "-")</map>
-        <map dest="mean_V">parseWithNull(@mean_V, str, "-")</map>
-        <map dest="ampl_I">parseWithNull(@ampl_I, str, "-")</map>
-        <map dest="period">parseWithNull(@period, str, "-")</map>
-        <map dest="period_err">parseWithNull(@period_err, str, "-")</map>
+        <map dest="mean_I">parseWithNull(@mean_I, float, "-")</map>
+        <map dest="mean_V">parseWithNull(@mean_V, float, "-")</map>
+        <map dest="ampl_I">parseWithNull(@ampl_I, float, "-")</map>
+        <map dest="period">parseWithNull(@period, float, "-")</map>
+        <map dest="period_err">parseWithNull(@period_err, float, "-")</map>
+        <map dest="ogle_vartype">parseWithNull(@ogle_vartype, str, "-")</map>
       </rowmaker>
     </make>
   </data>
@@ -523,54 +425,23 @@
 <!-- ########################## lightcurves ############################################## -->
 
 
-  <table id="lightcurves" onDisk="True" adql="True">
+  <table id="lightcurves" onDisk="True" adql="True"  namePath="ogle/aux#lc">
     <meta name="description">The united table with photometry points of all OGLE Lightcurves</meta>
     <index columns="object_id"/>
     <index columns="passband"/>
     <index columns="obs_time"/>
 
-    <column name="object_id" type="text"
-      ucd="meta.id"
-      tablehead="Object id"
-      description="Object identifier for this photometry point"
-      required="True"/>
-
-    <column name="passband" type="text"
-      utype="ssa:DataID.Bandpass" ucd="instr.bandpass"
-      tablehead="Filter" verbLevel="15"
-      description="Bandpass (i.e., rough spectral location) of this dataset"/>
-
-    <column name="obs_time" type="double precision"
-      unit="d" ucd="time.epoch"
-      tablehead="Obs Time"
-      description="mjd of the photometry point"/>
-
-    <column name="magnitude" type="double precision"
-      ucd="phot.mag"
-      unit="mag"
-      tablehead="Magnitude"
-      description="Stellar magnitude"
-      required="False"/>
-
-    <column name="mag_err" type="double precision"
-      ucd="stat.error;phot.mag"
-      unit="mag"
-      tablehead="Magnitude error"
-      description="Estimation of magnitude error"
-      required="False"/>
-
-    <column name="ogle_phase" type="integer"
-      ucd="meta.id;meta.dataset"
-      tablehead="Project Phase"
-      description="OGLE project phase code (0–4): 2 = OGLE II, 3 = OGLE III, 
-                   4 = OGLE IV; 0 = not specified"
-      required="True"/>
+    <LOOP listItems="object_id passband obs_time magnitude mag_err ogle_phase">
+      <events>
+        <column original="\item"/>
+      </events>
+    </LOOP>
   </table>
 
   <data id="import_lightcurves" updating="True">
 
     <!-- <sources pattern="data/blgx_lpv/phot_ogle3/[VI]/*.dat"/>  -->
-    <sources pattern="data/m54/phot/I/*.dat"/>
+    <sources pattern="data/m54x/phot/I/*.dat"/>
 
     <csvGrammar delimiter=" " strip="True" names="dateobs_jd, magnitude, mag_err"/>
 
