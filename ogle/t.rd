@@ -109,7 +109,7 @@
     </make>
   </data>
 
-<!-- ====================== ident tables (base for objects view) ==========  -->
+<!-- ====================== blg ident tables (base for objects view) ==========  -->
 
   <STREAM id="makeCommonRowsIdent">
         <var name="raj2000">hmsToDeg(@alphaHMS, ":")</var>
@@ -124,7 +124,8 @@
     <meta name="description">The original table with identification of stars from 
                        Classical Cepheids toward the Galactic bulge collection</meta>
 
-    <LOOP listItems="object_id raj2000 dej2000 ogle4_id ogle3_id ogle2_id vsx">
+    <LOOP listItems="object_id raj2000 dej2000 ogle4_id ogle3_id ogle2_id vsx
+                     ogle_vartype vartype">
       <events>
         <column original="\item"/>
       </events>
@@ -157,6 +158,8 @@
       <rowmaker idmaps="*">
         <FEED source="makeCommonRowsIdent"/>
         <map dest="pulse_mode">parseWithNull(@pulse_mode, str, "")</map>
+        <var name="ogle_vartype">None</var>
+        <var name="vartype">"Ce*"</var>
       </rowmaker>
     </make>
   </data>
@@ -166,7 +169,7 @@
                        the Mira stars toward the Galactic Bulge collection</meta>
 
     <LOOP listItems="object_id  raj2000 dej2000 ogle4_id ogle3_id ogle2_id
-                     vsx ogle_vartype">
+                     vsx ogle_vartype vartype">
       <events>
         <column original="\item"/>
       </events>
@@ -193,13 +196,14 @@
       <rowmaker idmaps="*">
         <FEED source="makeCommonRowsIdent"/>
         <map dest="ogle_vartype">parseWithNull(@type, str, "")</map>
+        <var name="vartype">"LP*"</var>
       </rowmaker>
     </make>
   </data>
 
-<!-- ================== auxiliary tables ============================= -->
+<!-- ================== param tables ============================= -->
 
-  <table id="aux_blg_lpv_miras" onDisk="True" adql="hidden">
+  <table id="param_blg_lpv_miras" onDisk="True" adql="hidden">
     <meta name="description">The table from original Miras.dat from OGLE Mira stars toward the
                 Galactic bulge collection</meta>
 
@@ -239,7 +243,9 @@
 
   </table>
 
-  <data id="import_aux_blg_lpv_miras">
+<!-- =================== Miras param table ======================== -->
+
+  <data id="import_param_blg_lpv_miras">
     <sources>data/blg_lpv/Miras.dat</sources>
 
     <columnGrammar>
@@ -252,17 +258,17 @@
       </colDefs>
     </columnGrammar>
 
-    <make table="aux_blg_lpv_miras">
+    <make table="param_blg_lpv_miras">
       <rowmaker idmaps="*">
-        <map dest="mean_I">parseWithNull(@mean_I, str, "-")</map>
-        <map dest="mean_V">parseWithNull(@mean_V, str, "-")</map>
-        <map dest="ampl_I">parseWithNull(@ampl_I, str, "-")</map>
-        <map dest="period">parseWithNull(@period, str, "-")</map>
+        <map dest="mean_I">parseWithNull(@mean_I, float, "-")</map>
+        <map dest="mean_V">parseWithNull(@mean_V, float, "-")</map>
+        <map dest="ampl_I">parseWithNull(@ampl_I, float, "-")</map>
+        <map dest="period">parseWithNull(@period, float, "-")</map>
       </rowmaker>
     </make>
   </data>
 
-  <!-- =============== BLG Cepheids ======================== -->
+  <!-- =============== BLG Cepheid params ======================== -->
 
   <STREAM id="blg_cep_dd">
     <columnGrammar>
@@ -277,15 +283,15 @@
     </columnGrammar>
     <make table="\table_name">
       <rowmaker idmaps="*">
-        <map dest="mean_I">parseWithNull(@mean_I, str, "-")</map>
-        <map dest="mean_V">parseWithNull(@mean_V, str, "-")</map>
-        <map dest="period">parseWithNull(@period, str, "-")</map>
-        <map dest="period_err">parseWithNull(@period_err, str, "-")</map>
+        <map dest="mean_I">parseWithNull(@mean_I, float, "-")</map>
+        <map dest="mean_V">parseWithNull(@mean_V, float, "-")</map>
+        <map dest="period">parseWithNull(@period, float, "-")</map>
+        <map dest="period_err">parseWithNull(@period_err, float, "-")</map>
       </rowmaker>
     </make>
   </STREAM>
 
-  <table id="aux_blg_cep_cepf" onDisk="True" adql="hidden" namePath="ogle/aux#object">
+  <table id="param_blg_cep_cepf" onDisk="True" adql="hidden" namePath="ogle/aux#object">
     <meta name="description">The table from the base of original cepF.dat 
                 with parameters of fundamental-mode (F) Cepheids
                 from OGLE classical Cepheids toward the Galactic bulge collection</meta>
@@ -300,10 +306,10 @@
 
   <data id="import_blg_cep_cepf">
     <sources>data/blg_cep/cepF.dat</sources>
-    <FEED source="blg_cep_dd" table_name="aux_blg_cep_cepf"/>
+    <FEED source="blg_cep_dd" table_name="param_blg_cep_cepf"/>
   </data>
 
-  <table id="aux_blg_cep_cep1o" onDisk="True" adql="hidden" namePath="ogle/aux#object">
+  <table id="param_blg_cep_cep1o" onDisk="True" adql="hidden" namePath="ogle/aux#object">
     <meta name="description">The table from the base of original cep1O.dat 
                 with parameters of first-overtone (1O) Cepheids
                 from OGLE classical Cepheids toward the Galactic bulge collection</meta>
@@ -315,10 +321,10 @@
   </table>
   <data id="import_blg_cep_cep1o">
     <sources>data/blg_cep/cep1O.dat</sources>
-    <FEED source="blg_cep_dd" table_name="aux_blg_cep_cep1o"/>
+    <FEED source="blg_cep_dd" table_name="param_blg_cep_cep1o"/>
   </data>
 
-  <table id="aux_blg_cep_cepf1o" onDisk="True" adql="hidden" namePath="ogle/aux#object">
+  <table id="param_blg_cep_cepf1o" onDisk="True" adql="hidden" namePath="ogle/aux#object">
     <meta name="description">The table from the base of original cepF1O.dat 
                 with parameters of double-mode (F/1O) Cepheids
                 from OGLE classical Cepheids toward the Galactic bulge collection</meta>
@@ -330,10 +336,10 @@
   </table>
   <data id="import_blg_cep_cepf1o">
     <sources>data/blg_cep/cepF1O.dat</sources>
-    <FEED source="blg_cep_dd" table_name="aux_blg_cep_cepf1o"/>
+    <FEED source="blg_cep_dd" table_name="param_blg_cep_cepf1o"/>
   </data>
 
-  <table id="aux_blg_cep_cep1o2o" onDisk="True" adql="hidden" namePath="ogle/aux#object">
+  <table id="param_blg_cep_cep1o2o" onDisk="True" adql="hidden" namePath="ogle/aux#object">
     <meta name="description">The table from the base of original cep1O2O.dat
                 with parameters of double-mode 1O/2O Cepheids
                 from OGLE classical Cepheids toward the Galactic bulge collection</meta>
@@ -345,10 +351,10 @@
   </table>
   <data id="import_blg_cep_cep1o2o">
     <sources>data/blg_cep/cep1O2O.dat</sources>
-    <FEED source="blg_cep_dd" table_name="aux_blg_cep_cep1o2o"/>
+    <FEED source="blg_cep_dd" table_name="param_blg_cep_cep1o2o"/>
   </data>
 
-  <table id="aux_blg_cep_cep1o2o3o" onDisk="True" adql="hidden" namePath="ogle/aux#object">
+  <table id="param_blg_cep_cep1o2o3o" onDisk="True" adql="hidden" namePath="ogle/aux#object">
     <meta name="description">The table from the base of original cep1O2O3O.dat
                 with parameters of triple-mode 1O/2O/3O Cepheids
                 from OGLE classical Cepheids toward the Galactic bulge collection</meta>
@@ -360,10 +366,10 @@
   </table>
   <data id="import_blg_cep_cep1o2o3o">
     <sources>data/blg_cep/cep1O2O3O.dat</sources>
-    <FEED source="blg_cep_dd" table_name="aux_blg_cep_cep1o2o3o"/>
+    <FEED source="blg_cep_dd" table_name="param_blg_cep_cep1o2o3o"/>
   </data>
 
-  <table id="aux_blg_cep_cep2o3o" onDisk="True" adql="hidden" namePath="ogle/aux#object">
+  <table id="param_blg_cep_cep2o3o" onDisk="True" adql="hidden" namePath="ogle/aux#object">
     <meta name="description">The table from the base of original cep2O3O.dat
                 with parameters of 2O/3O Cepheids
                 from OGLE classical Cepheids toward the Galactic bulge collection</meta>
@@ -375,7 +381,7 @@
   </table>
   <data id="import_blg_cep_cep2o3o">
     <sources>data/blg_cep/cep2O3O.dat</sources>
-    <FEED source="blg_cep_dd" table_name="aux_blg_cep_cep2o3o"/>
+    <FEED source="blg_cep_dd" table_name="param_blg_cep_cep2o3o"/>
   </data>
 
 <!-- ==================== M54 stars  =========================================== -->
@@ -384,7 +390,7 @@
     <meta name="description">The (almost) original table M54variables.dat with identification and parameters of stars
                    from Sagittarius Dwarf Spheroidal Galaxy and its M54 Globular Cluster</meta>
 
-    <LOOP listItems="object_id raj2000 dej2000 period period_err ogle_vartype
+    <LOOP listItems="object_id raj2000 dej2000 period period_err ogle_vartype vartype
                      mean_I mean_V ampl_I period period_err">
       <events>
         <column original="\item"/>
@@ -410,6 +416,7 @@
     </columnGrammar>
     <make table="m54">
       <rowmaker idmaps="*">
+        <map name="object_id">"OGLE-M54-"+@object_id</map>
         <var name="raj2000">hmsToDeg(@alphaHMS, ":")</var>
         <var name="dej2000">dmsToDeg(@deltaDMS, ":")</var>
         <map dest="mean_I">parseWithNull(@mean_I, float, "-")</map>
@@ -417,6 +424,30 @@
         <map dest="ampl_I">parseWithNull(@ampl_I, float, "-")</map>
         <map dest="period">parseWithNull(@period, float, "-")</map>
         <map dest="period_err">parseWithNull(@period_err, float, "-")</map>
+
+        <!-- Try to bring ogle vartypes to the Simbad codes -->        
+        <var name="vartype">@ogle_vartype</var>
+        <apply name="to_simbad_vartype" procDef="//procs#dictMap">
+          <bind key="default">base.NotGiven</bind>
+          <bind key="key">"vartype"</bind>
+          <bind key="mapping"> {
+            "-" : None,
+            "v" : "V*",
+            "RRab": "RR*",
+            "RRc": "RR*",
+            "RRd": "RR*",
+            "EA": "EB*",
+            "EB": "EB*",
+            "EW": "EB*",
+            "SXPhe": "SX*",
+            "Irr": "Ir*",
+            "SR": "V*",
+            "BLHer": "WV*",
+            "WVir": "WV*",
+            "Ell": "El*",
+            "spotted": "Ro*"
+          } </bind>
+        </apply>
         <map dest="ogle_vartype">parseWithNull(@ogle_vartype, str, "-")</map>
       </rowmaker>
     </make>
@@ -438,10 +469,10 @@
     </LOOP>
   </table>
 
-  <data id="import_lightcurves" updating="True">
+  <data id="import_lightcurves" updating="False">
 
     <!-- <sources pattern="data/blgx_lpv/phot_ogle3/[VI]/*.dat"/>  -->
-    <sources pattern="data/m54x/phot/I/*.dat"/>
+    <sources pattern="data/m54/phot/I/*.dat"/>
 
     <csvGrammar delimiter=" " strip="True" names="dateobs_jd, magnitude, mag_err"/>
 
@@ -452,9 +483,23 @@
           2400000.5 if "blg_cep" in \rootlessPath else -49999.5
         </var>
         <var name="obs_time">float(@dateobs_jd)-@to_mjd</var>
-        <map key="object_id">
+
+        <apply name="restore_object_names">
+          <code>
+            abs_path = vars["parser_"].sourceToken
+            name = \srcstem
+            name = name[:-2] if name.endswith(("_V", "_I")) else name
+            collection = abs_path.split("/")[-4].upper()
+            if not name.startswith("OGLE"):
+              name = "OGLE-" + collection + "-" + name
+            @object_id = name
+          </code>
+        </apply>
+<!--        <map key="object_id">
           \srcstem[:-2] if \srcstem.endswith(("_V", "_I")) else \srcstem
         </map>
+-->
+
         <!-- <map key="object_id">\srcstem</map> -->
         <map key="passband">\rootlessPath.split("/")[-2]</map>
 
@@ -467,7 +512,7 @@
     </make>
   </data>
 
-<!-- ################################################################# -->
+<!-- ############################## web services ################################### -->
 
   <service id="cep-web" allowed="form">
     <meta name="title">OGLE BLG CEP united table</meta>

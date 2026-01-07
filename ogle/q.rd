@@ -79,10 +79,10 @@
   </macDef>
 
   <macDef name="object_common_cols">
-   object_id, raj2000, dej2000,period, ampl_I, mean_I, mean_V
+   object_id, raj2000, dej2000,period, ampl_I, mean_I, mean_V, vartype, ogle_vartype
   </macDef>
 
-  <macDef name="aux_common_cols">
+  <macDef name="param_common_cols">
     object_id, period, period_err, ampl_I, mean_I, mean_V
   </macDef>
 
@@ -110,7 +110,7 @@
     </stc>
 
     <LOOP listItems="object_id raj2000 dej2000 period period_err ampl_I
-                     mean_I mean_V vsx vartype subtype">
+                     mean_I mean_V vsx vartype ogle_vartype subtype">
       <events>
         <column original="\item"/>
       </events>
@@ -120,29 +120,29 @@
     <viewStatement>
       CREATE MATERIALIZED VIEW \curtable AS (
         SELECT \colNames FROM (
-          WITH aux_cep_all AS (
-            SELECT \aux_common_cols, 'cepf' AS subtype FROM \schema.aux_blg_cep_cepf
+          WITH param_cep_all AS (
+            SELECT \param_common_cols FROM \schema.param_blg_cep_cepf
             UNION ALL
-            SELECT \aux_common_cols, 'cepf1o' AS subtype FROM \schema.aux_blg_cep_cepf1o
+            SELECT \param_common_cols FROM \schema.param_blg_cep_cepf1o
             UNION ALL
-            SELECT \aux_common_cols, 'cep1o' AS subtype FROM \schema.aux_blg_cep_cep1o
+            SELECT \param_common_cols FROM \schema.param_blg_cep_cep1o
             UNION ALL
-            SELECT \aux_common_cols, 'cep1o2o' AS subtype FROM \schema.aux_blg_cep_cep1o2o
+            SELECT \param_common_cols FROM \schema.param_blg_cep_cep1o2o
             UNION ALL
-            SELECT \aux_common_cols, 'cep1o2o3o' AS subtype FROM \schema.aux_blg_cep_cep1o2o3o
+            SELECT \param_common_cols FROM \schema.param_blg_cep_cep1o2o3o
             UNION ALL
-            SELECT \aux_common_cols, 'cep2p3o' AS subtype FROM \schema.aux_blg_cep_cep2o3o
+            SELECT \param_common_cols FROM \schema.param_blg_cep_cep2o3o
           )
-          SELECT \object_common_cols, vsx, period_err, 'Ce*' AS vartype, subtype, 'OGLE-BLG-CEP' AS ssa_collection
+          SELECT \object_common_cols, vsx, period_err, pulse_mode AS subtype, 'OGLE-BLG-CEP' AS ssa_collection
           FROM \schema.ident_blg_cep
-          LEFT JOIN aux_cep_all AS c USING (object_id)
+          LEFT JOIN param_cep_all USING (object_id)
         UNION ALL
-          SELECT \object_common_cols, vsx, NULL AS period_err, 'LP*' AS vartype, NULL AS subtype, 
+          SELECT \object_common_cols, vsx, NULL AS period_err, NULL AS subtype, 
                  'OGLE-BLG-LPV' AS ssa_collection
           FROM \schema.ident_blg_lpv
-          LEFT JOIN \schema.aux_blg_lpv_miras AS m USING (object_id)
+          LEFT JOIN \schema.param_blg_lpv_miras USING (object_id)
         UNION ALL
-          SELECT \object_common_cols, NULL AS vsx, period_err, ogle_vartype AS vartype, NULL AS subtype, 
+          SELECT \object_common_cols, NULL AS vsx, period_err, NULL AS subtype, 
                  'OGLE-M54' AS ssa_collection
           FROM \schema.m54
         ) AS all_objects)           
