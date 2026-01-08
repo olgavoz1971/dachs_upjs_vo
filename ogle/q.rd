@@ -79,7 +79,7 @@
   </macDef>
 
   <macDef name="object_common_cols">
-   object_id, raj2000, dej2000,period, ampl_I, mean_I, mean_V, vartype, ogle_vartype
+    object_id, raj2000, dej2000, period, ampl_I, mean_I, mean_V, vartype, ogle_vartype, ssa_reference
   </macDef>
 
   <macDef name="param_common_cols">
@@ -110,7 +110,7 @@
     </stc>
 
     <LOOP listItems="object_id raj2000 dej2000 period period_err ampl_I
-                     mean_I mean_V vsx vartype ogle_vartype subtype">
+                     mean_I mean_V vsx vartype ogle_vartype subtype ssa_reference">
       <events>
         <column original="\item"/>
       </events>
@@ -120,29 +120,43 @@
     <viewStatement>
       CREATE MATERIALIZED VIEW \curtable AS (
         SELECT \colNames FROM (
-          WITH param_cep_all AS (
-            SELECT \param_common_cols FROM \schema.param_blg_cep_cepf
-            UNION ALL
-            SELECT \param_common_cols FROM \schema.param_blg_cep_cepf1o
-            UNION ALL
-            SELECT \param_common_cols FROM \schema.param_blg_cep_cep1o
-            UNION ALL
-            SELECT \param_common_cols FROM \schema.param_blg_cep_cep1o2o
-            UNION ALL
-            SELECT \param_common_cols FROM \schema.param_blg_cep_cep1o2o3o
-            UNION ALL
-            SELECT \param_common_cols FROM \schema.param_blg_cep_cep2o3o
-          )
+          WITH 
+            param_blg_cep_all AS (													-- blg cep
+              SELECT \param_common_cols FROM \schema.param_blg_cep_cepf
+              UNION ALL
+              SELECT \param_common_cols FROM \schema.param_blg_cep_cepf1o
+              UNION ALL
+              SELECT \param_common_cols FROM \schema.param_blg_cep_cep1o
+              UNION ALL
+              SELECT \param_common_cols FROM \schema.param_blg_cep_cep1o2o
+              UNION ALL
+              SELECT \param_common_cols FROM \schema.param_blg_cep_cep1o2o3o
+              UNION ALL
+              SELECT \param_common_cols FROM \schema.param_blg_cep_cep2o3o
+            ),
+            param_blg_rr_all AS (													-- blg rrlyr
+              SELECT \param_common_cols FROM \schema.param_blg_rr_ab
+              UNION ALL
+              SELECT \param_common_cols FROM \schema.param_blg_rr_c
+              UNION ALL
+              SELECT \param_common_cols FROM \schema.param_blg_rr_d
+              UNION ALL
+              SELECT \param_common_cols FROM \schema.param_blg_arr_d
+            )
           SELECT \object_common_cols, vsx, period_err, pulse_mode AS subtype, 'OGLE-BLG-CEP' AS ssa_collection
           FROM \schema.ident_blg_cep
-          LEFT JOIN param_cep_all USING (object_id)
+          LEFT JOIN param_blg_cep_all USING (object_id)
         UNION ALL
-          SELECT \object_common_cols, vsx, NULL AS period_err, NULL AS subtype, 
+          SELECT \object_common_cols, vsx, period_err, subtype, 'OGLE-BLG-RRLYR' AS ssa_collection
+          FROM \schema.ident_blg_rr
+          LEFT JOIN param_blg_rr_all USING (object_id)
+        UNION ALL
+          SELECT \object_common_cols, vsx, NULL AS period_err, NULL AS subtype,			-- blg lpv
                  'OGLE-BLG-LPV' AS ssa_collection
           FROM \schema.ident_blg_lpv
           LEFT JOIN \schema.param_blg_lpv_miras USING (object_id)
         UNION ALL
-          SELECT \object_common_cols, NULL AS vsx, period_err, NULL AS subtype, 
+          SELECT \object_common_cols, NULL AS vsx, period_err, NULL AS subtype,			-- misc m54
                  'OGLE-M54' AS ssa_collection
           FROM \schema.m54
         ) AS all_objects)           
@@ -219,7 +233,7 @@
     -->
     <LOOP listItems="ssa_dstitle ssa_targname ssa_targclass
       ssa_pubDID ssa_bandpass ssa_specmid ssa_specstart ssa_specend ssa_specext 
-      ssa_timeExt ssa_length ssa_collection">
+      ssa_timeExt ssa_length ssa_collection ssa_reference">
       <events>
         <column original="\item"/>
       </events>
@@ -298,7 +312,8 @@
           NULL AS embargo,
           NULL AS owner,
           NULL AS datalink,
-          ssa_collection
+          o.ssa_collection,
+          o.ssa_reference
         FROM (
           SELECT
             l.object_id, l.passband,
@@ -322,6 +337,8 @@
     <!-- <property key="previewDir">previews</property> -->
     <make table="raw_data"/>
   </data>
+
+<!-- ================================== ts_ssa =========================== -->
 
   <table id="ts_ssa" onDisk="True" adql="True">
     <meta name="table-rank">50</meta>
@@ -423,7 +440,7 @@
           description="stellar magnitude error"
           verbLevel="1"
           required="False"/>
-        <column original="ogle/t#lightcurves.ogle_phase"/>
+        <column original="ogle/aux#lc.ogle_phase"/>
     </table>
   </STREAM>
 

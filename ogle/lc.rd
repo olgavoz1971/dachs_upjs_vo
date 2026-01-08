@@ -1,4 +1,5 @@
 <resource schema="ogle" resdir=".">
+  <meta name="schema-rank">50</meta>
   <meta name="creationDate">2025-12-21T20:06:30Z</meta>
 
   <meta name="title">Combined lightcurve tables with all PP for all objects from OGLE
@@ -41,7 +42,7 @@
 
 <!-- ########################## lightcurves ############################################## -->
 
-<!-- Note: We _update_ the lightcurve table, because it is quite large. 
+<!-- Note: We _updating_ the lightcurve table, because it is quite large. 
      I have not found the way to check whether the importing collection was ingested already, so
      be careful not to double/triple data. Just play with the templates
 -->
@@ -59,11 +60,11 @@
     </LOOP>
   </table>
 
-  <data id="import_lightcurves" updating="False">
+  <data id="import_lightcurves" updating="True">
 
-    <!-- <sources pattern="data/blgx_lpv/phot_ogle3/[VI]/*.dat"/>  -->
-    <!-- <sources pattern="data/m54/phot/I/*.dat"/>  -->
-    <sources pattern="data/blg_/phot/I/*.dat"/>
+    <sources pattern="data/blg/lpv/phot_ogle2/[VI]/*.dat"/>
+    <!-- <sources pattern="data/misc/m54/phot/V/*.dat"/>  -->
+    <!-- <sources pattern="data/blg/rrlyr/phot/V/*.dat"/> -->
 
     <csvGrammar delimiter=" " strip="True" names="dateobs_jd, magnitude, mag_err"/>
 
@@ -71,7 +72,7 @@
       <rowmaker idmaps="*">
         <!-- OGLE jds come with different "time zero-points" unfortunately -->
         <var name="to_mjd">
-          2400000.5 if "blg_cep" in \rootlessPath else -49999.5
+          2400000.5 if "blg/cep" in \rootlessPath else -49999.5
         </var>
         <var name="obs_time">float(@dateobs_jd)-@to_mjd</var>
 
@@ -80,7 +81,10 @@
             abs_path = vars["parser_"].sourceToken
             name = \srcstem
             name = name[:-2] if name.endswith(("_V", "_I")) else name
-            collection = abs_path.split("/")[-4].upper()
+            # collection = abs_path.split("/")[-4].upper()
+            part1 = '' if abs_path.split("/")[-5].upper() == 'MISC' else abs_path.split("/")[-5].upper() + '-'
+            part2 = abs_path.split("/")[-4].upper()
+            collection = part1 + part2
             if not name.startswith("OGLE"):
               name = "OGLE-" + collection + "-" + name
             @object_id = name

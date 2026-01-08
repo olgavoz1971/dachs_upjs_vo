@@ -1,4 +1,5 @@
 <resource schema="ogle" resdir=".">
+  <meta name="schema-rank">50</meta>
   <meta name="creationDate">2025-12-21T20:06:30Z</meta>
 
   <meta name="title">Original OGLE ident tables outside the main fields</meta>
@@ -110,7 +111,7 @@
                    from Sagittarius Dwarf Spheroidal Galaxy and its M54 Globular Cluster</meta>
 
     <LOOP listItems="object_id raj2000 dej2000 period period_err ogle_vartype vartype
-                     mean_I mean_V ampl_I period period_err">
+                     mean_I mean_V ampl_I period period_err ssa_reference">
       <events>
         <column original="\item"/>
       </events>
@@ -119,7 +120,7 @@
 
   <!-- JK: there is an error in column format description in the README file; corrected -->
   <data id="import_m54">
-    <sources>data/m54/M54variables_cleaned.dat</sources>
+    <sources>data/misc/m54/M54variables_cleaned.dat</sources>
     <columnGrammar topIgnoredLines="3">
       <colDefs>
         object_id:   1-4
@@ -168,8 +169,8 @@
           } </bind>
         </apply>
         <map dest="ogle_vartype">parseWithNull(@ogle_vartype, str, "-")</map>
+        <var name="ssa_reference">"2015M54_Change_Me....65....1U"</var>
       </rowmaker>
     </make>
   </data>
-
 </resource>

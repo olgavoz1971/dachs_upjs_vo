@@ -95,6 +95,9 @@
       tablehead="Period err"
       description="Uncertainty of period"
       required="False"/>
+
+    <column original="//ssap#instance.ssa_reference"/>
+
   </table>
 
   <table id="lc" onDisk="False">

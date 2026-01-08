@@ -1,6 +1,6 @@
 <resource schema="ogle" resdir=".">
+  <meta name="schema-rank">50</meta>
   <meta name="creationDate">2025-12-21T20:06:30Z</meta>
-
   <macDef name="field">toward the Galactic bulge</macDef>
 
   <meta name="title">Original OGLE Variable Stars Collection tables.</meta>
@@ -63,7 +63,7 @@
                        Classical Cepheids \field collection</meta>
 
     <LOOP listItems="object_id raj2000 dej2000 ogle4_id ogle3_id ogle2_id vsx
-                     ogle_vartype vartype">
+                     ogle_vartype vartype ssa_reference">
       <events>
         <column original="\item"/>
       </events>
@@ -77,7 +77,7 @@
   </table>
 
   <data id="import_blg_cep">
-    <sources>data/ident_blg_cep.dat</sources>
+    <sources>data/blg/cep/ident.dat</sources>
 
     <columnGrammar>
       <colDefs>
@@ -98,6 +98,7 @@
         <map dest="pulse_mode">parseWithNull(@pulse_mode, str, "")</map>
         <var name="ogle_vartype">"Cep"</var>
         <var name="vartype">"Ce*"</var>
+        <var name="ssa_reference">"2015BLG_CEP_Change_Me....65....1U"</var>
       </rowmaker>
     </make>
   </data>
@@ -108,7 +109,7 @@
     <meta name="description">The original table with identification of Mira stars \field collection</meta>
 
     <LOOP listItems="object_id  raj2000 dej2000 ogle4_id ogle3_id ogle2_id
-                     vsx ogle_vartype vartype">
+                     vsx ogle_vartype vartype ssa_reference">
       <events>
         <column original="\item"/>
       </events>
@@ -116,7 +117,7 @@
   </table>
 
   <data id="import_blg_lpv">
-    <sources>data/ident_blg_lpv.dat</sources>
+    <sources>data/blg/lpv/ident.dat</sources>
 
     <columnGrammar>
       <colDefs>
@@ -136,6 +137,7 @@
         <FEED source="makeCommonRowsIdent"/>
         <map dest="ogle_vartype">parseWithNull(@type, str, "")</map>
         <var name="vartype">"LP*"</var>
+        <var name="ssa_reference">"2015BLG_LPV_Change_Me....65....1U"</var>
       </rowmaker>
     </make>
   </data>
@@ -146,7 +148,7 @@
     <meta name="description">The original table with identification of RR Lyr stars \field collection</meta>
 
     <LOOP listItems="object_id  raj2000 dej2000 ogle4_id ogle3_id ogle2_id
-                     ogle_vartype vartype subtype">
+                     ogle_vartype vartype subtype ssa_reference">
       <events>
         <column original="\item"/>
       </events>
@@ -155,7 +157,7 @@
   </table>
 
   <data id="import_blg_rr">
-    <sources>data/ident_blg_lpv.dat</sources>
+    <sources>data/blg/rrlyr/ident.dat</sources>
 
     <columnGrammar>
       <colDefs>
@@ -178,7 +180,7 @@
         <var name="vartype">@subtype</var>
         <apply name="to_simbad_vartype" procDef="//procs#dictMap">
           <bind key="default">base.NotGiven</bind>
-          <bind key="key">"subtype"</bind>
+          <bind key="key">"vartype"</bind>
           <bind key="mapping"> {
             "-" : None,
             "RRab": "RR*",
@@ -187,6 +189,7 @@
           } </bind>
         </apply>
         <var name="ogle_vartype">"RR Lyr"</var>
+        <var name="ssa_reference">"2015BLG_RR_Change_Me....65....1U"</var>
       </rowmaker>
     </make>
   </data>
@@ -197,7 +200,6 @@
 
   <table id="param_blg_lpv_miras" onDisk="True" adql="hidden" namePath="ogle/aux#object">
     <meta name="description">The table from original Miras.dat from OGLE Mira stars \field collection</meta>
-
     <LOOP listItems="object_id mean_I mean_V ampl_I period">
       <events>
         <column original="\item"/>
@@ -206,8 +208,7 @@
   </table>
 
   <data id="import_param_blg_lpv_miras">
-    <sources>data/blg_lpv/Miras.dat</sources>
-
+    <sources>data/blg/lpv/Miras.dat</sources>
     <columnGrammar>
       <colDefs>
         object_id:   1-19
@@ -217,7 +218,6 @@
         ampl_I:     46-50
       </colDefs>
     </columnGrammar>
-
     <make table="param_blg_lpv_miras">
       <rowmaker idmaps="*">
         <map dest="mean_I">parseWithNull(@mean_I, float, "-")</map>
@@ -250,7 +250,7 @@
         </LOOP>
       </table>
       <data id="import_blg_\class">
-        <sources>data/blg_rrlyr/\source</sources>
+        <sources>data/blg/rrlyr/\source</sources>
         <columnGrammar>
           <colDefs>
             object_id:   1-20
@@ -278,12 +278,12 @@
   <LOOP>
     <csvItems>
       class,             source, subclass
-      cepf,            cepF.dat, fundamental-mode-(F)-Cepheids
-      cep1o,          cep1O.dat, first-overtone-(1O)-Cepheids
-      cepf1o,        cepF1O.dat, double-mode-(F/1O)-Cepheids
-      cepf1o2o,     cep1O2O.dat, double-mode-(1O/2O)-Cepheids
-      cepf1o2o3o, cep1O2O3O.dat, triple-mode-(1O/2O/30)-Cepheids
-      cepf2o3o,     cep2O3O.dat, double-mode-(2O/30)-Cepheids
+      cepf,           cepF.dat, fundamental-mode-(F)-Cepheids
+      cep1o,         cep1O.dat, first-overtone-(1O)-Cepheids
+      cepf1o,       cepF1O.dat, double-mode-(F/1O)-Cepheids
+      cep1o2o,     cep1O2O.dat, double-mode-(1O/2O)-Cepheids
+      cep1o2o3o, cep1O2O3O.dat, triple-mode-(1O/2O/30)-Cepheids
+      cep2o3o,     cep2O3O.dat, double-mode-(2O/30)-Cepheids
     </csvItems>
     <events>
       <table id="param_blg_cep_\class" onDisk="True" adql="hidden" namePath="ogle/aux#object">
@@ -298,7 +298,7 @@
         </LOOP>
       </table>
       <data id="import_blg_\class">
-        <sources>data/blg_cep/\source</sources>
+        <sources>data/blg/cep/\source</sources>
         <columnGrammar>
           <colDefs>
               object_id:   1-16
