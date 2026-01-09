@@ -1,4 +1,5 @@
 <resource schema="ogle" resdir=".">
+  <macDef name="referenceM54">2016AcA....66..197H</macDef>
   <meta name="schema-rank">50</meta>
   <meta name="creationDate">2025-12-21T20:06:30Z</meta>
 
@@ -111,7 +112,7 @@
                    from Sagittarius Dwarf Spheroidal Galaxy and its M54 Globular Cluster</meta>
 
     <LOOP listItems="object_id raj2000 dej2000 period period_err ogle_vartype vartype
-                     mean_I mean_V ampl_I period period_err ssa_reference">
+                     mean_I mean_V ampl_I period period_err ssa_collection ssa_reference">
       <events>
         <column original="\item"/>
       </events>
@@ -136,7 +137,7 @@
     </columnGrammar>
     <make table="m54">
       <rowmaker idmaps="*">
-        <map name="object_id">"OGLE-M54-"+@object_id</map>
+        <map name="object_id">"OGLE-M54-" + @object_id</map>
         <var name="raj2000">hmsToDeg(@alphaHMS, ":")</var>
         <var name="dej2000">dmsToDeg(@deltaDMS, ":")</var>
         <map dest="mean_I">parseWithNull(@mean_I, float, "-")</map>
@@ -169,7 +170,8 @@
           } </bind>
         </apply>
         <map dest="ogle_vartype">parseWithNull(@ogle_vartype, str, "-")</map>
-        <var name="ssa_reference">"2015M54_Change_Me....65....1U"</var>
+        <var name="ssa_collection">"OGLE-M54"</var>
+        <var name="ssa_reference">"\referenceM54"</var>
       </rowmaker>
     </make>
   </data>

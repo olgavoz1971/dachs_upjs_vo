@@ -96,6 +96,7 @@
       description="Uncertainty of period"
       required="False"/>
 
+    <column original="//ssap#instance.ssa_collection"/>
     <column original="//ssap#instance.ssa_reference"/>
 
   </table>

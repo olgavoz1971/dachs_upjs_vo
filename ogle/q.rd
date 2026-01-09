@@ -79,7 +79,8 @@
   </macDef>
 
   <macDef name="object_common_cols">
-    object_id, raj2000, dej2000, period, ampl_I, mean_I, mean_V, vartype, ogle_vartype, ssa_reference
+    object_id, raj2000, dej2000, period, ampl_I, mean_I, mean_V, vartype, ogle_vartype, 
+    ssa_reference, ssa_collection
   </macDef>
 
   <macDef name="param_common_cols">
@@ -110,12 +111,11 @@
     </stc>
 
     <LOOP listItems="object_id raj2000 dej2000 period period_err ampl_I
-                     mean_I mean_V vsx vartype ogle_vartype subtype ssa_reference">
+               mean_I mean_V vsx vartype ogle_vartype subtype ssa_reference ssa_collection">
       <events>
         <column original="\item"/>
       </events>
     </LOOP>
-    <column original="//ssap#instance.ssa_collection"/>
 
     <viewStatement>
       CREATE MATERIALIZED VIEW \curtable AS (
@@ -143,21 +143,19 @@
               UNION ALL
               SELECT \param_common_cols FROM \schema.param_blg_arr_d
             )
-          SELECT \object_common_cols, vsx, period_err, pulse_mode AS subtype, 'OGLE-BLG-CEP' AS ssa_collection
+          SELECT \object_common_cols, vsx, period_err, pulse_mode AS subtype			-- blg cep
           FROM \schema.ident_blg_cep
           LEFT JOIN param_blg_cep_all USING (object_id)
         UNION ALL
-          SELECT \object_common_cols, vsx, period_err, subtype, 'OGLE-BLG-RRLYR' AS ssa_collection
+          SELECT \object_common_cols, vsx, period_err, subtype							-- blg rrlyr
           FROM \schema.ident_blg_rr
           LEFT JOIN param_blg_rr_all USING (object_id)
         UNION ALL
-          SELECT \object_common_cols, vsx, NULL AS period_err, NULL AS subtype,			-- blg lpv
-                 'OGLE-BLG-LPV' AS ssa_collection
+          SELECT \object_common_cols, vsx, NULL AS period_err, NULL AS subtype			-- blg lpv
           FROM \schema.ident_blg_lpv
           LEFT JOIN \schema.param_blg_lpv_miras USING (object_id)
         UNION ALL
-          SELECT \object_common_cols, NULL AS vsx, period_err, NULL AS subtype,			-- misc m54
-                 'OGLE-M54' AS ssa_collection
+          SELECT \object_common_cols, NULL AS vsx, period_err, NULL AS subtype			-- misc m54
           FROM \schema.m54
         ) AS all_objects)           
 

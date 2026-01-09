@@ -1,7 +1,23 @@
 <resource schema="ogle" resdir=".">
   <meta name="schema-rank">50</meta>
   <meta name="creationDate">2025-12-21T20:06:30Z</meta>
+
   <macDef name="field">toward the Galactic bulge</macDef>
+  <macDef name="prefix">OGLE-BLG</macDef>
+
+<!-- Assign each collection its own ssa_reference --> 
+  <macDef name="referenceDefault">2015AcA....65....1U</macDef>
+  <macDef name="referenceCep">2017AcA....67..297S</macDef>
+  <macDef name="referenceLPV">2022ApJS..260...46I</macDef>
+  <macDef name="referenceRRLyr">2014AcA....64..177S</macDef>
+  <macDef name="referenceDPV">\referenceDefault</macDef>
+  <macDef name="referenceDSct">2020AcA....70..241P</macDef>
+  <macDef name="referenceEcl">2016AcA....66..405S</macDef>
+  <macDef name="referenceHB">2022ApJS..259...16W</macDef>
+  <macDef name="referenceRot">\referenceDefault</macDef>
+  <macDef name="referenceShortEcl">2015AcA....65...39S</macDef>
+  <macDef name="referenceT2Cep">2017AcA....67..297S</macDef>
+  <macDef name="referenceTransits">2023AcA....73..127M</macDef>
 
   <meta name="title">Original OGLE Variable Stars Collection tables.</meta>
   <meta name="description">
@@ -63,7 +79,7 @@
                        Classical Cepheids \field collection</meta>
 
     <LOOP listItems="object_id raj2000 dej2000 ogle4_id ogle3_id ogle2_id vsx
-                     ogle_vartype vartype ssa_reference">
+                     ogle_vartype vartype ssa_collection ssa_reference">
       <events>
         <column original="\item"/>
       </events>
@@ -98,7 +114,8 @@
         <map dest="pulse_mode">parseWithNull(@pulse_mode, str, "")</map>
         <var name="ogle_vartype">"Cep"</var>
         <var name="vartype">"Ce*"</var>
-        <var name="ssa_reference">"2015BLG_CEP_Change_Me....65....1U"</var>
+        <var name="ssa_collection">"\prefix-CEP"</var>
+        <var name="ssa_reference">"\referenceCep"</var>
       </rowmaker>
     </make>
   </data>
@@ -109,7 +126,7 @@
     <meta name="description">The original table with identification of Mira stars \field collection</meta>
 
     <LOOP listItems="object_id  raj2000 dej2000 ogle4_id ogle3_id ogle2_id
-                     vsx ogle_vartype vartype ssa_reference">
+                     vsx ogle_vartype vartype ssa_collection ssa_reference">
       <events>
         <column original="\item"/>
       </events>
@@ -118,7 +135,6 @@
 
   <data id="import_blg_lpv">
     <sources>data/blg/lpv/ident.dat</sources>
-
     <columnGrammar>
       <colDefs>
         object_id:    1-19
@@ -131,13 +147,13 @@
         vsx:         103-150
       </colDefs>
     </columnGrammar>
-
     <make table="ident_blg_lpv">
       <rowmaker idmaps="*">
         <FEED source="makeCommonRowsIdent"/>
         <map dest="ogle_vartype">parseWithNull(@type, str, "")</map>
         <var name="vartype">"LP*"</var>
-        <var name="ssa_reference">"2015BLG_LPV_Change_Me....65....1U"</var>
+        <var name="ssa_collection">"\prefix-LPV"</var>
+        <var name="ssa_reference">"\referenceLPV"</var>
       </rowmaker>
     </make>
   </data>
@@ -148,7 +164,7 @@
     <meta name="description">The original table with identification of RR Lyr stars \field collection</meta>
 
     <LOOP listItems="object_id  raj2000 dej2000 ogle4_id ogle3_id ogle2_id
-                     ogle_vartype vartype subtype ssa_reference">
+                     ogle_vartype vartype subtype ssa_collection ssa_reference">
       <events>
         <column original="\item"/>
       </events>
@@ -158,10 +174,9 @@
 
   <data id="import_blg_rr">
     <sources>data/blg/rrlyr/ident.dat</sources>
-
     <columnGrammar>
       <colDefs>
-        object_id:    1-20
+        object_id:     1-20
         subtype:      23-26
         alphaHMS:     29-39
         deltaDMS:     41-51
@@ -171,11 +186,9 @@
         vsx:         103-150
       </colDefs>
     </columnGrammar>
-
     <make table="ident_blg_rr">
       <rowmaker idmaps="*">
         <FEED source="makeCommonRowsIdent"/>
-
         <!-- Map ogle RRlyr suptypes to the Simbad codes -->
         <var name="vartype">@subtype</var>
         <apply name="to_simbad_vartype" procDef="//procs#dictMap">
@@ -189,7 +202,8 @@
           } </bind>
         </apply>
         <var name="ogle_vartype">"RR Lyr"</var>
-        <var name="ssa_reference">"2015BLG_RR_Change_Me....65....1U"</var>
+        <var name="ssa_collection">"\prefix-RRLYR"</var>
+        <var name="ssa_reference">"\referenceRRLyr"</var>
       </rowmaker>
     </make>
   </data>
