@@ -39,7 +39,7 @@
 
     <column name="vsx" type="text" ucd="meta.id"
       tablehead="VSX" verbLevel="1"
-      description="VSX designation"
+      description="VSX/GCVS/Macho or other designation"
       required="False">
     </column>
 

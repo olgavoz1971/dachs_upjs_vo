@@ -64,12 +64,19 @@
 <!-- ##########################  Ident tables  #############  -->
 
   <STREAM id="makeCommonRowsIdent">
-        <var name="raj2000">hmsToDeg(@alphaHMS, ":")</var>
-        <var name="dej2000">dmsToDeg(@deltaDMS, ":")</var>
-        <map dest="ogle4_id">parseWithNull(@ogle4_id, str, "")</map>
-        <map dest="ogle3_id">parseWithNull(@ogle3_id, str, "")</map>
-        <map dest="ogle2_id">parseWithNull(@ogle2_id, str, "")</map>
-        <map dest="vsx">parseWithNull(@vsx, str, "")</map>    
+    <DEFAULTS sep=":"/>
+
+    <!-- Input HMS/DMS fields are quite diverse: separators may be spaces or
+         colons; leading  zeros may be replaced by extra spaces -->
+    <var name="alphaHMS_clean">@alphaHMS.replace(" \sep", "\sep")</var>
+    <var name="deltaDMS_clean">@deltaDMS.replace(" \sep", "\sep")</var>
+    <var name="raj2000">hmsToDeg(@alphaHMS_clean, "\sep")</var>
+    <var name="dej2000">dmsToDeg(@deltaDMS_clean, "\sep")</var>
+
+    <map dest="ogle4_id">parseWithNull(@ogle4_id, str, "")</map>
+    <map dest="ogle3_id">parseWithNull(@ogle3_id, str, "")</map>
+    <map dest="ogle2_id">parseWithNull(@ogle2_id, str, "")</map>
+    <map dest="vsx">parseWithNull(@vsx, str, "")</map>
   </STREAM>
 
 <!-- ================ Classical Cepheids ================== -->
@@ -201,6 +208,46 @@
     </make>
   </data>
 
+<!-- ======================= HB (Heartbeat stars) ================================== -->
+
+  <table id="ident_blg_hb" onDisk="True" adql="hidden" namePath="ogle/aux#object">
+    <meta name="description">The original table with identifications of Heartbeat binary systems
+                in the Galactic bulge and Magellanic Clouds</meta>
+
+    <LOOP listItems="object_id  raj2000 dej2000 ogle4_id ogle3_id ogle2_id
+                     vsx subtype ogle_vartype vartype ssa_collection ssa_reference">
+      <events>
+        <column original="\item"/>
+      </events>
+    </LOOP>
+  </table>
+
+  <data id="import_blg_hb">
+    <sources>data/blg/hb/ident.dat</sources>
+    <columnGrammar>
+      <colDefs>
+        object_id:     1-16
+	    subtype:      18-19
+        alphaHMS:     21-31
+        deltaDMS:     33-43
+        ogle4_id:     56-60
+        ogle3_id:     62-76
+        ogle2_id:     78-92
+        vsx:         94-123
+      </colDefs>
+    </columnGrammar>
+    <make table="ident_blg_hb">
+      <rowmaker idmaps="*">
+        <FEED source="makeCommonRowsIdent" sep=" "/>
+        <map dest="subtype">parseWithNull(@subtype, str, "")</map>
+        <var name="ogle_vartype">"Hb"</var>
+        <var name="vartype">"Pu*,El*"</var>
+        <var name="ssa_collection">"\prefix-HB"</var>
+        <var name="ssa_reference">"\referenceHB"</var>
+      </rowmaker>
+    </make>
+  </data>
+
 <!-- ======================= RR Lyr ================================== -->
 
   <table id="ident_blg_rr" onDisk="True" adql="hidden" namePath="ogle/aux#object">
@@ -316,6 +363,40 @@
         <map dest="ampl_I">parseWithNull(@ampl_I, float, "-")</map>
         <map dest="period">parseWithNull(@period, float, "-")</map>
         <map dest="period_err">parseWithNull(@period_err, float, "-")</map>
+      </rowmaker>
+    </make>
+  </data>
+
+<!-- =============================== Param HB (heartbeat binary systems) ============ -->
+
+  <table id="param_blg_hb" onDisk="True" adql="hidden" namePath="ogle/aux#object">
+    <meta name="description">The table from original hb.dat from OGLE 
+                         Heartbeat binary systems \field collection</meta>
+    <LOOP listItems="object_id mean_I mean_V ampl_I period period_err">
+      <events>
+        <column original="\item"/>
+      </events>
+    </LOOP>
+  </table>
+
+  <data id="import_param_blg_hb">
+    <sources>data/blg/hb/hb.dat</sources>
+    <columnGrammar>
+      <colDefs>
+        object_id:   1-16
+        mean_I:     18-23
+        mean_V:     25-30
+        period:     32-44
+        ampl_I:     57-61
+      </colDefs>
+    </columnGrammar>
+    <make table="param_blg_hb">
+      <rowmaker idmaps="*">
+        <map dest="mean_I">parseWithNull(@mean_I, float, "-")</map>
+        <map dest="mean_V">parseWithNull(@mean_V, float, "-")</map>
+        <map dest="ampl_I">parseWithNull(@ampl_I, float, "-")</map>
+        <map dest="period">parseWithNull(@period, float, "-")</map>
+        <var name="period_err">None</var>
       </rowmaker>
     </make>
   </data>

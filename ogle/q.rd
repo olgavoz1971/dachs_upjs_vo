@@ -159,6 +159,10 @@
           FROM \schema.ident_blg_dsct
           LEFT JOIN \schema.param_blg_dsct USING (object_id)
         UNION ALL
+          SELECT \object_common_cols, vsx, subtype									-- blg hb
+          FROM \schema.ident_blg_hb
+          LEFT JOIN \schema.param_blg_hb USING (object_id)
+        UNION ALL
           SELECT \object_common_cols, NULL AS vsx, NULL AS subtype					-- misc m54
           FROM \schema.m54
         ) AS all_objects)           
