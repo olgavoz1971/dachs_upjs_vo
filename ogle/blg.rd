@@ -137,8 +137,8 @@
     <sources>data/blg/lpv/ident.dat</sources>
     <columnGrammar>
       <colDefs>
-        object_id:    1-19
-        type: 22-25
+        object_id:     1-19
+        type:         22-25
         alphaHMS:     28-38
         deltaDMS:     40-50
         ogle4_id:     53-68
@@ -154,6 +154,49 @@
         <var name="vartype">"LP*"</var>
         <var name="ssa_collection">"\prefix-LPV"</var>
         <var name="ssa_reference">"\referenceLPV"</var>
+      </rowmaker>
+    </make>
+  </data>
+
+<!-- ======================= DPV (Double Periodic Variables) ================================== -->
+<!-- Is this is a subset of ecl? What about lightcurves, are they includee in the ecl collection?-->
+
+<!-- ======================= DSct (Delta Sct) ================================== -->
+
+  <table id="ident_blg_dsct" onDisk="True" adql="hidden" namePath="ogle/aux#object">
+    <meta name="description">The original table with identifications of delta Scuti-type stars
+                 \field collection</meta>
+
+    <LOOP listItems="object_id  raj2000 dej2000 ogle4_id ogle3_id ogle2_id
+                     vsx subtype ogle_vartype vartype ssa_collection ssa_reference">
+      <events>
+        <column original="\item"/>
+      </events>
+    </LOOP>
+  </table>
+
+  <data id="import_blg_dsct">
+    <sources>data/blg/dsct/ident.dat</sources>
+    <columnGrammar>
+      <colDefs>
+        object_id:     1-19
+	    subtype:      22-31
+        alphaHMS:     34-44
+        deltaDMS:     46-56
+        ogle4_id:     59-74
+        ogle3_id:     76-90
+        ogle2_id:     92-107
+        vsx:         109-150
+      </colDefs>
+    </columnGrammar>
+    <make table="ident_blg_dsct">
+      <rowmaker idmaps="*">
+        <FEED source="makeCommonRowsIdent"/>
+        <map dest="subtype">parseWithNull(@subtype, str, "")</map>
+        <var name="ogle_vartype">"dSct"</var>
+        <var name="vartype">"dS*"</var>
+        <var name="ssa_collection">"\prefix-DSCT"</var>
+        <var name="ssa_reference">"\referenceDSct"</var>
       </rowmaker>
     </make>
   </data>
@@ -212,16 +255,16 @@
 
 <!-- ================================= Param Miras (LPV) ============= -->
 
-  <table id="param_blg_lpv_miras" onDisk="True" adql="hidden" namePath="ogle/aux#object">
+  <table id="param_blg_lpv" onDisk="True" adql="hidden" namePath="ogle/aux#object">
     <meta name="description">The table from original Miras.dat from OGLE Mira stars \field collection</meta>
-    <LOOP listItems="object_id mean_I mean_V ampl_I period">
+    <LOOP listItems="object_id mean_I mean_V ampl_I period period_err">
       <events>
         <column original="\item"/>
       </events>
     </LOOP>
   </table>
 
-  <data id="import_param_blg_lpv_miras">
+  <data id="import_param_blg_lpv">
     <sources>data/blg/lpv/Miras.dat</sources>
     <columnGrammar>
       <colDefs>
@@ -232,12 +275,47 @@
         ampl_I:     46-50
       </colDefs>
     </columnGrammar>
-    <make table="param_blg_lpv_miras">
+    <make table="param_blg_lpv">
       <rowmaker idmaps="*">
         <map dest="mean_I">parseWithNull(@mean_I, float, "-")</map>
         <map dest="mean_V">parseWithNull(@mean_V, float, "-")</map>
         <map dest="ampl_I">parseWithNull(@ampl_I, float, "-")</map>
         <map dest="period">parseWithNull(@period, float, "-")</map>
+        <var name="period_err">None</var>
+      </rowmaker>
+    </make>
+  </data>
+
+<!-- ================================= Param DSCT (Delta Sct) ============= -->
+
+  <table id="param_blg_dsct" onDisk="True" adql="hidden" namePath="ogle/aux#object">
+    <meta name="description">The table from original dsct.dat from OGLE Delta Scuti Stars \field collection</meta>
+    <LOOP listItems="object_id mean_I mean_V ampl_I period period_err">
+      <events>
+        <column original="\item"/>
+      </events>
+    </LOOP>
+  </table>
+
+  <data id="import_param_blg_dsct">
+    <sources>data/blg/dsct/dsct.dat</sources>
+    <columnGrammar>
+      <colDefs>
+        object_id:   1-19
+        mean_I:     22-27
+        mean_V:     29-34
+        period:     37-46
+        period_err: 48-57
+        ampl_I:     72-76
+      </colDefs>
+    </columnGrammar>
+    <make table="param_blg_dsct">
+      <rowmaker idmaps="*">
+        <map dest="mean_I">parseWithNull(@mean_I, float, "-")</map>
+        <map dest="mean_V">parseWithNull(@mean_V, float, "-")</map>
+        <map dest="ampl_I">parseWithNull(@ampl_I, float, "-")</map>
+        <map dest="period">parseWithNull(@period, float, "-")</map>
+        <map dest="period_err">parseWithNull(@period_err, float, "-")</map>
       </rowmaker>
     </make>
   </data>

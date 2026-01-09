@@ -79,7 +79,7 @@
   </macDef>
 
   <macDef name="object_common_cols">
-    object_id, raj2000, dej2000, period, ampl_I, mean_I, mean_V, vartype, ogle_vartype, 
+    object_id, raj2000, dej2000, period, period_err, ampl_I, mean_I, mean_V, vartype, ogle_vartype, 
     ssa_reference, ssa_collection
   </macDef>
 
@@ -143,19 +143,23 @@
               UNION ALL
               SELECT \param_common_cols FROM \schema.param_blg_arr_d
             )
-          SELECT \object_common_cols, vsx, period_err, pulse_mode AS subtype			-- blg cep
+          SELECT \object_common_cols, vsx, pulse_mode AS subtype					-- blg cep
           FROM \schema.ident_blg_cep
           LEFT JOIN param_blg_cep_all USING (object_id)
         UNION ALL
-          SELECT \object_common_cols, vsx, period_err, subtype							-- blg rrlyr
+          SELECT \object_common_cols, vsx, subtype									-- blg rrlyr
           FROM \schema.ident_blg_rr
           LEFT JOIN param_blg_rr_all USING (object_id)
         UNION ALL
-          SELECT \object_common_cols, vsx, NULL AS period_err, NULL AS subtype			-- blg lpv
+          SELECT \object_common_cols, vsx, NULL AS subtype							-- blg lpv
           FROM \schema.ident_blg_lpv
-          LEFT JOIN \schema.param_blg_lpv_miras USING (object_id)
+          LEFT JOIN \schema.param_blg_lpv USING (object_id)
         UNION ALL
-          SELECT \object_common_cols, NULL AS vsx, period_err, NULL AS subtype			-- misc m54
+          SELECT \object_common_cols, vsx, subtype									-- blg dsct
+          FROM \schema.ident_blg_dsct
+          LEFT JOIN \schema.param_blg_dsct USING (object_id)
+        UNION ALL
+          SELECT \object_common_cols, NULL AS vsx, NULL AS subtype					-- misc m54
           FROM \schema.m54
         ) AS all_objects)           
 

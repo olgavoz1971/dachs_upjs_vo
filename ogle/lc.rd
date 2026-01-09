@@ -62,9 +62,10 @@
 
   <data id="import_lightcurves" updating="True">
 
-    <sources pattern="data/blg/lpv/phot_ogle2/[VI]/*.dat"/>
+    <!-- <sources pattern="data/blg/lpv/phot_ogle2/[VI]/*.dat"/> -->
     <!-- <sources pattern="data/misc/m54/phot/V/*.dat"/>  -->
     <!-- <sources pattern="data/blg/rrlyr/phot/V/*.dat"/> -->
+    <sources pattern="data/blg/dsct/phot*/I/*.dat"/>
 
     <csvGrammar delimiter=" " strip="True" names="dateobs_jd, magnitude, mag_err"/>
 
