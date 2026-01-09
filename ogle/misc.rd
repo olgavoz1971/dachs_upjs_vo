@@ -137,7 +137,7 @@
     </columnGrammar>
     <make table="m54">
       <rowmaker idmaps="*">
-        <map name="object_id">"OGLE-M54-" + @object_id</map>
+        <map dest="object_id">f'OGLE-M54-{@object_id}'</map>
         <var name="raj2000">hmsToDeg(@alphaHMS, ":")</var>
         <var name="dej2000">dmsToDeg(@deltaDMS, ":")</var>
         <map dest="mean_I">parseWithNull(@mean_I, float, "-")</map>
@@ -148,7 +148,7 @@
 
         <!-- Try to bring ogle vartypes to the Simbad codes -->        
         <var name="vartype">@ogle_vartype</var>
-        <apply name="to_simbad_vartype" procDef="//procs#dictMap">
+        <apply name="m54_to_simbad_vartype" procDef="//procs#dictMap">
           <bind key="default">base.NotGiven</bind>
           <bind key="key">"vartype"</bind>
           <bind key="mapping"> {

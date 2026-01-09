@@ -82,6 +82,13 @@
       description="I-band amplitude of the primary period"
       required="False"/>
 
+    <column name="ampl_V" type="double precision"
+      ucd="phot.mag"
+      unit="mag"
+      tablehead="Ampl V"
+      description="V-band amplitude of the primary period"
+      required="False"/>
+
     <column name="period" type="double precision"
       ucd="src.var;time.period"
       unit="d"

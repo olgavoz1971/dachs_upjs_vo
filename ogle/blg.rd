@@ -68,10 +68,8 @@
 
     <!-- Input HMS/DMS fields are quite diverse: separators may be spaces or
          colons; leading  zeros may be replaced by extra spaces -->
-    <var name="alphaHMS_clean">@alphaHMS.replace(" \sep", "\sep")</var>
-    <var name="deltaDMS_clean">@deltaDMS.replace(" \sep", "\sep")</var>
-    <var name="raj2000">hmsToDeg(@alphaHMS_clean, "\sep")</var>
-    <var name="dej2000">dmsToDeg(@deltaDMS_clean, "\sep")</var>
+    <var name="raj2000">hmsToDeg(@alphaHMS.replace(" \sep", "\sep"), "\sep")</var>
+    <var name="dej2000">dmsToDeg(@deltaDMS.replace(" \sep", "\sep"), "\sep")</var>
 
     <map dest="ogle4_id">parseWithNull(@ogle4_id, str, "")</map>
     <map dest="ogle3_id">parseWithNull(@ogle3_id, str, "")</map>
@@ -248,6 +246,97 @@
     </make>
   </data>
 
+<!-- ======================= ROT (Rotating Variables) ================================== -->
+
+  <table id="ident_blg_rot" onDisk="True" adql="hidden" namePath="ogle/aux#object">
+    <meta name="description">The original table with identifications of Rotating Variables
+                 \field colection</meta>
+
+    <LOOP listItems="object_id  raj2000 dej2000 ogle4_id ogle3_id ogle2_id
+                     vsx ogle_vartype vartype ssa_collection ssa_reference">
+      <events>
+        <column original="\item"/>
+      </events>
+    </LOOP>
+  </table>
+
+  <!-- The format described in the original README is completely incorrect -->
+  <data id="import_blg_rot">
+    <sources>data/blg/rot/ident.dat</sources>
+    <columnGrammar>
+      <colDefs>
+        object_id:     1-19
+        alphaHMS:     21-31
+        deltaDMS:     33-43
+        ogle4_id:     45-60
+        ogle3_id:     62-76
+        ogle2_id:     78-92
+        vsx:          95-150
+      </colDefs>
+    </columnGrammar>
+    <make table="ident_blg_rot">
+      <rowmaker idmaps="*">
+        <FEED source="makeCommonRowsIdent"/>
+        <var name="ogle_vartype">"Rot"</var>
+        <var name="vartype">"Ro*"</var>
+        <var name="ssa_collection">"\prefix-ROT"</var>
+        <var name="ssa_reference">"\referenceRot"</var>
+      </rowmaker>
+    </make>
+  </data>
+
+<!-- ======================= Ecl (Eclipsing and Ellipsoidal) ================================== -->
+
+  <table id="ident_blg_ecl" onDisk="True" adql="hidden" namePath="ogle/aux#object">
+    <meta name="description">The original table with identifications of Eclipsing and Ellipsoidal
+                 binary systems \field colection</meta>
+
+    <LOOP listItems="object_id  raj2000 dej2000 ogle4_id ogle3_id ogle2_id
+                     subtype vsx ogle_vartype vartype ssa_collection ssa_reference">
+      <events>
+        <column original="\item"/>
+      </events>
+    </LOOP>
+  </table>
+
+  <data id="import_blg_ecl">
+    <sources>data/blg/ecl/ident.dat</sources>
+    <columnGrammar>
+      <colDefs>
+        object_id:     1-19
+        subtype:      22-24
+        alphaHMS:     26-36
+        deltaDMS:     38-48
+        ogle4_id:     51-66
+        ogle3_id:     68-82
+        ogle2_id:     84-98
+        vsx:          99-150
+      </colDefs>
+    </columnGrammar>
+    <make table="ident_blg_ecl">
+      <rowmaker idmaps="*">
+        <FEED source="makeCommonRowsIdent"/>
+        <map key="subtype">parseWithNull(@subtype, str, "")</map>
+        <map key="ogle_vartype">@object_id.split("-")[2].capitalize()</map>
+
+        <var name="vartype">@subtype</var>
+        <apply name="ecl_to_simbad_vartype" procDef="//procs#dictMap">
+          <bind key="default">"EB*"</bind>
+          <bind key="key">"vartype"</bind>
+          <bind key="mapping"> {
+            "C": "EB*",
+            "NC": "EB*",
+            "CV": "EB*",
+            "ELL": "El*",
+          } </bind>
+        </apply>
+
+        <map key="ssa_collection">f'\prefix-{@object_id.split("-")[2]}'</map>
+        <var key="ssa_reference">"\referenceEcl"</var>
+      </rowmaker>
+    </make>
+  </data>
+
 <!-- ======================= RR Lyr ================================== -->
 
   <table id="ident_blg_rr" onDisk="True" adql="hidden" namePath="ogle/aux#object">
@@ -279,9 +368,9 @@
     <make table="ident_blg_rr">
       <rowmaker idmaps="*">
         <FEED source="makeCommonRowsIdent"/>
-        <!-- Map ogle RRlyr suptypes to the Simbad codes -->
+
         <var name="vartype">@subtype</var>
-        <apply name="to_simbad_vartype" procDef="//procs#dictMap">
+        <apply name="rr_to_simbad_vartype" procDef="//procs#dictMap">
           <bind key="default">base.NotGiven</bind>
           <bind key="key">"vartype"</bind>
           <bind key="mapping"> {
@@ -400,6 +489,93 @@
       </rowmaker>
     </make>
   </data>
+
+<!-- =============================== Param Rot (rotating) ============ -->
+
+  <table id="param_blg_rot" onDisk="True" adql="hidden" namePath="ogle/aux#object">
+    <meta name="description">The table from original rot.dat from OGLE 
+                         Rotating Variables \field collection</meta>
+    <LOOP listItems="object_id mean_I mean_V ampl_I ampl_V period period_err">
+      <events>
+        <column original="\item"/>
+      </events>
+    </LOOP>
+  </table>
+
+  <!-- The format described in the original README is completely incorrect 
+  I've corrected format, but I'm not sure if columns V and I are reversed -->
+  <data id="import_param_blg_rot">
+    <sources>data/blg/rot/rot.dat</sources>
+    <columnGrammar>
+      <colDefs>
+        object_id:   1-19
+        mean_V:     21-26
+        ampl_V:     27-32
+        mean_I:     34-39
+        ampl_I:     40-45
+        period:     48-58
+      </colDefs>
+    </columnGrammar>
+    <make table="param_blg_rot">
+      <rowmaker idmaps="*">
+        <map dest="mean_I">parseWithNull(@mean_I, float, "-")</map>
+        <map dest="mean_V">parseWithNull(@mean_V, float, "-")</map>
+        <map dest="ampl_I">parseWithNull(@ampl_I, float, "-")</map>
+        <map dest="ampl_V">parseWithNull(@ampl_V, float, "-")</map>
+        <map dest="period">parseWithNull(@period, float, "-")</map>
+        <var name="period_err">None</var>
+      </rowmaker>
+    </make>
+  </data>
+
+  <!-- =============== Ecl/Ell parameters ======================== -->
+
+  <LOOP>
+    <csvItems>
+      class,   source, subclass
+      ecl,    ecl.dat, eclipsing-binaries
+      ell,    ell.dat, ellipsoidal-binaries
+    </csvItems>
+    <events>
+      <table id="param_blg_\class" onDisk="True" adql="hidden" namePath="ogle/aux#object">
+        <meta name="description">The table from the base of original \source file
+                  with parameters of \subclass stars
+                  from OGLE Eclipsing and Ellipsoidal Binary Systems  \\field collection</meta>
+        <LOOP listItems="object_id ampl_I period period_err">
+          <events>
+            <column original="\item"/>
+          </events>
+        </LOOP>
+        <column original="mean_I" description="I-band magnitude at the maximum light"/>
+        <column original="mean_V" description="V-band magnitude at the maximum light"/>
+        <column original="ampl_I" description="Depth of the primary eclipse" tablehead="Primary Ampl"/>
+        <column original="ampl_V" description="Depth of the secondary eclipse" tablehead="Secondary Ampl"/>
+      </table>
+      <data id="import_blg_\class">
+        <sources>data/blg/ecl/\source</sources>
+        <columnGrammar>
+          <colDefs>
+            object_id:   1-19
+            mean_I:     22-27
+            mean_V:     29-34
+            period:     36-47
+            depth1:     61-65
+            depth2:     67-71            
+          </colDefs>
+        </columnGrammar>
+        <make table="param_blg_\class">
+          <rowmaker idmaps="*">
+            <map dest="mean_I">parseWithNull(@mean_I, float, "-")</map>
+            <map dest="mean_V">parseWithNull(@mean_V, float, "-")</map>
+            <map dest="period">parseWithNull(@period, float, "-")</map>
+            <var key="period_err">None</var>
+            <map dest="ampl_I">parseWithNull(@depth1, float, "-")</map>
+            <map dest="ampl_V">parseWithNull(@depth2, float, "-")</map>
+          </rowmaker>
+        </make>
+      </data>
+    </events>
+  </LOOP>
 
   <!-- =============== RR Lyr parameters ======================== -->
 

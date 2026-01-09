@@ -163,6 +163,10 @@
           FROM \schema.ident_blg_hb
           LEFT JOIN \schema.param_blg_hb USING (object_id)
         UNION ALL
+          SELECT \object_common_cols, vsx, NULL AS subtype									-- blg rot 
+          FROM \schema.ident_blg_rot
+          LEFT JOIN \schema.param_blg_rot USING (object_id)
+        UNION ALL
           SELECT \object_common_cols, NULL AS vsx, NULL AS subtype					-- misc m54
           FROM \schema.m54
         ) AS all_objects)           
