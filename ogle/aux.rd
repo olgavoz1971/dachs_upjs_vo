@@ -55,11 +55,13 @@
       required="False">
     </column>
 
+<!--
     <column name="vartype" type="text" ucd="meta.code.class"
       tablehead="Simbad type of Variable Star" verbLevel="15"
       description="Simbad type of variable star"
       required="False">
     </column>
+-->
 
     <column name="mean_I" type="real"
       ucd="phot.mag"
@@ -103,6 +105,7 @@
       description="Uncertainty of period"
       required="False"/>
 
+    <column original="//ssap#instance.ssa_targclass"/>
     <column original="//ssap#instance.ssa_collection"/>
     <column original="//ssap#instance.ssa_reference"/>
 

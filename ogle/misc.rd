@@ -111,7 +111,7 @@
     <meta name="description">The (almost) original table M54variables.dat with identification and parameters of stars
                    from Sagittarius Dwarf Spheroidal Galaxy and its M54 Globular Cluster</meta>
 
-    <LOOP listItems="object_id raj2000 dej2000 period period_err ogle_vartype vartype
+    <LOOP listItems="object_id raj2000 dej2000 period period_err subtype ogle_vartype ssa_targclass
                      mean_I mean_V ampl_I period period_err ssa_collection ssa_reference">
       <events>
         <column original="\item"/>
@@ -140,17 +140,18 @@
         <map dest="object_id">f'OGLE-M54-{@object_id}'</map>
         <var name="raj2000">hmsToDeg(@alphaHMS, ":")</var>
         <var name="dej2000">dmsToDeg(@deltaDMS, ":")</var>
+        <var name="subtype">None</var>
         <map dest="mean_I">parseWithNull(@mean_I, float, "-")</map>
         <map dest="mean_V">parseWithNull(@mean_V, float, "-")</map>
         <map dest="ampl_I">parseWithNull(@ampl_I, float, "-")</map>
         <map dest="period">parseWithNull(@period, float, "-")</map>
         <map dest="period_err">parseWithNull(@period_err, float, "-")</map>
 
-        <!-- Try to bring ogle vartypes to the Simbad codes -->        
-        <var name="vartype">@ogle_vartype</var>
-        <apply name="m54_to_simbad_vartype" procDef="//procs#dictMap">
+        <!-- Try to bring ogle vartypes to the Simbad obkect types -->        
+        <var name="ssa_targclass">@ogle_vartype</var>
+        <apply name="m54_to_simbad_otype" procDef="//procs#dictMap">
           <bind key="default">base.NotGiven</bind>
-          <bind key="key">"vartype"</bind>
+          <bind key="key">"ssa_targclass"</bind>
           <bind key="mapping"> {
             "-" : None,
             "v" : "V*",

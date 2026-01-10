@@ -84,7 +84,7 @@
                        Classical Cepheids \field collection</meta>
 
     <LOOP listItems="object_id raj2000 dej2000 ogle4_id ogle3_id ogle2_id vsx
-                     ogle_vartype vartype ssa_collection ssa_reference">
+                     ogle_vartype ssa_targclass ssa_collection ssa_reference">
       <events>
         <column original="\item"/>
       </events>
@@ -118,7 +118,7 @@
         <FEED source="makeCommonRowsIdent"/>
         <map dest="pulse_mode">parseWithNull(@pulse_mode, str, "")</map>
         <var name="ogle_vartype">"Cep"</var>
-        <var name="vartype">"Ce*"</var>
+        <var name="ssa_targclass">"Ce*"</var>
         <var name="ssa_collection">"\prefix-CEP"</var>
         <var name="ssa_reference">"\referenceCep"</var>
       </rowmaker>
@@ -131,7 +131,7 @@
     <meta name="description">The original table with identification of Mira stars \field collection</meta>
 
     <LOOP listItems="object_id  raj2000 dej2000 ogle4_id ogle3_id ogle2_id
-                     vsx ogle_vartype vartype ssa_collection ssa_reference">
+                     vsx ogle_vartype ssa_targclass ssa_collection ssa_reference">
       <events>
         <column original="\item"/>
       </events>
@@ -156,7 +156,7 @@
       <rowmaker idmaps="*">
         <FEED source="makeCommonRowsIdent"/>
         <map dest="ogle_vartype">parseWithNull(@type, str, "")</map>
-        <var name="vartype">"LP*"</var>
+        <var name="ssa_targclass">"LP*"</var>
         <var name="ssa_collection">"\prefix-LPV"</var>
         <var name="ssa_reference">"\referenceLPV"</var>
       </rowmaker>
@@ -164,7 +164,11 @@
   </data>
 
 <!-- ======================= DPV (Double Periodic Variables) ================================== -->
-<!-- Is this is a subset of ecl? What about lightcurves, are they includee in the ecl collection?-->
+<!-- Is this is a subset of ecl? What about lightcurves, are they included in the ecl collection?-->
+
+<!-- ======================= short_period_ecl  ================================== -->
+<!-- Is this is a subset of ecl? What about lightcurves, are they included in the ecl collection?-->
+
 
 <!-- ======================= DSct (Delta Sct) ================================== -->
 
@@ -173,7 +177,7 @@
                  \field collection</meta>
 
     <LOOP listItems="object_id  raj2000 dej2000 ogle4_id ogle3_id ogle2_id
-                     vsx subtype ogle_vartype vartype ssa_collection ssa_reference">
+                     vsx subtype ogle_vartype ssa_targclass ssa_collection ssa_reference">
       <events>
         <column original="\item"/>
       </events>
@@ -199,9 +203,50 @@
         <FEED source="makeCommonRowsIdent"/>
         <map dest="subtype">parseWithNull(@subtype, str, "")</map>
         <var name="ogle_vartype">"dSct"</var>
-        <var name="vartype">"dS*"</var>
+        <var name="ssa_targclass">"dS*"</var>
         <var name="ssa_collection">"\prefix-DSCT"</var>
         <var name="ssa_reference">"\referenceDSct"</var>
+      </rowmaker>
+    </make>
+  </data>
+
+<!-- ======================= t2cep (Type II Cepheids) ================================== -->
+
+  <macDef name="class_desc">Type II Cepheids</macDef>
+
+  <table id="ident_blg_t2cep" onDisk="True" adql="hidden" namePath="ogle/aux#object">
+    <meta name="description">The original table with identifications of \class_desc \field</meta>
+
+    <LOOP listItems="object_id  raj2000 dej2000 ogle4_id ogle3_id ogle2_id
+                     vsx subtype ogle_vartype ssa_targclass ssa_collection ssa_reference">
+      <events>
+        <column original="\item"/>
+      </events>
+    </LOOP>
+  </table>
+
+  <data id="import_blg_t2cep">
+    <sources>data/blg/t2cep/ident.dat</sources>
+    <columnGrammar>
+      <colDefs>
+        object_id:     1-19
+	    subtype:      22-26
+        alphaHMS:     29-39
+        deltaDMS:     41-51
+        ogle4_id:     54-69
+        ogle3_id:     71-85
+        ogle2_id:     87-101
+        vsx:         103-150
+      </colDefs>
+    </columnGrammar>
+    <make table="ident_blg_t2cep">
+      <rowmaker idmaps="*">
+        <FEED source="makeCommonRowsIdent"/>
+        <map dest="subtype">parseWithNull(@subtype, str, "")</map>
+        <var name="ogle_vartype">"T2Cep"</var>
+        <var name="ssa_targclass">"WV*"</var>
+        <var name="ssa_collection">"\prefix-T2CEP"</var>
+        <var name="ssa_reference">"\referenceT2Cep"</var>
       </rowmaker>
     </make>
   </data>
@@ -213,7 +258,7 @@
                 in the Galactic bulge and Magellanic Clouds</meta>
 
     <LOOP listItems="object_id  raj2000 dej2000 ogle4_id ogle3_id ogle2_id
-                     vsx subtype ogle_vartype vartype ssa_collection ssa_reference">
+                     vsx subtype ogle_vartype ssa_targclass ssa_collection ssa_reference">
       <events>
         <column original="\item"/>
       </events>
@@ -239,7 +284,7 @@
         <FEED source="makeCommonRowsIdent" sep=" "/>
         <map dest="subtype">parseWithNull(@subtype, str, "")</map>
         <var name="ogle_vartype">"Hb"</var>
-        <var name="vartype">"Pu*,El*"</var>
+        <var name="ssa_targclass">"Pu*,El*"</var>
         <var name="ssa_collection">"\prefix-HB"</var>
         <var name="ssa_reference">"\referenceHB"</var>
       </rowmaker>
@@ -253,7 +298,7 @@
                  \field colection</meta>
 
     <LOOP listItems="object_id  raj2000 dej2000 ogle4_id ogle3_id ogle2_id
-                     vsx ogle_vartype vartype ssa_collection ssa_reference">
+                     vsx ogle_vartype ssa_targclass subtype ssa_collection ssa_reference">
       <events>
         <column original="\item"/>
       </events>
@@ -278,7 +323,8 @@
       <rowmaker idmaps="*">
         <FEED source="makeCommonRowsIdent"/>
         <var name="ogle_vartype">"Rot"</var>
-        <var name="vartype">"Ro*"</var>
+        <var name="ssa_targclass">"Ro*"</var>
+        <var name="subtype">None</var>
         <var name="ssa_collection">"\prefix-ROT"</var>
         <var name="ssa_reference">"\referenceRot"</var>
       </rowmaker>
@@ -292,7 +338,7 @@
                  binary systems \field colection</meta>
 
     <LOOP listItems="object_id  raj2000 dej2000 ogle4_id ogle3_id ogle2_id
-                     subtype vsx ogle_vartype vartype ssa_collection ssa_reference">
+                     subtype vsx ogle_vartype ssa_targclass ssa_collection ssa_reference">
       <events>
         <column original="\item"/>
       </events>
@@ -319,14 +365,14 @@
         <map key="subtype">parseWithNull(@subtype, str, "")</map>
         <map key="ogle_vartype">@object_id.split("-")[2].capitalize()</map>
 
-        <var name="vartype">@subtype</var>
-        <apply name="ecl_to_simbad_vartype" procDef="//procs#dictMap">
+        <var name="ssa_targclass">@subtype</var>
+        <apply name="ecl_to_simbad_otype" procDef="//procs#dictMap">
           <bind key="default">"EB*"</bind>
-          <bind key="key">"vartype"</bind>
+          <bind key="key">"ssa_targclass"</bind>
           <bind key="mapping"> {
             "C": "EB*",
             "NC": "EB*",
-            "CV": "EB*",
+            "CV": "CV*",
             "ELL": "El*",
           } </bind>
         </apply>
@@ -343,7 +389,7 @@
     <meta name="description">The original table with identification of RR Lyr stars \field collection</meta>
 
     <LOOP listItems="object_id  raj2000 dej2000 ogle4_id ogle3_id ogle2_id
-                     ogle_vartype vartype subtype ssa_collection ssa_reference">
+                     ogle_vartype ssa_targclass subtype ssa_collection ssa_reference">
       <events>
         <column original="\item"/>
       </events>
@@ -369,10 +415,10 @@
       <rowmaker idmaps="*">
         <FEED source="makeCommonRowsIdent"/>
 
-        <var name="vartype">@subtype</var>
-        <apply name="rr_to_simbad_vartype" procDef="//procs#dictMap">
+        <var name="ssa_targclass">@subtype</var>
+        <apply name="rr_to_simbad_otype" procDef="//procs#dictMap">
           <bind key="default">base.NotGiven</bind>
-          <bind key="key">"vartype"</bind>
+          <bind key="key">"ssa_targclass"</bind>
           <bind key="mapping"> {
             "-" : None,
             "RRab": "RR*",
@@ -383,6 +429,46 @@
         <var name="ogle_vartype">"RR Lyr"</var>
         <var name="ssa_collection">"\prefix-RRLYR"</var>
         <var name="ssa_reference">"\referenceRRLyr"</var>
+      </rowmaker>
+    </make>
+  </data>
+
+<!-- ======================= Transits ================================== -->
+
+  <table id="ident_blg_transits" onDisk="True" adql="hidden" namePath="ogle/aux#object">
+    <meta name="description">The original table with identification of candidates for transiting
+                   planets \field collection</meta>
+
+    <LOOP listItems="object_id  raj2000 dej2000 ogle4_id ogle3_id ogle2_id
+                     ogle_vartype ssa_targclass subtype ssa_collection ssa_reference">
+      <events>
+        <column original="\item"/>
+      </events>
+    </LOOP>
+    <column original="vsx" description="GCVS or VSX designation"/>
+  </table>
+
+  <data id="import_blg_transits">
+    <sources>data/blg/transits/ident.dat</sources>
+    <columnGrammar>
+      <colDefs>
+        object_id:     1-12
+        alphaHMS:     14-24
+        deltaDMS:     26-36
+        ogle4_id:     38-53
+        ogle3_id:     55-69
+        ogle2_id:     71-85
+        vsx:          87-150
+      </colDefs>
+    </columnGrammar>
+    <make table="ident_blg_transits">
+      <rowmaker idmaps="*">
+        <FEED source="makeCommonRowsIdent"/>
+        <var name="subtype">None</var>
+        <var name="ssa_targclass">"V*,Pl"</var>
+        <var name="ogle_vartype">"Transit"</var>
+        <var name="ssa_collection">"\prefix-TR"</var>
+        <var name="ssa_reference">"\referenceTransits"</var>
       </rowmaker>
     </make>
   </data>
@@ -446,6 +532,40 @@
       </colDefs>
     </columnGrammar>
     <make table="param_blg_dsct">
+      <rowmaker idmaps="*">
+        <map dest="mean_I">parseWithNull(@mean_I, float, "-")</map>
+        <map dest="mean_V">parseWithNull(@mean_V, float, "-")</map>
+        <map dest="ampl_I">parseWithNull(@ampl_I, float, "-")</map>
+        <map dest="period">parseWithNull(@period, float, "-")</map>
+        <map dest="period_err">parseWithNull(@period_err, float, "-")</map>
+      </rowmaker>
+    </make>
+  </data>
+
+<!-- ================================= Param t2cep (Type II Cepheids) ============= -->
+
+  <table id="param_blg_t2cep" onDisk="True" adql="hidden" namePath="ogle/aux#object">
+    <meta name="description">The table from original t2cep.dat from OGLE Type II Cepheids \field collection</meta>
+    <LOOP listItems="object_id mean_I mean_V ampl_I period period_err">
+      <events>
+        <column original="\item"/>
+      </events>
+    </LOOP>
+  </table>
+
+  <data id="import_param_blg_t2cep">
+    <sources>data/blg/t2cep/t2cep.dat</sources>
+    <columnGrammar>
+      <colDefs>
+        object_id:   1-19
+        mean_I:     22-27
+        mean_V:     29-34
+        period:     37-46
+        period_err: 48-56
+        ampl_I:     73-77
+      </colDefs>
+    </columnGrammar>
+    <make table="param_blg_t2cep">
       <rowmaker idmaps="*">
         <map dest="mean_I">parseWithNull(@mean_I, float, "-")</map>
         <map dest="mean_V">parseWithNull(@mean_V, float, "-")</map>
@@ -522,6 +642,42 @@
         <map dest="mean_V">parseWithNull(@mean_V, float, "-")</map>
         <map dest="ampl_I">parseWithNull(@ampl_I, float, "-")</map>
         <map dest="ampl_V">parseWithNull(@ampl_V, float, "-")</map>
+        <map dest="period">parseWithNull(@period, float, "-")</map>
+        <var name="period_err">None</var>
+      </rowmaker>
+    </make>
+  </data>
+
+  <!-- =============== Transits parameters ======================== -->
+
+  <table id="param_blg_transits" onDisk="True" adql="hidden" namePath="ogle/aux#object">
+    <meta name="description">The table from original transits.dat from OGLE
+                catalog of candidates for transiting planets \field</meta>
+    <LOOP listItems="object_id mean_I mean_V period period_err">
+      <events>
+        <column original="\item"/>
+      </events>
+    </LOOP>
+    <column original="ampl_I" description="Transit depth"/>
+  </table>
+
+  <!-- There is an incorrect format description in the README file -->
+  <data id="import_param_blg_transits">
+    <sources>data/blg/transits/transits.dat</sources>
+    <columnGrammar>
+      <colDefs>
+        object_id:   1-12
+        mean_I:     14-19
+        mean_V:     21-26
+        period:     28-38
+        ampl_I:     51-56
+      </colDefs>
+    </columnGrammar>
+    <make table="param_blg_transits">
+      <rowmaker idmaps="*">
+        <map dest="mean_I">parseWithNull(@mean_I, float, "-")</map>
+        <map dest="mean_V">parseWithNull(@mean_V, float, "-")</map>
+        <map dest="ampl_I">parseWithNull(@ampl_I, float, "-")</map>
         <map dest="period">parseWithNull(@period, float, "-")</map>
         <var name="period_err">None</var>
       </rowmaker>

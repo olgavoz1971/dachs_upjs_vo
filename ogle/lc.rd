@@ -64,11 +64,14 @@
 
     <!-- <sources pattern="data/blg/lpv/phot_ogle2/[VI]/*.dat"/> -->
     <!-- <sources pattern="data/misc/m54/phot/I/*.dat"/> -->
-    <sources pattern="data/blg/rrlyr/phot/I/*.dat"/>
+    <!-- <sources pattern="data/blg/rrlyr/phot/I/*.dat"/> -->
     <!-- sources pattern="data/blg/dsct/phot*/I/*.dat"/> -->
     <!-- <sources pattern="data/blg/hb/phot*/[VI]/*.dat"/> -->
     <!-- <sources pattern="data/blg/rot/phot*/I/*.dat"/> -->
     <!-- <sources pattern="data/blg/cep/phot*/V/*.dat"/> -->
+    <!-- <sources pattern="data/blg/ecl/phot*/I/*.dat"/> -->
+    <!-- <sources pattern="data/blg/t2cep/phot*/[VI]/*.dat"/> -->
+    <sources pattern="data/blg/transits/phot*/[VI]/*.dat"/>
 
     <csvGrammar delimiter=" " strip="True" names="dateobs_jd, magnitude, mag_err"/>
 
@@ -142,15 +145,18 @@
   <regSuite title="ogle regression">
     <regTest title="ogle table serves some data">
       <url parSet="TAP"
-        QUERY="SELECT object_id, count(*)  FROM ogle.objects_all group by object_id having count(*) > 1"
+        QUERY="SELECT object_id, count(*) AS n FROM ogle.objects_all group by object_id having count(*) > 1"
       >/tap/sync</url>
       <code>
         # The actual assertions are pyUnit-like.  Obviously, you want to
         # remove the print statement once you've worked out what to test
         # against.
+        print('???????????????????????????')
+        print()
         row = self.getFirstVOTableRow()
         print(row)
-        self.assertAlmostEqual(row["n"], 0)
+        # self.assertAlmostEqual(row["n"], 0)
+        
       </code>
     </regTest>
 

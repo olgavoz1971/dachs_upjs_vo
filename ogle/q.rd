@@ -79,8 +79,8 @@
   </macDef>
 
   <macDef name="object_common_cols">
-    object_id, raj2000, dej2000, period, period_err, ampl_I, mean_I, mean_V, vartype, ogle_vartype, 
-    ssa_reference, ssa_collection
+    object_id, raj2000, dej2000, period, period_err, ampl_I, mean_I, mean_V, ssa_targclass,
+    ogle_vartype, ssa_reference, ssa_collection
   </macDef>
 
   <macDef name="param_common_cols">
@@ -111,7 +111,7 @@
     </stc>
 
     <LOOP listItems="object_id raj2000 dej2000 period period_err ampl_I
-               mean_I mean_V vsx vartype ogle_vartype subtype ssa_reference ssa_collection">
+               mean_I mean_V vsx ssa_targclass ogle_vartype subtype ssa_reference ssa_collection">
       <events>
         <column original="\item"/>
       </events>
@@ -142,6 +142,11 @@
               SELECT \param_common_cols FROM \schema.param_blg_rr_d
               UNION ALL
               SELECT \param_common_cols FROM \schema.param_blg_arr_d
+            ),
+            param_blg_ecl_all AS (													-- blg ecl
+              SELECT \param_common_cols FROM \schema.param_blg_ecl
+              UNION ALL
+              SELECT \param_common_cols FROM \schema.param_blg_ell
             )
           SELECT \object_common_cols, vsx, pulse_mode AS subtype					-- blg cep
           FROM \schema.ident_blg_cep
@@ -151,6 +156,10 @@
           FROM \schema.ident_blg_rr
           LEFT JOIN param_blg_rr_all USING (object_id)
         UNION ALL
+          SELECT \object_common_cols, vsx, subtype									-- blg ecl
+          FROM \schema.ident_blg_ecl
+          LEFT JOIN param_blg_ecl_all USING (object_id)
+        UNION ALL
           SELECT \object_common_cols, vsx, NULL AS subtype							-- blg lpv
           FROM \schema.ident_blg_lpv
           LEFT JOIN \schema.param_blg_lpv USING (object_id)
@@ -159,13 +168,21 @@
           FROM \schema.ident_blg_dsct
           LEFT JOIN \schema.param_blg_dsct USING (object_id)
         UNION ALL
+          SELECT \object_common_cols, vsx, subtype									-- blg t2cep
+          FROM \schema.ident_blg_t2cep
+          LEFT JOIN \schema.param_blg_t2cep USING (object_id)
+        UNION ALL
           SELECT \object_common_cols, vsx, subtype									-- blg hb
           FROM \schema.ident_blg_hb
           LEFT JOIN \schema.param_blg_hb USING (object_id)
         UNION ALL
-          SELECT \object_common_cols, vsx, NULL AS subtype									-- blg rot 
+          SELECT \object_common_cols, vsx, subtype									-- blg rot 
           FROM \schema.ident_blg_rot
           LEFT JOIN \schema.param_blg_rot USING (object_id)
+        UNION ALL
+          SELECT \object_common_cols, vsx, subtype									-- blg transits
+          FROM \schema.ident_blg_transits
+          LEFT JOIN \schema.param_blg_transits USING (object_id)
         UNION ALL
           SELECT \object_common_cols, NULL AS vsx, NULL AS subtype					-- misc m54
           FROM \schema.m54
@@ -300,7 +317,7 @@
         SELECT
           'OGLE ' || q.passband || ' lightcurve ' || 'for ' || q.object_id AS ssa_dstitle,
           q.object_id AS ssa_targname,
-          vartype AS ssa_targclass,
+          ssa_targclass,
           spoint(radians(o.raj2000), radians(o.dej2000)) as ssa_location,
           NULL::spoly AS ssa_region,
           '\getConfig{web}{serverURL}/\rdId/sdl/dlget?ID=' || '\pubDIDBase' || q.object_id || '-' || q.passband AS accref,
