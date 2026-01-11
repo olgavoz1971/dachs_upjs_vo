@@ -8,3 +8,45 @@ The original data are provided by the Optical Gravitational Lensing Experiment
 
 The re-publication is carried out with the permission of the OGLE team
 (see correspondence).
+
+## Structure
+
+The OGLE Collection of Variable Star light curves is large. 
+The input data are split into numerous tables by sky field, variability type, and other criteria. 
+There are the time series themselves and separate tables containing star
+coordinates, names and variable-star parameters. A couple of these tables are subsets of others, 
+which, as I understand it, reflects the hierarchy of variability subtypes.
+
+All this results in a rather complex system of RD files.
+I try to follow the approach described below.
+
+1. I ingest the original data _as is_ wherever possible, reflecting the original OGLE directory 
+structure in the “field” RDs (such as blg, gd, lmc, smc, etc.),
+These RD's corresponds to the top level of the OGLE directory tree.
+I hope this approach may help with future data updates.
+
+2. Client-visible tables are organised as views over the original data in the o.rd (“objects”). 
+Here I try to aggregate objects of the same variability type (and therefore having a homogeneous set 
+of parameters) into separate variable-star-type tables, such as Cepheids, RR Lyrae stars, 
+eclipsing binaries, etc.
+In this way, clients can construct ADQL queries for light curves by selecting variable stars 
+with specified parameters.
+
+3. The light curves themselves, together with previews of folded and unfolded curves, 
+are accessible via DataLink services from the ts_ssa or ObsCore tables. ts_ssa
+is intended to be the main access point for time series data.
+
+4. I implement SSAP and Cone Search but, honestly, I am not sure how useful these services will be 
+for the OGLE collection.
+
+## References
+
+There are many publications produced by the OGLE team. I include references 
+in the ssa_reference column of the ts_ssa table (the main access point for time series
+data).
+
+The references are assigned separately for each part of the collection, following the publications 
+listed in the original OGLE directory structure at https://www.astrouw.edu.pl/ogle/ogle4/OCVS
+
+Unfortunately, it is not possible to include multiple publications in a single row of the table. 
+Therefore, when several relevant papers exist, I selected the “paper1”.
