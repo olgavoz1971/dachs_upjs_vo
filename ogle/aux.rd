@@ -61,14 +61,6 @@
       required="False">
     </column>
 
-<!--
-    <column name="vartype" type="text" ucd="meta.code.class"
-      tablehead="Simbad type of Variable Star" verbLevel="15"
-      description="Simbad type of variable star"
-      required="False">
-    </column>
--->
-
     <column name="mean_I" type="real"
       ucd="phot.mag"
       unit="mag"
@@ -124,11 +116,11 @@
 
   </table>
 
-  <table id="cepheid" onDisk="False" namePath="object">
+  <table id="cepheid" onDisk="False" namePath="object">					<!-- Cepheid -->
     <meta name="description">Columns relevant for the Cepheid object tables</meta>
     <LOOP listItems="object_id raj2000 dej2000 ogle4_id ogle3_id ogle2_id vsx
                      ogle_vartype ssa_targclass ssa_collection ssa_reference
-                     mean_I mean_V ampl_I ampl_V period period_err epoch">
+                     mean_I mean_V ampl_I period period_err epoch">
       <events>
         <column original="\item"/>
       </events>
@@ -170,6 +162,89 @@
       required="False"/>
   </table>
 
+  <table id="dsct" onDisk="False" namePath="object">					<!-- d Sct -->
+    <meta name="description">Columns relevant for the Delta Sct object tables</meta>
+    <LOOP listItems="object_id raj2000 dej2000 ogle4_id ogle3_id ogle2_id vsx
+                     ogle_vartype ssa_targclass ssa_collection ssa_reference
+                     mean_I mean_V ampl_I period period_err epoch">
+      <events>
+        <column original="\item"/>
+      </events>
+    </LOOP>
+
+    <column original="subtype" description="singlemode, multimode"/>
+    <column original="period" description="Primary period"/>
+    <column name="period2" type="double precision"
+      ucd="src.var;time.period"
+      unit="d"
+      tablehead="Secondary Period"
+      description="The secondary period"
+      required="False"/>
+
+    <column name="period2_err" type="double precision"
+      ucd="src.var;time.period"
+      unit="d"
+      tablehead="Period2 err"
+      description="Uncertainty of the secondary period"
+      required="False"/>
+
+    <column name="period3" type="double precision"
+      ucd="src.var;time.period"
+      unit="d"
+      tablehead="Tertiary Period"
+      description="The tertiary period"
+      required="False"/>
+
+    <column name="period3_err" type="double precision"
+      ucd="src.var;time.period"
+      unit="d"
+      tablehead="Period3 err"
+      description="Uncertainty of the tertiary period"
+      required="False"/>
+  </table>
+
+  <table id="mira" onDisk="False" namePath="object">					<!-- LPV -->
+    <meta name="description">Columns relevant for the Mira (LPV) object tables</meta>
+    <LOOP listItems="object_id raj2000 dej2000 ogle4_id ogle3_id ogle2_id vsx
+                     ogle_vartype ssa_targclass ssa_collection ssa_reference
+                     mean_I mean_V ampl_I period period_err">
+      <events>
+        <column original="\item"/>
+      </events>
+    </LOOP>
+  </table>
+
+  <table id="ecl" onDisk="False" namePath="object">					<!-- Ecl -->
+    <meta name="description">Columns relevant for the Eclipsing and Ellipsoidal Binary Systems tables</meta>
+    <LOOP listItems="object_id raj2000 dej2000 ogle4_id ogle3_id ogle2_id vsx
+                     ogle_vartype ssa_targclass subtype ssa_collection ssa_reference
+                     period_err">
+      <events>
+        <column original="\item"/>
+      </events>
+    </LOOP>
+    <column original="mean_I" tablehead="I at max" description="I-band magnitude at the maximum light"/>
+    <column original="mean_V" tablehead="V at max" description="V-band magnitude at the maximum light"/>
+    <column original="period" description="Orbital period"/>
+    <column original="epoch" description="Epoch of of the primary eclipse, MJD"/>
+
+    <column name="depth1" type="double precision"
+      ucd="phot.mag"
+      unit="mag"
+      tablehead="Depth 1"
+      description="Depth of the primary eclipse"
+      required="False"/>
+
+    <column name="depth2" type="double precision"
+      ucd="phot.mag"
+      unit="mag"
+      tablehead="Depth 2"
+      description="Depth of the secondary eclipse"
+      required="False"/>
+
+  </table>
+
+<!-- ============ lightcurve ================= -->
   <table id="lc" onDisk="False">
   <meta name="description">Reusable columns for the ligthcurve</meta>
 

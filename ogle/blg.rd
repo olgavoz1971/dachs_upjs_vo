@@ -20,7 +20,7 @@
   <macDef name="referenceTransits">2023AcA....73..127M</macDef>
 
   <meta name="title">Original OGLE Variable Stars tables form the \field Collection.</meta>
-  <meta name="description">
+  <meta name="description" format="rst">
     The OGLE project consists of several sub-surveys that differ by sky coverage and by the type of variability targeted.
     The content and structure of tables containing observed object parameters vary between these sub-surveys.
 
@@ -61,8 +61,6 @@
     TBD
   </meta>
 
-<!-- ##########################  Ident tables  #############  -->
-
   <STREAM id="makeCommonRowsIdent">
     <DEFAULTS sep=":"/>
 
@@ -77,7 +75,7 @@
     <map dest="vsx">parseWithNull(@vsx, str, "")</map>
   </STREAM>
 
-<!-- ================ Classical Cepheids ================== -->
+<!-- ================================= Classical Cepheids ============================== -->
 
   <table id="ident_blg_cep" onDisk="True" adql="hidden" namePath="ogle/aux#cepheid">
     <meta name="description">The original table with identification of 
@@ -161,7 +159,7 @@
         </columnGrammar>
         <make table="param_blg_cep_\class">
           <rowmaker idmaps="*">
-            <LOOP listItems="mean_I mean_V period period_err">
+            <LOOP listItems="mean_I mean_V ampl_I period period_err">
               <events>
                 <map dest="\item">parseWithNull(@\item, float, "-")</map>
               </events>
@@ -212,7 +210,7 @@
         </columnGrammar>
         <make table="param_blg_cep_\class">
           <rowmaker idmaps="*">
-            <LOOP listItems="mean_I mean_V period period_err period_short period_short_err">
+            <LOOP listItems="mean_I mean_V ampl_I period period_err period_short period_short_err">
               <events>
                 <map dest="\item">parseWithNull(@\item, float, "-")</map>
               </events>
@@ -263,7 +261,7 @@
         </columnGrammar>
         <make table="param_blg_cep_\class">
           <rowmaker idmaps="*">
-            <LOOP listItems="mean_I mean_V period period_err 
+            <LOOP listItems="mean_I mean_V ampl_I period period_err 
                   period_med period_med_err period_short period_short_err">
               <events>
                 <map dest="\item">parseWithNull(@\item, float, "-")</map>
@@ -275,54 +273,13 @@
       </data>
     </events>
   </LOOP>
-<!-- ======================= LPV (Miras) ================================== -->
 
-  <table id="ident_blg_lpv" onDisk="True" adql="hidden" namePath="ogle/aux#object">
-    <meta name="description">The original table with identification of Mira stars \field collection</meta>
-
-    <LOOP listItems="object_id  raj2000 dej2000 ogle4_id ogle3_id ogle2_id
-                     vsx ogle_vartype ssa_targclass ssa_collection ssa_reference">
-      <events>
-        <column original="\item"/>
-      </events>
-    </LOOP>
-  </table>
-
-  <data id="import_blg_lpv">
-    <sources>data/blg/lpv/ident.dat</sources>
-    <columnGrammar>
-      <colDefs>
-        object_id:     1-19
-        type:         22-25
-        alphaHMS:     28-38
-        deltaDMS:     40-50
-        ogle4_id:     53-68
-        ogle3_id:     70-84
-        ogle2_id:     86-101
-        vsx:         103-150
-      </colDefs>
-    </columnGrammar>
-    <make table="ident_blg_lpv">
-      <rowmaker idmaps="*">
-        <FEED source="makeCommonRowsIdent"/>
-        <map dest="ogle_vartype">parseWithNull(@type, str, "")</map>
-        <var name="ssa_targclass">"LP*"</var>
-        <var name="ssa_collection">"\prefix-LPV"</var>
-        <var name="ssa_reference">"\referenceLPV"</var>
-      </rowmaker>
-    </make>
-  </data>
-
-<!-- ======================= DPV (Double Periodic Variables) ================================== -->
+<!-- ========================= DPV (Double Periodic Variables) ================================== -->
 <!-- Is this is a subset of ecl? What about lightcurves, are they included in the ecl collection?-->
 
-<!-- ======================= short_period_ecl  ================================== -->
-<!-- Is this is a subset of ecl? What about lightcurves, are they included in the ecl collection?-->
+<!-- ============================= DSct (Delta Sct) ============================================ -->
 
-
-<!-- ======================= DSct (Delta Sct) ================================== -->
-
-  <table id="ident_blg_dsct" onDisk="True" adql="hidden" namePath="ogle/aux#object">
+  <table id="ident_blg_dsct" onDisk="True" adql="hidden" namePath="ogle/aux#dsct">
     <meta name="description">The original table with identifications of delta Scuti-type stars
                  \field collection</meta>
 
@@ -359,6 +316,225 @@
       </rowmaker>
     </make>
   </data>
+
+<!-- ================================= Param DSCT (Delta Sct) ============= -->
+
+  <table id="param_blg_dsct" onDisk="True" adql="hidden" namePath="ogle/aux#dsct">
+    <meta name="description">The table from original dsct.dat from OGLE Delta Scuti Stars \field collection</meta>
+    <LOOP listItems="object_id mean_I mean_V ampl_I period period_err epoch period2 period2_err period3 period3_err">
+      <events>
+        <column original="\item"/>
+      </events>
+    </LOOP>
+  </table>
+
+  <data id="import_param_blg_dsct">
+    <sources>data/blg/dsct/dsct.dat</sources>
+    <columnGrammar>
+      <colDefs>
+        object_id:     1-19
+        mean_I:       22-27
+        mean_V:       29-34
+        period:       37-46
+        period_err:   48-57
+        epoch:        60-69
+        ampl_I:       72-76
+        period2:     105-114
+        period2_err: 116-125
+        period3:     173-182
+        period3_err: 184-193
+      </colDefs>
+    </columnGrammar>
+    <make table="param_blg_dsct">
+      <rowmaker idmaps="*">
+        <LOOP listItems="mean_I mean_V ampl_I period period_err">
+          <events>
+            <map dest="\item">parseWithNull(@\item, float, "-")</map>
+          </events>
+        </LOOP>
+        <LOOP listItems="period2 period2_err period3 period3_err">
+          <events>
+            <map dest="\item">parseWithNull(@\item, float, "")</map>
+          </events>
+        </LOOP>
+        <map dest="epoch">float(@epoch)+49999.5</map>
+      </rowmaker>
+    </make>
+  </data>
+
+<!-- ======================= LPV (Long Period Variable, Miras) ================================== -->
+
+  <table id="ident_blg_lpv" onDisk="True" adql="hidden" namePath="ogle/aux#mira">
+    <meta name="description">The original table with identification of Mira stars \field collection</meta>
+
+    <LOOP listItems="object_id  raj2000 dej2000 ogle4_id ogle3_id ogle2_id
+                     vsx ogle_vartype ssa_targclass ssa_collection ssa_reference">
+      <events>
+        <column original="\item"/>
+      </events>
+    </LOOP>
+  </table>
+
+  <data id="import_blg_lpv">
+    <sources>data/blg/lpv/ident.dat</sources>
+    <columnGrammar>
+      <colDefs>
+        object_id:     1-19
+        type:         22-25
+        alphaHMS:     28-38
+        deltaDMS:     40-50
+        ogle4_id:     53-68
+        ogle3_id:     70-84
+        ogle2_id:     86-101
+        vsx:         103-150
+      </colDefs>
+    </columnGrammar>
+    <make table="ident_blg_lpv">
+      <rowmaker idmaps="*">
+        <FEED source="makeCommonRowsIdent"/>
+        <map dest="ogle_vartype">parseWithNull(@type, str, "")</map>
+        <var name="ssa_targclass">"LP*"</var>
+        <var name="ssa_collection">"\prefix-LPV"</var>
+        <var name="ssa_reference">"\referenceLPV"</var>
+      </rowmaker>
+    </make>
+  </data>
+
+<!-- ========================= Ecl (Eclipsing and Ellipsoidal) ================================== -->
+
+  <table id="ident_blg_ecl" onDisk="True" adql="hidden" namePath="ogle/aux#ecl">
+    <meta name="description">The original table with identifications of Eclipsing and Ellipsoidal
+                 binary systems \field colection</meta>
+
+    <LOOP listItems="object_id  raj2000 dej2000 ogle4_id ogle3_id ogle2_id
+                     subtype vsx ogle_vartype ssa_targclass ssa_collection ssa_reference">
+      <events>
+        <column original="\item"/>
+      </events>
+    </LOOP>
+  </table>
+
+  <data id="import_blg_ecl">
+    <sources>data/blg/ecl/ident.dat</sources>
+    <columnGrammar>
+      <colDefs>
+        object_id:     1-19
+        subtype:      22-24
+        alphaHMS:     26-36
+        deltaDMS:     38-48
+        ogle4_id:     51-66
+        ogle3_id:     68-82
+        ogle2_id:     84-98
+        vsx:          99-150
+      </colDefs>
+    </columnGrammar>
+    <make table="ident_blg_ecl">
+      <rowmaker idmaps="*">
+        <FEED source="makeCommonRowsIdent"/>
+        <map key="subtype">parseWithNull(@subtype, str, "")</map>
+        <map key="ogle_vartype">@object_id.split("-")[2].capitalize()</map>
+
+        <var name="ssa_targclass">@subtype</var>
+        <apply name="ecl_to_simbad_otype" procDef="//procs#dictMap">
+          <bind key="default">"EB*"</bind>
+          <bind key="key">"ssa_targclass"</bind>
+          <bind key="mapping"> {
+            "C": "EB*",
+            "NC": "EB*",
+            "CV": "CV*",
+            "ELL": "El*",
+          } </bind>
+        </apply>
+
+        <map key="ssa_collection">f'\prefix-{@object_id.split("-")[2]}'</map>
+        <var key="ssa_reference">"\referenceEcl"</var>
+      </rowmaker>
+    </make>
+  </data>
+
+  <!-- ============== Ecl/Ell parameters ====================== -->
+
+  <LOOP>
+    <csvItems>
+      class,   source, subclass
+      ecl,    ecl.dat, eclipsing-binaries
+      ell,    ell.dat, ellipsoidal-binaries
+    </csvItems>
+    <events>
+      <table id="param_blg_\class" onDisk="True" adql="hidden" namePath="ogle/aux#ecl">
+        <meta name="description">The table from the base of original \source file with parameters 
+              of \subclass stars from OGLE Eclipsing and Ellipsoidal Binary Systems  \\field collection</meta>
+        <LOOP listItems="object_id mean_I mean_V epoch period period_err depth1 depth2">
+          <events>
+            <column original="\item"/>
+          </events>
+        </LOOP>
+      </table>
+      <data id="import_param_blg_\class">
+        <sources>data/blg/ecl/\source</sources>
+        <columnGrammar>
+          <colDefs>
+            object_id:   1-19
+            mean_I:     22-27
+            mean_V:     29-34
+            epoch:      50-58
+            period:     36-47
+            depth1:     61-65
+            depth2:     67-71            
+          </colDefs>
+        </columnGrammar>
+        <make table="param_blg_\class">
+          <rowmaker idmaps="*">
+            <LOOP listItems="mean_I mean_V period depth1 depth2">
+              <events>
+                <map dest="\item">parseWithNull(@\item, float, "-")</map>
+              </events>
+            </LOOP>
+            <var key="period_err">None</var>
+            <map dest="epoch">float(@epoch)+49999.5</map>
+          </rowmaker>
+        </make>
+      </data>
+    </events>
+  </LOOP>
+
+<!-- ====================== Parameters of Miras (LPV) ============= -->
+
+  <table id="param_blg_lpv" onDisk="True" adql="hidden" namePath="ogle/aux#mira">
+    <meta name="description">The table from original Miras.dat from OGLE Mira stars \field collection</meta>
+    <LOOP listItems="object_id mean_I mean_V ampl_I period period_err">
+      <events>
+        <column original="\item"/>
+      </events>
+    </LOOP>
+  </table>
+
+  <data id="import_param_blg_lpv">
+    <sources>data/blg/lpv/Miras.dat</sources>
+    <columnGrammar>
+      <colDefs>
+        object_id:   1-19
+        mean_I:     22-27
+        mean_V:     29-34
+        period:     36-44
+        ampl_I:     46-50
+      </colDefs>
+    </columnGrammar>
+    <make table="param_blg_lpv">
+      <rowmaker idmaps="*">
+        <LOOP listItems="mean_I mean_V ampl_I period">
+          <events>
+            <map dest="\item">parseWithNull(@\item, float, "-")</map>
+          </events>
+        </LOOP>
+        <var name="period_err">None</var>
+      </rowmaker>
+    </make>
+  </data>
+
+<!-- ======================= short_period_ecl  ================================== -->
+<!-- Is this is a subset of ecl? What about lightcurves, are they included in the ecl collection?-->
+
 
 <!-- ======================= t2cep (Type II Cepheids) ================================== -->
 
@@ -481,58 +657,6 @@
     </make>
   </data>
 
-<!-- ======================= Ecl (Eclipsing and Ellipsoidal) ================================== -->
-
-  <table id="ident_blg_ecl" onDisk="True" adql="hidden" namePath="ogle/aux#object">
-    <meta name="description">The original table with identifications of Eclipsing and Ellipsoidal
-                 binary systems \field colection</meta>
-
-    <LOOP listItems="object_id  raj2000 dej2000 ogle4_id ogle3_id ogle2_id
-                     subtype vsx ogle_vartype ssa_targclass ssa_collection ssa_reference">
-      <events>
-        <column original="\item"/>
-      </events>
-    </LOOP>
-  </table>
-
-  <data id="import_blg_ecl">
-    <sources>data/blg/ecl/ident.dat</sources>
-    <columnGrammar>
-      <colDefs>
-        object_id:     1-19
-        subtype:      22-24
-        alphaHMS:     26-36
-        deltaDMS:     38-48
-        ogle4_id:     51-66
-        ogle3_id:     68-82
-        ogle2_id:     84-98
-        vsx:          99-150
-      </colDefs>
-    </columnGrammar>
-    <make table="ident_blg_ecl">
-      <rowmaker idmaps="*">
-        <FEED source="makeCommonRowsIdent"/>
-        <map key="subtype">parseWithNull(@subtype, str, "")</map>
-        <map key="ogle_vartype">@object_id.split("-")[2].capitalize()</map>
-
-        <var name="ssa_targclass">@subtype</var>
-        <apply name="ecl_to_simbad_otype" procDef="//procs#dictMap">
-          <bind key="default">"EB*"</bind>
-          <bind key="key">"ssa_targclass"</bind>
-          <bind key="mapping"> {
-            "C": "EB*",
-            "NC": "EB*",
-            "CV": "CV*",
-            "ELL": "El*",
-          } </bind>
-        </apply>
-
-        <map key="ssa_collection">f'\prefix-{@object_id.split("-")[2]}'</map>
-        <var key="ssa_reference">"\referenceEcl"</var>
-      </rowmaker>
-    </make>
-  </data>
-
 <!-- ======================= RR Lyr ================================== -->
 
   <table id="ident_blg_rr" onDisk="True" adql="hidden" namePath="ogle/aux#object">
@@ -624,73 +748,6 @@
   </data>
 
 <!-- ########################## Parameters tables ################## -->
-
-<!-- ================================= Param Miras (LPV) ============= -->
-
-  <table id="param_blg_lpv" onDisk="True" adql="hidden" namePath="ogle/aux#object">
-    <meta name="description">The table from original Miras.dat from OGLE Mira stars \field collection</meta>
-    <LOOP listItems="object_id mean_I mean_V ampl_I period period_err">
-      <events>
-        <column original="\item"/>
-      </events>
-    </LOOP>
-  </table>
-
-  <data id="import_param_blg_lpv">
-    <sources>data/blg/lpv/Miras.dat</sources>
-    <columnGrammar>
-      <colDefs>
-        object_id:   1-19
-        mean_I:     22-27
-        mean_V:     29-34
-        period:     36-44
-        ampl_I:     46-50
-      </colDefs>
-    </columnGrammar>
-    <make table="param_blg_lpv">
-      <rowmaker idmaps="*">
-        <map dest="mean_I">parseWithNull(@mean_I, float, "-")</map>
-        <map dest="mean_V">parseWithNull(@mean_V, float, "-")</map>
-        <map dest="ampl_I">parseWithNull(@ampl_I, float, "-")</map>
-        <map dest="period">parseWithNull(@period, float, "-")</map>
-        <var name="period_err">None</var>
-      </rowmaker>
-    </make>
-  </data>
-
-<!-- ================================= Param DSCT (Delta Sct) ============= -->
-
-  <table id="param_blg_dsct" onDisk="True" adql="hidden" namePath="ogle/aux#object">
-    <meta name="description">The table from original dsct.dat from OGLE Delta Scuti Stars \field collection</meta>
-    <LOOP listItems="object_id mean_I mean_V ampl_I period period_err">
-      <events>
-        <column original="\item"/>
-      </events>
-    </LOOP>
-  </table>
-
-  <data id="import_param_blg_dsct">
-    <sources>data/blg/dsct/dsct.dat</sources>
-    <columnGrammar>
-      <colDefs>
-        object_id:   1-19
-        mean_I:     22-27
-        mean_V:     29-34
-        period:     37-46
-        period_err: 48-57
-        ampl_I:     72-76
-      </colDefs>
-    </columnGrammar>
-    <make table="param_blg_dsct">
-      <rowmaker idmaps="*">
-        <map dest="mean_I">parseWithNull(@mean_I, float, "-")</map>
-        <map dest="mean_V">parseWithNull(@mean_V, float, "-")</map>
-        <map dest="ampl_I">parseWithNull(@ampl_I, float, "-")</map>
-        <map dest="period">parseWithNull(@period, float, "-")</map>
-        <map dest="period_err">parseWithNull(@period_err, float, "-")</map>
-      </rowmaker>
-    </make>
-  </data>
 
 <!-- ================================= Param t2cep (Type II Cepheids) ============= -->
 
@@ -833,55 +890,6 @@
       </rowmaker>
     </make>
   </data>
-
-  <!-- =============== Ecl/Ell parameters ======================== -->
-
-  <LOOP>
-    <csvItems>
-      class,   source, subclass
-      ecl,    ecl.dat, eclipsing-binaries
-      ell,    ell.dat, ellipsoidal-binaries
-    </csvItems>
-    <events>
-      <table id="param_blg_\class" onDisk="True" adql="hidden" namePath="ogle/aux#object">
-        <meta name="description">The table from the base of original \source file
-                  with parameters of \subclass stars
-                  from OGLE Eclipsing and Ellipsoidal Binary Systems  \\field collection</meta>
-        <LOOP listItems="object_id ampl_I period period_err">
-          <events>
-            <column original="\item"/>
-          </events>
-        </LOOP>
-        <column original="mean_I" description="I-band magnitude at the maximum light"/>
-        <column original="mean_V" description="V-band magnitude at the maximum light"/>
-        <column original="ampl_I" description="Depth of the primary eclipse" tablehead="Primary Ampl"/>
-        <column original="ampl_V" description="Depth of the secondary eclipse" tablehead="Secondary Ampl"/>
-      </table>
-      <data id="import_blg_\class">
-        <sources>data/blg/ecl/\source</sources>
-        <columnGrammar>
-          <colDefs>
-            object_id:   1-19
-            mean_I:     22-27
-            mean_V:     29-34
-            period:     36-47
-            depth1:     61-65
-            depth2:     67-71            
-          </colDefs>
-        </columnGrammar>
-        <make table="param_blg_\class">
-          <rowmaker idmaps="*">
-            <map dest="mean_I">parseWithNull(@mean_I, float, "-")</map>
-            <map dest="mean_V">parseWithNull(@mean_V, float, "-")</map>
-            <map dest="period">parseWithNull(@period, float, "-")</map>
-            <var key="period_err">None</var>
-            <map dest="ampl_I">parseWithNull(@depth1, float, "-")</map>
-            <map dest="ampl_V">parseWithNull(@depth2, float, "-")</map>
-          </rowmaker>
-        </make>
-      </data>
-    </events>
-  </LOOP>
 
   <!-- =============== RR Lyr parameters ======================== -->
 
