@@ -19,7 +19,7 @@
   <macDef name="referenceT2Cep">2017AcA....67..297S</macDef>
   <macDef name="referenceTransits">2023AcA....73..127M</macDef>
 
-  <meta name="title">Original OGLE Variable Stars Collection tables.</meta>
+  <meta name="title">Original OGLE Variable Stars tables form the \field Collection.</meta>
   <meta name="description">
     The OGLE project consists of several sub-surveys that differ by sky coverage and by the type of variability targeted.
     The content and structure of tables containing observed object parameters vary between these sub-surveys.
@@ -79,11 +79,11 @@
 
 <!-- ================ Classical Cepheids ================== -->
 
-  <table id="ident_blg_cep" onDisk="True" adql="hidden" namePath="ogle/aux#object">
+  <table id="ident_blg_cep" onDisk="True" adql="hidden" namePath="ogle/aux#cepheid">
     <meta name="description">The original table with identification of 
                        Classical Cepheids \field collection</meta>
 
-    <LOOP listItems="object_id raj2000 dej2000 ogle4_id ogle3_id ogle2_id vsx
+    <LOOP listItems="object_id raj2000 dej2000 pulse_mode ogle4_id ogle3_id ogle2_id vsx
                      ogle_vartype ssa_targclass ssa_collection ssa_reference">
       <events>
         <column original="\item"/>
@@ -125,6 +125,156 @@
     </make>
   </data>
 
+  <!-- =============== Classical Cepheids parameters ======================== -->
+
+  <!-- ================ Single mode =============== -->
+  <LOOP>
+    <csvItems>
+      class,             source, subclass
+      cepf,           cepF.dat, fundamental-mode-(F)-Cepheids
+      cep1o,         cep1O.dat, first-overtone-(1O)-Cepheids
+    </csvItems>
+    <events>
+      <table id="param_blg_cep_\class" onDisk="True" adql="hidden" namePath="ogle/aux#cepheid">
+        <meta name="description">The table from the base of original \source \
+                with parameters of \subclass \
+                from OGLE classical Cepheids \\field collection</meta>
+
+        <LOOP listItems="object_id mean_I mean_V ampl_I period period_err epoch">
+          <events>
+            <column original="\item"/>
+          </events>
+        </LOOP>
+      </table>
+      <data id="import_param_blg_\class">
+        <sources>data/blg/cep/\source</sources>
+        <columnGrammar>
+          <colDefs>
+              object_id:   1-16
+              mean_I:     19-24
+              mean_V:     26-31
+              period:     34-43
+              period_err: 45-53
+              epoch:      56-66
+              ampl_I:     70-74
+          </colDefs>
+        </columnGrammar>
+        <make table="param_blg_cep_\class">
+          <rowmaker idmaps="*">
+            <LOOP listItems="mean_I mean_V period period_err">
+              <events>
+                <map dest="\item">parseWithNull(@\item, float, "-")</map>
+              </events>
+            </LOOP>
+            <map dest="epoch">float(@epoch)-JD_MJD</map>
+          </rowmaker>
+        </make>
+      </data>
+    </events>
+  </LOOP>
+
+  <!-- ================ Double mode ============== -->
+
+  <LOOP>
+    <csvItems>
+      class,             source, subclass
+      cepf1o,       cepF1O.dat, double-mode-(F/1O)-Cepheids
+      cep1o2o,     cep1O2O.dat, double-mode-(1O/2O)-Cepheids
+      cep2o3o,     cep2O3O.dat, double-mode-(2O/30)-Cepheids
+    </csvItems>
+    <events>
+      <table id="param_blg_cep_\class" onDisk="True" adql="hidden" namePath="ogle/aux#cepheid">
+        <meta name="description">The table from the base of original \source \
+                with parameters of \subclass \
+                from OGLE classical Cepheids \\field collection</meta>
+
+        <LOOP listItems="object_id mean_I mean_V ampl_I period period_err 
+                         period_short period_short_err epoch">
+          <events>
+            <column original="\item"/>
+          </events>
+        </LOOP>
+      </table>
+      <data id="import_param_blg_\class">
+        <sources>data/blg/cep/\source</sources>
+        <columnGrammar>
+          <colDefs>
+              object_id:   1-16
+              mean_I:     19-24
+              mean_V:     26-31
+              period:     34-43
+              period_err: 45-53
+              epoch:      56-67
+              ampl_I:     70-74
+              period_short:     102-111
+              period_short_err: 113-121
+          </colDefs>
+        </columnGrammar>
+        <make table="param_blg_cep_\class">
+          <rowmaker idmaps="*">
+            <LOOP listItems="mean_I mean_V period period_err period_short period_short_err">
+              <events>
+                <map dest="\item">parseWithNull(@\item, float, "-")</map>
+              </events>
+            </LOOP>
+            <map dest="epoch">float(@epoch)-JD_MJD</map>
+          </rowmaker>
+        </make>
+      </data>
+    </events>
+  </LOOP>
+
+  <!-- ================ Triple mode ============== -->
+
+  <LOOP>
+    <csvItems>
+      class,             source, subclass
+      cep1o2o3o, cep1O2O3O.dat, triple-mode-(1O/2O/30)-Cepheids
+    </csvItems>
+    <events>
+      <table id="param_blg_cep_\class" onDisk="True" adql="hidden" namePath="ogle/aux#cepheid">
+        <meta name="description">The table from the base of original \source \
+                with parameters of \subclass \
+                from OGLE classical Cepheids \\field collection</meta>
+
+        <LOOP listItems="object_id mean_I mean_V ampl_I period period_err 
+                         period_med period_med_err period_short period_short_err epoch">
+          <events>
+            <column original="\item"/>
+          </events>
+        </LOOP>
+      </table>
+      <data id="import_param_blg_\class">
+        <sources>data/blg/cep/\source</sources>
+        <columnGrammar>
+          <colDefs>
+              object_id:   1-16
+              mean_I:     19-24
+              mean_V:     26-31
+              period:     34-43
+              period_err: 45-53
+              epoch:      56-67
+              ampl_I:     70-74
+              period_med:     102-111
+              period_med_err: 113-121
+              period_short:     170-179
+              period_short_err: 181-189
+          </colDefs>
+        </columnGrammar>
+        <make table="param_blg_cep_\class">
+          <rowmaker idmaps="*">
+            <LOOP listItems="mean_I mean_V period period_err 
+                  period_med period_med_err period_short period_short_err">
+              <events>
+                <map dest="\item">parseWithNull(@\item, float, "-")</map>
+              </events>
+            </LOOP>
+            <map dest="epoch">float(@epoch)-JD_MJD</map>
+          </rowmaker>
+        </make>
+      </data>
+    </events>
+  </LOOP>
 <!-- ======================= LPV (Miras) ================================== -->
 
   <table id="ident_blg_lpv" onDisk="True" adql="hidden" namePath="ogle/aux#object">
@@ -778,52 +928,5 @@
     </events>
   </LOOP>
 
-  <!-- =============== Cepheids parameters ======================== -->
-
-  <LOOP>
-    <csvItems>
-      class,             source, subclass
-      cepf,           cepF.dat, fundamental-mode-(F)-Cepheids
-      cep1o,         cep1O.dat, first-overtone-(1O)-Cepheids
-      cepf1o,       cepF1O.dat, double-mode-(F/1O)-Cepheids
-      cep1o2o,     cep1O2O.dat, double-mode-(1O/2O)-Cepheids
-      cep1o2o3o, cep1O2O3O.dat, triple-mode-(1O/2O/30)-Cepheids
-      cep2o3o,     cep2O3O.dat, double-mode-(2O/30)-Cepheids
-    </csvItems>
-    <events>
-      <table id="param_blg_cep_\class" onDisk="True" adql="hidden" namePath="ogle/aux#object">
-        <meta name="description">The table from the base of original \source
-                with parameters of \subclass
-                from OGLE classical Cepheids \\field collection</meta>
-
-        <LOOP listItems="object_id mean_I mean_V ampl_I period period_err">
-          <events>
-            <column original="\item"/>
-          </events>
-        </LOOP>
-      </table>
-      <data id="import_blg_\class">
-        <sources>data/blg/cep/\source</sources>
-        <columnGrammar>
-          <colDefs>
-              object_id:   1-16
-              mean_I:     19-24
-              mean_V:     26-31
-              period:     34-43
-              period_err: 45-53
-              ampl_I:     70-74
-          </colDefs>
-        </columnGrammar>
-        <make table="param_blg_cep_\class">
-          <rowmaker idmaps="*">
-            <map dest="mean_I">parseWithNull(@mean_I, float, "-")</map>
-            <map dest="mean_V">parseWithNull(@mean_V, float, "-")</map>
-            <map dest="period">parseWithNull(@period, float, "-")</map>
-            <map dest="period_err">parseWithNull(@period_err, float, "-")</map>
-          </rowmaker>
-        </make>
-      </data>
-    </events>
-  </LOOP>
 
 </resource>

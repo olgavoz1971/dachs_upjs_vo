@@ -1,5 +1,11 @@
 <resource schema="ogle" resdir=".">
+  <meta name="creationDate">2026-01-01T07:00:00Z</meta>
+  <meta name="subject">light-curves</meta>
+  <meta name="subject">variable-stars</meta>
+  <meta name="subject">surveys</meta>
+
   <meta name="title">Auxiliary things</meta>
+
   <table id="object" onDisk="False">
   <meta name="description">A stuff for motley OGLE tables to pull columns from</meta>
 
@@ -105,10 +111,63 @@
       description="Uncertainty of period"
       required="False"/>
 
+    <column name="epoch" type="double precision"
+      ucd="src.var;time.epoch"
+      unit="d"
+      tablehead="Epoch"
+      description="Time of maximum brightness; mjd (HJD)"
+      required="False"/>
+
     <column original="//ssap#instance.ssa_targclass"/>
     <column original="//ssap#instance.ssa_collection"/>
     <column original="//ssap#instance.ssa_reference"/>
 
+  </table>
+
+  <table id="cepheid" onDisk="False" namePath="object">
+    <meta name="description">Columns relevant for the Cepheid object tables</meta>
+    <LOOP listItems="object_id raj2000 dej2000 ogle4_id ogle3_id ogle2_id vsx
+                     ogle_vartype ssa_targclass ssa_collection ssa_reference
+                     mean_I mean_V ampl_I ampl_V period period_err epoch">
+      <events>
+        <column original="\item"/>
+      </events>
+    </LOOP>
+
+    <column name="pulse_mode" type="text" ucd="meta.code.class"
+      tablehead="Pulsation Mode" verbLevel="15"
+      description="Cepheid Mode(s) of pulsation: F-fundamental, o1-first \
+                   overtone, o2-second, etc"
+      required="False">
+    </column>
+    <column original="period" description="Period (longest)"/>
+    <column name="period_short" type="double precision"
+      ucd="src.var;time.period"
+      unit="d"
+      tablehead="Shortest Period"
+      description="The shortest period of the Cepheid"
+      required="False"/>
+
+    <column name="period_short_err" type="double precision"
+      ucd="src.var;time.period"
+      unit="d"
+      tablehead="Period err"
+      description="Uncertainty of the shortest period"
+      required="False"/>
+
+    <column name="period_med" type="double precision"
+      ucd="src.var;time.period"
+      unit="d"
+      tablehead=" Period"
+      description="The medium period of the Cepheid"
+      required="False"/>
+
+    <column name="period_med_err" type="double precision"
+      ucd="src.var;time.period"
+      unit="d"
+      tablehead="Period err"
+      description="Uncertainty of the medium period"
+      required="False"/>
   </table>
 
   <table id="lc" onDisk="False">
