@@ -77,22 +77,20 @@
 
 <!-- ================================= Classical Cepheids ============================== -->
 
-  <table id="ident_blg_cep" onDisk="True" adql="hidden" namePath="ogle/aux#cepheid">
-    <meta name="description">The original table with identification of 
+  <table id="ident_blg_cep" onDisk="True" adql="hidden" namePath="ogle/aux#cepheid_id">
+    <meta name="description">The original table with identification of \
                        Classical Cepheids \field collection</meta>
 
-    <LOOP listItems="object_id raj2000 dej2000 pulse_mode ogle4_id ogle3_id ogle2_id vsx
-                     ogle_vartype ssa_targclass ssa_collection ssa_reference">
-      <events>
-        <column original="\item"/>
-      </events>
+    <!-- Pull all columns from the prototype id table: -->
+    <LOOP>
+       <codeItems>
+         for col in context.resolveId("ogle/aux#cepheid_id").columns:
+           yield {'item': col.name}
+       </codeItems>
+       <events>
+         <column original="\item"/>
+       </events>
     </LOOP>
-
-    <column name="pulse_mode" type="text" ucd="meta.code.class"
-      tablehead="Pulsation Mode" verbLevel="15"
-      description="Cepheid Mode(s) of pulsation"
-      required="False">
-    </column>
   </table>
 
   <data id="import_blg_cep">
@@ -133,12 +131,15 @@
       cep1o,         cep1O.dat, first-overtone-(1O)-Cepheids
     </csvItems>
     <events>
-      <table id="param_blg_cep_\class" onDisk="True" adql="hidden" namePath="ogle/aux#cepheid">
-        <meta name="description">The table from the base of original \source \
-                with parameters of \subclass \
+      <table id="param_blg_cep_\class" onDisk="True" adql="hidden" namePath="ogle/aux#cepheid_p">
+        <meta name="description">The table from the base of original \source with parameters of \subclass \
                 from OGLE classical Cepheids \\field collection</meta>
 
-        <LOOP listItems="object_id mean_I mean_V ampl_I period period_err epoch">
+        <LOOP>
+          <codeItems>
+            for col in context.resolveId("ogle/aux#cepheid_p").columns:
+              yield {'item': col.name}
+          </codeItems>
           <events>
             <column original="\item"/>
           </events>
@@ -165,6 +166,15 @@
               </events>
             </LOOP>
             <map dest="epoch">float(@epoch)-JD_MJD</map>
+            <!-- 
+            JK: seems, here is no need to do this explcitly, DaCHS assigns None
+            authomatucally to all empty columns, right?
+            <LOOP listItems="period_short period_short_err period_med period_med_err">
+              <events>
+                <var key="\item">None</var>
+              </events>
+            </LOOP>
+            -->
           </rowmaker>
         </make>
       </data>
@@ -181,13 +191,15 @@
       cep2o3o,     cep2O3O.dat, double-mode-(2O/30)-Cepheids
     </csvItems>
     <events>
-      <table id="param_blg_cep_\class" onDisk="True" adql="hidden" namePath="ogle/aux#cepheid">
+      <table id="param_blg_cep_\class" onDisk="True" adql="hidden" namePath="ogle/aux#cepheid_p">
         <meta name="description">The table from the base of original \source \
                 with parameters of \subclass \
                 from OGLE classical Cepheids \\field collection</meta>
-
-        <LOOP listItems="object_id mean_I mean_V ampl_I period period_err 
-                         period_short period_short_err epoch">
+        <LOOP>
+          <codeItems>
+            for col in context.resolveId("ogle/aux#cepheid_p").columns:
+              yield {'item': col.name}
+          </codeItems>
           <events>
             <column original="\item"/>
           </events>
@@ -216,6 +228,13 @@
               </events>
             </LOOP>
             <map dest="epoch">float(@epoch)-JD_MJD</map>
+            <!--
+            <LOOP listItems="period_med period_med_err">
+              <events>
+                <var key="\item">None</var>
+              </events>
+            </LOOP>
+            -->
           </rowmaker>
         </make>
       </data>
@@ -230,13 +249,15 @@
       cep1o2o3o, cep1O2O3O.dat, triple-mode-(1O/2O/30)-Cepheids
     </csvItems>
     <events>
-      <table id="param_blg_cep_\class" onDisk="True" adql="hidden" namePath="ogle/aux#cepheid">
+      <table id="param_blg_cep_\class" onDisk="True" adql="hidden" namePath="ogle/aux#cepheid_p">
         <meta name="description">The table from the base of original \source \
                 with parameters of \subclass \
                 from OGLE classical Cepheids \\field collection</meta>
-
-        <LOOP listItems="object_id mean_I mean_V ampl_I period period_err 
-                         period_med period_med_err period_short period_short_err epoch">
+        <LOOP>
+          <codeItems>
+            for col in context.resolveId("ogle/aux#cepheid_p").columns:
+              yield {'item': col.name}
+          </codeItems>
           <events>
             <column original="\item"/>
           </events>
@@ -279,15 +300,18 @@
 
 <!-- ============================= DSct (Delta Sct) ============================================ -->
 
-  <table id="ident_blg_dsct" onDisk="True" adql="hidden" namePath="ogle/aux#dsct">
-    <meta name="description">The original table with identifications of delta Scuti-type stars
-                 \field collection</meta>
+  <table id="ident_blg_dsct" onDisk="True" adql="hidden" namePath="ogle/aux#dsct_id">
+    <meta name="description">The original table with identifications of delta Scuti-type stars \field collection</meta>
 
-    <LOOP listItems="object_id  raj2000 dej2000 ogle4_id ogle3_id ogle2_id
-                     vsx subtype ogle_vartype ssa_targclass ssa_collection ssa_reference">
-      <events>
-        <column original="\item"/>
-      </events>
+    <!-- Pull all columns from the prototype id table: -->
+    <LOOP>
+       <codeItems>
+         for col in context.resolveId("ogle/aux#dsct_id").columns:
+           yield {'item': col.name}
+       </codeItems>
+       <events>
+         <column original="\item"/>
+       </events>
     </LOOP>
   </table>
 
@@ -319,11 +343,15 @@
 
 <!-- ================================= Param DSCT (Delta Sct) ============= -->
 
-  <table id="param_blg_dsct" onDisk="True" adql="hidden" namePath="ogle/aux#dsct">
+  <table id="param_blg_dsct" onDisk="True" adql="hidden" namePath="ogle/aux#dsct_p">
     <meta name="description">The table from original dsct.dat from OGLE Delta Scuti Stars \field collection</meta>
-    <LOOP listItems="object_id mean_I mean_V ampl_I period period_err epoch period2 period2_err period3 period3_err">
+    <LOOP>
+      <codeItems>
+          for col in context.resolveId("ogle/aux#dsct_p").columns:
+              yield {'item': col.name}
+      </codeItems>
       <events>
-        <column original="\item"/>
+            <column original="\item"/>
       </events>
     </LOOP>
   </table>
@@ -362,55 +390,21 @@
     </make>
   </data>
 
-<!-- ======================= LPV (Long Period Variable, Miras) ================================== -->
-
-  <table id="ident_blg_lpv" onDisk="True" adql="hidden" namePath="ogle/aux#mira">
-    <meta name="description">The original table with identification of Mira stars \field collection</meta>
-
-    <LOOP listItems="object_id  raj2000 dej2000 ogle4_id ogle3_id ogle2_id
-                     vsx ogle_vartype ssa_targclass ssa_collection ssa_reference">
-      <events>
-        <column original="\item"/>
-      </events>
-    </LOOP>
-  </table>
-
-  <data id="import_blg_lpv">
-    <sources>data/blg/lpv/ident.dat</sources>
-    <columnGrammar>
-      <colDefs>
-        object_id:     1-19
-        type:         22-25
-        alphaHMS:     28-38
-        deltaDMS:     40-50
-        ogle4_id:     53-68
-        ogle3_id:     70-84
-        ogle2_id:     86-101
-        vsx:         103-150
-      </colDefs>
-    </columnGrammar>
-    <make table="ident_blg_lpv">
-      <rowmaker idmaps="*">
-        <FEED source="makeCommonRowsIdent"/>
-        <map dest="ogle_vartype">parseWithNull(@type, str, "")</map>
-        <var name="ssa_targclass">"LP*"</var>
-        <var name="ssa_collection">"\prefix-LPV"</var>
-        <var name="ssa_reference">"\referenceLPV"</var>
-      </rowmaker>
-    </make>
-  </data>
 
 <!-- ========================= Ecl (Eclipsing and Ellipsoidal) ================================== -->
 
-  <table id="ident_blg_ecl" onDisk="True" adql="hidden" namePath="ogle/aux#ecl">
-    <meta name="description">The original table with identifications of Eclipsing and Ellipsoidal
+  <table id="ident_blg_ecl" onDisk="True" adql="hidden" namePath="ogle/aux#ecl_id">
+    <meta name="description">The original table with identifications of Eclipsing and Ellipsoidal \
                  binary systems \field colection</meta>
 
-    <LOOP listItems="object_id  raj2000 dej2000 ogle4_id ogle3_id ogle2_id
-                     subtype vsx ogle_vartype ssa_targclass ssa_collection ssa_reference">
-      <events>
-        <column original="\item"/>
-      </events>
+    <LOOP>
+       <codeItems>
+         for col in context.resolveId("ogle/aux#ecl_id").columns:
+           yield {'item': col.name}
+       </codeItems>
+       <events>
+         <column original="\item"/>
+       </events>
     </LOOP>
   </table>
 
@@ -461,15 +455,21 @@
       ell,    ell.dat, ellipsoidal-binaries
     </csvItems>
     <events>
-      <table id="param_blg_\class" onDisk="True" adql="hidden" namePath="ogle/aux#ecl">
-        <meta name="description">The table from the base of original \source file with parameters 
+      <table id="param_blg_\class" onDisk="True" adql="hidden" namePath="ogle/aux#ecl_p">
+        <meta name="description">The table from the base of original \source file with parameters \
               of \subclass stars from OGLE Eclipsing and Ellipsoidal Binary Systems  \\field collection</meta>
-        <LOOP listItems="object_id mean_I mean_V epoch period period_err depth1 depth2">
+ 
+       <LOOP>
+          <codeItems>
+            for col in context.resolveId("ogle/aux#ecl_p").columns:
+              yield {'item': col.name}
+          </codeItems>
           <events>
             <column original="\item"/>
           </events>
         </LOOP>
       </table>
+
       <data id="import_param_blg_\class">
         <sources>data/blg/ecl/\source</sources>
         <columnGrammar>
@@ -498,96 +498,20 @@
     </events>
   </LOOP>
 
-<!-- ====================== Parameters of Miras (LPV) ============= -->
-
-  <table id="param_blg_lpv" onDisk="True" adql="hidden" namePath="ogle/aux#mira">
-    <meta name="description">The table from original Miras.dat from OGLE Mira stars \field collection</meta>
-    <LOOP listItems="object_id mean_I mean_V ampl_I period period_err">
-      <events>
-        <column original="\item"/>
-      </events>
-    </LOOP>
-  </table>
-
-  <data id="import_param_blg_lpv">
-    <sources>data/blg/lpv/Miras.dat</sources>
-    <columnGrammar>
-      <colDefs>
-        object_id:   1-19
-        mean_I:     22-27
-        mean_V:     29-34
-        period:     36-44
-        ampl_I:     46-50
-      </colDefs>
-    </columnGrammar>
-    <make table="param_blg_lpv">
-      <rowmaker idmaps="*">
-        <LOOP listItems="mean_I mean_V ampl_I period">
-          <events>
-            <map dest="\item">parseWithNull(@\item, float, "-")</map>
-          </events>
-        </LOOP>
-        <var name="period_err">None</var>
-      </rowmaker>
-    </make>
-  </data>
-
-<!-- ======================= short_period_ecl  ================================== -->
-<!-- Is this is a subset of ecl? What about lightcurves, are they included in the ecl collection?-->
-
-
-<!-- ======================= t2cep (Type II Cepheids) ================================== -->
-
-  <macDef name="class_desc">Type II Cepheids</macDef>
-
-  <table id="ident_blg_t2cep" onDisk="True" adql="hidden" namePath="ogle/aux#object">
-    <meta name="description">The original table with identifications of \class_desc \field</meta>
-
-    <LOOP listItems="object_id  raj2000 dej2000 ogle4_id ogle3_id ogle2_id
-                     vsx subtype ogle_vartype ssa_targclass ssa_collection ssa_reference">
-      <events>
-        <column original="\item"/>
-      </events>
-    </LOOP>
-  </table>
-
-  <data id="import_blg_t2cep">
-    <sources>data/blg/t2cep/ident.dat</sources>
-    <columnGrammar>
-      <colDefs>
-        object_id:     1-19
-	    subtype:      22-26
-        alphaHMS:     29-39
-        deltaDMS:     41-51
-        ogle4_id:     54-69
-        ogle3_id:     71-85
-        ogle2_id:     87-101
-        vsx:         103-150
-      </colDefs>
-    </columnGrammar>
-    <make table="ident_blg_t2cep">
-      <rowmaker idmaps="*">
-        <FEED source="makeCommonRowsIdent"/>
-        <map dest="subtype">parseWithNull(@subtype, str, "")</map>
-        <var name="ogle_vartype">"T2Cep"</var>
-        <var name="ssa_targclass">"WV*"</var>
-        <var name="ssa_collection">"\prefix-T2CEP"</var>
-        <var name="ssa_reference">"\referenceT2Cep"</var>
-      </rowmaker>
-    </make>
-  </data>
-
 <!-- ======================= HB (Heartbeat stars) ================================== -->
 
-  <table id="ident_blg_hb" onDisk="True" adql="hidden" namePath="ogle/aux#object">
-    <meta name="description">The original table with identifications of Heartbeat binary systems
+  <table id="ident_blg_hb" onDisk="True" adql="hidden" namePath="ogle/aux#hb_id">
+    <meta name="description">The original table with identifications of Heartbeat binary systems \
                 in the Galactic bulge and Magellanic Clouds</meta>
 
-    <LOOP listItems="object_id  raj2000 dej2000 ogle4_id ogle3_id ogle2_id
-                     vsx subtype ogle_vartype ssa_targclass ssa_collection ssa_reference">
-      <events>
-        <column original="\item"/>
-      </events>
+    <LOOP>
+       <codeItems>
+         for col in context.resolveId("ogle/aux#hb_id").columns:
+           yield {'item': col.name}
+       </codeItems>
+       <events>
+         <column original="\item"/>
+       </events>
     </LOOP>
   </table>
 
@@ -617,17 +541,146 @@
     </make>
   </data>
 
+<!-- ====================== Param HB (heartbeat binary systems) ============ -->
+
+  <table id="param_blg_hb" onDisk="True" adql="hidden" namePath="ogle/aux#hb_p">
+    <meta name="description">The table from original hb.dat from OGLE \
+                         Heartbeat binary systems \field collection</meta>
+    <LOOP>
+      <codeItems>
+          for col in context.resolveId("ogle/aux#hb_p").columns:
+              yield {'item': col.name}
+      </codeItems>
+      <events>
+            <column original="\item"/>
+      </events>
+    </LOOP>
+  </table>
+
+  <data id="import_param_blg_hb">
+    <sources>data/blg/hb/hb.dat</sources>
+    <columnGrammar>
+      <colDefs>
+        object_id:   1-16
+        mean_I:     18-23
+        mean_V:     25-30
+        period:     32-44
+        epoch:      46-55
+        ampl_I:     57-61
+        ecc:        63-68
+        incl:       70-74
+        omega:      76-81
+        add_var:    83-91
+      </colDefs>
+    </columnGrammar>
+    <make table="param_blg_hb">
+      <rowmaker idmaps="*">
+        <LOOP listItems="mean_I mean_V ampl_I period ">
+          <events>
+            <map dest="\item">parseWithNull(@\item, float, "-")</map>
+          </events>
+        </LOOP>
+        <var name="period_err">None</var>
+        <map dest="add_var">parseWithNull(@add_var, str, "")</map>
+        <map dest="epoch">float(@epoch)+49999.5</map>
+      </rowmaker>
+    </make>
+  </data>
+
+<!-- ======================= LPV (Long Period Variable, Miras) ================================== -->
+
+  <table id="ident_blg_lpv" onDisk="True" adql="hidden" namePath="ogle/aux#mira_id">
+    <meta name="description">The original table with identification of Mira stars \field collection</meta>
+
+    <LOOP>
+       <codeItems>
+         for col in context.resolveId("ogle/aux#mira_id").columns:
+           yield {'item': col.name}
+       </codeItems>
+       <events>
+         <column original="\item"/>
+       </events>
+    </LOOP>
+
+  </table>
+
+  <data id="import_blg_lpv">
+    <sources>data/blg/lpv/ident.dat</sources>
+    <columnGrammar>
+      <colDefs>
+        object_id:     1-19
+        type:         22-25
+        alphaHMS:     28-38
+        deltaDMS:     40-50
+        ogle4_id:     53-68
+        ogle3_id:     70-84
+        ogle2_id:     86-101
+        vsx:         103-150
+      </colDefs>
+    </columnGrammar>
+    <make table="ident_blg_lpv">
+      <rowmaker idmaps="*">
+        <FEED source="makeCommonRowsIdent"/>
+        <map dest="ogle_vartype">parseWithNull(@type, str, "")</map>
+        <var name="ssa_targclass">"LP*"</var>
+        <var name="ssa_collection">"\prefix-LPV"</var>
+        <var name="ssa_reference">"\referenceLPV"</var>
+      </rowmaker>
+    </make>
+  </data>
+
+<!-- ====================== Parameters of Miras (LPV) ============= -->
+
+  <table id="param_blg_lpv" onDisk="True" adql="hidden" namePath="ogle/aux#mira_p">
+    <meta name="description">The table from original Miras.dat from OGLE Mira stars \field collection</meta>
+
+    <LOOP>
+          <codeItems>
+            for col in context.resolveId("ogle/aux#mira_p").columns:
+              yield {'item': col.name}
+          </codeItems>
+          <events>
+            <column original="\item"/>
+          </events>
+    </LOOP>
+  </table>
+
+  <data id="import_param_blg_lpv">
+    <sources>data/blg/lpv/Miras.dat</sources>
+    <columnGrammar>
+      <colDefs>
+        object_id:   1-19
+        mean_I:     22-27
+        mean_V:     29-34
+        period:     36-44
+        ampl_I:     46-50
+      </colDefs>
+    </columnGrammar>
+    <make table="param_blg_lpv">
+      <rowmaker idmaps="*">
+        <LOOP listItems="mean_I mean_V ampl_I period">
+          <events>
+            <map dest="\item">parseWithNull(@\item, float, "-")</map>
+          </events>
+        </LOOP>
+        <var name="period_err">None</var>
+      </rowmaker>
+    </make>
+  </data>
+
 <!-- ======================= ROT (Rotating Variables) ================================== -->
 
-  <table id="ident_blg_rot" onDisk="True" adql="hidden" namePath="ogle/aux#object">
-    <meta name="description">The original table with identifications of Rotating Variables
-                 \field colection</meta>
+  <table id="ident_blg_rot" onDisk="True" adql="hidden" namePath="ogle/aux#rot_id">
+    <meta name="description">The original table with identifications of Rotating Variables \field colection</meta>
 
-    <LOOP listItems="object_id  raj2000 dej2000 ogle4_id ogle3_id ogle2_id
-                     vsx ogle_vartype ssa_targclass subtype ssa_collection ssa_reference">
-      <events>
-        <column original="\item"/>
-      </events>
+    <LOOP>
+       <codeItems>
+         for col in context.resolveId("ogle/aux#rot_id").columns:
+           yield {'item': col.name}
+       </codeItems>
+       <events>
+         <column original="\item"/>
+       </events>
     </LOOP>
   </table>
 
@@ -657,18 +710,66 @@
     </make>
   </data>
 
-<!-- ======================= RR Lyr ================================== -->
+<!-- ======================= Param Rot (rotating) ============ -->
 
-  <table id="ident_blg_rr" onDisk="True" adql="hidden" namePath="ogle/aux#object">
-    <meta name="description">The original table with identification of RR Lyr stars \field collection</meta>
-
-    <LOOP listItems="object_id  raj2000 dej2000 ogle4_id ogle3_id ogle2_id
-                     ogle_vartype ssa_targclass subtype ssa_collection ssa_reference">
+  <table id="param_blg_rot" onDisk="True" adql="hidden" namePath="ogle/aux#rot_p">
+    <meta name="description">The table from original rot.dat from OGLE \
+                         Rotating Variables \field collection</meta>
+    <LOOP>
+      <codeItems>
+          for col in context.resolveId("ogle/aux#rot_p").columns:
+              yield {'item': col.name}
+      </codeItems>
       <events>
-        <column original="\item"/>
+            <column original="\item"/>
       </events>
     </LOOP>
-    <column original="vsx" description="GCVS or VSX designation"/>
+  </table>
+
+  <!-- The format described in the original README is completely incorrect 
+  I've corrected format, but I'm not sure if columns V and I are reversed -->
+  <data id="import_param_blg_rot">
+    <sources>data/blg/rot/rot.dat</sources>
+    <columnGrammar>
+      <colDefs>
+        object_id:   1-19
+        mean_V:     21-26
+        ampl_V:     27-32
+        mean_I:     34-39
+        ampl_I:     40-45
+        period:     48-58
+      </colDefs>
+    </columnGrammar>
+    <make table="param_blg_rot">
+      <rowmaker idmaps="*">
+        <LOOP listItems="mean_I mean_V ampl_I ampl_V period">
+          <events>
+            <map dest="\item">parseWithNull(@\item, float, "-")</map>
+          </events>
+        </LOOP>
+        <var name="period_err">None</var>
+      </rowmaker>
+    </make>
+  </data>
+
+<!-- ======================= short_period_ecl  ================================== -->
+<!-- Is this is a subset of ecl? What about lightcurves, are they included in the ecl collection?-->
+
+
+<!-- ======================= RR Lyr ================================== -->
+
+  <table id="ident_blg_rr" onDisk="True" adql="hidden" namePath="ogle/aux#rrlyr_id">
+    <meta name="description">The original table with identification of RR Lyr stars \field collection</meta>
+
+    <LOOP>
+      <codeItems>
+          for col in context.resolveId("ogle/aux#rrlyr_id").columns:
+              yield {'item': col.name}
+      </codeItems>
+      <events>
+            <column original="\item"/>
+      </events>
+    </LOOP>
   </table>
 
   <data id="import_blg_rr">
@@ -707,211 +808,30 @@
     </make>
   </data>
 
-<!-- ======================= Transits ================================== -->
-
-  <table id="ident_blg_transits" onDisk="True" adql="hidden" namePath="ogle/aux#object">
-    <meta name="description">The original table with identification of candidates for transiting
-                   planets \field collection</meta>
-
-    <LOOP listItems="object_id  raj2000 dej2000 ogle4_id ogle3_id ogle2_id
-                     ogle_vartype ssa_targclass subtype ssa_collection ssa_reference">
-      <events>
-        <column original="\item"/>
-      </events>
-    </LOOP>
-    <column original="vsx" description="GCVS or VSX designation"/>
-  </table>
-
-  <data id="import_blg_transits">
-    <sources>data/blg/transits/ident.dat</sources>
-    <columnGrammar>
-      <colDefs>
-        object_id:     1-12
-        alphaHMS:     14-24
-        deltaDMS:     26-36
-        ogle4_id:     38-53
-        ogle3_id:     55-69
-        ogle2_id:     71-85
-        vsx:          87-150
-      </colDefs>
-    </columnGrammar>
-    <make table="ident_blg_transits">
-      <rowmaker idmaps="*">
-        <FEED source="makeCommonRowsIdent"/>
-        <var name="subtype">None</var>
-        <var name="ssa_targclass">"V*,Pl"</var>
-        <var name="ogle_vartype">"Transit"</var>
-        <var name="ssa_collection">"\prefix-TR"</var>
-        <var name="ssa_reference">"\referenceTransits"</var>
-      </rowmaker>
-    </make>
-  </data>
-
-<!-- ########################## Parameters tables ################## -->
-
-<!-- ================================= Param t2cep (Type II Cepheids) ============= -->
-
-  <table id="param_blg_t2cep" onDisk="True" adql="hidden" namePath="ogle/aux#object">
-    <meta name="description">The table from original t2cep.dat from OGLE Type II Cepheids \field collection</meta>
-    <LOOP listItems="object_id mean_I mean_V ampl_I period period_err">
-      <events>
-        <column original="\item"/>
-      </events>
-    </LOOP>
-  </table>
-
-  <data id="import_param_blg_t2cep">
-    <sources>data/blg/t2cep/t2cep.dat</sources>
-    <columnGrammar>
-      <colDefs>
-        object_id:   1-19
-        mean_I:     22-27
-        mean_V:     29-34
-        period:     37-46
-        period_err: 48-56
-        ampl_I:     73-77
-      </colDefs>
-    </columnGrammar>
-    <make table="param_blg_t2cep">
-      <rowmaker idmaps="*">
-        <map dest="mean_I">parseWithNull(@mean_I, float, "-")</map>
-        <map dest="mean_V">parseWithNull(@mean_V, float, "-")</map>
-        <map dest="ampl_I">parseWithNull(@ampl_I, float, "-")</map>
-        <map dest="period">parseWithNull(@period, float, "-")</map>
-        <map dest="period_err">parseWithNull(@period_err, float, "-")</map>
-      </rowmaker>
-    </make>
-  </data>
-
-<!-- =============================== Param HB (heartbeat binary systems) ============ -->
-
-  <table id="param_blg_hb" onDisk="True" adql="hidden" namePath="ogle/aux#object">
-    <meta name="description">The table from original hb.dat from OGLE 
-                         Heartbeat binary systems \field collection</meta>
-    <LOOP listItems="object_id mean_I mean_V ampl_I period period_err">
-      <events>
-        <column original="\item"/>
-      </events>
-    </LOOP>
-  </table>
-
-  <data id="import_param_blg_hb">
-    <sources>data/blg/hb/hb.dat</sources>
-    <columnGrammar>
-      <colDefs>
-        object_id:   1-16
-        mean_I:     18-23
-        mean_V:     25-30
-        period:     32-44
-        ampl_I:     57-61
-      </colDefs>
-    </columnGrammar>
-    <make table="param_blg_hb">
-      <rowmaker idmaps="*">
-        <map dest="mean_I">parseWithNull(@mean_I, float, "-")</map>
-        <map dest="mean_V">parseWithNull(@mean_V, float, "-")</map>
-        <map dest="ampl_I">parseWithNull(@ampl_I, float, "-")</map>
-        <map dest="period">parseWithNull(@period, float, "-")</map>
-        <var name="period_err">None</var>
-      </rowmaker>
-    </make>
-  </data>
-
-<!-- =============================== Param Rot (rotating) ============ -->
-
-  <table id="param_blg_rot" onDisk="True" adql="hidden" namePath="ogle/aux#object">
-    <meta name="description">The table from original rot.dat from OGLE 
-                         Rotating Variables \field collection</meta>
-    <LOOP listItems="object_id mean_I mean_V ampl_I ampl_V period period_err">
-      <events>
-        <column original="\item"/>
-      </events>
-    </LOOP>
-  </table>
-
-  <!-- The format described in the original README is completely incorrect 
-  I've corrected format, but I'm not sure if columns V and I are reversed -->
-  <data id="import_param_blg_rot">
-    <sources>data/blg/rot/rot.dat</sources>
-    <columnGrammar>
-      <colDefs>
-        object_id:   1-19
-        mean_V:     21-26
-        ampl_V:     27-32
-        mean_I:     34-39
-        ampl_I:     40-45
-        period:     48-58
-      </colDefs>
-    </columnGrammar>
-    <make table="param_blg_rot">
-      <rowmaker idmaps="*">
-        <map dest="mean_I">parseWithNull(@mean_I, float, "-")</map>
-        <map dest="mean_V">parseWithNull(@mean_V, float, "-")</map>
-        <map dest="ampl_I">parseWithNull(@ampl_I, float, "-")</map>
-        <map dest="ampl_V">parseWithNull(@ampl_V, float, "-")</map>
-        <map dest="period">parseWithNull(@period, float, "-")</map>
-        <var name="period_err">None</var>
-      </rowmaker>
-    </make>
-  </data>
-
-  <!-- =============== Transits parameters ======================== -->
-
-  <table id="param_blg_transits" onDisk="True" adql="hidden" namePath="ogle/aux#object">
-    <meta name="description">The table from original transits.dat from OGLE
-                catalog of candidates for transiting planets \field</meta>
-    <LOOP listItems="object_id mean_I mean_V period period_err">
-      <events>
-        <column original="\item"/>
-      </events>
-    </LOOP>
-    <column original="ampl_I" description="Transit depth"/>
-  </table>
-
-  <!-- There is an incorrect format description in the README file -->
-  <data id="import_param_blg_transits">
-    <sources>data/blg/transits/transits.dat</sources>
-    <columnGrammar>
-      <colDefs>
-        object_id:   1-12
-        mean_I:     14-19
-        mean_V:     21-26
-        period:     28-38
-        ampl_I:     51-56
-      </colDefs>
-    </columnGrammar>
-    <make table="param_blg_transits">
-      <rowmaker idmaps="*">
-        <map dest="mean_I">parseWithNull(@mean_I, float, "-")</map>
-        <map dest="mean_V">parseWithNull(@mean_V, float, "-")</map>
-        <map dest="ampl_I">parseWithNull(@ampl_I, float, "-")</map>
-        <map dest="period">parseWithNull(@period, float, "-")</map>
-        <var name="period_err">None</var>
-      </rowmaker>
-    </make>
-  </data>
-
   <!-- =============== RR Lyr parameters ======================== -->
 
-  <LOOP>
+  <LOOP>										<!-- single mode -->
     <csvItems>
       class,   source, subclass
       rr_ab, RRab.dat, RRab
       rr_c,   RRc.dat, first-overtone
-      rr_d,   RRd.dat, double-mode
-      arr_d, aRRd.dat, anomalous-RRd
     </csvItems>
     <events>
-      <table id="param_blg_\class" onDisk="True" adql="hidden" namePath="ogle/aux#object">
-        <meta name="description">The table from the base of original \source 
-                  with parameters of \subclass stars
+      <table id="param_blg_\class" onDisk="True" adql="hidden" namePath="ogle/aux#rrlyr_p">
+        <meta name="description">The table from the base of original \source \
+                  with parameters of \subclass stars \
                   from OGLE RR Lyr \\field collection</meta>
-        <LOOP listItems="object_id mean_I mean_V ampl_I period period_err">
+        <LOOP>
+          <codeItems>
+              for col in context.resolveId("ogle/aux#rrlyr_p").columns:
+                yield {'item': col.name}
+          </codeItems>
           <events>
-            <column original="\item"/>
+                <column original="\item"/>
           </events>
         </LOOP>
       </table>
+
       <data id="import_blg_\class">
         <sources>data/blg/rrlyr/\source</sources>
         <columnGrammar>
@@ -936,5 +856,227 @@
     </events>
   </LOOP>
 
+  <LOOP>									<!-- double mode -->
+    <csvItems>
+      class,   source, subclass
+      rr_d,   RRd.dat, double-mode
+      arr_d, aRRd.dat, anomalous-RRd
+    </csvItems>
+    <events>
+      <table id="param_blg_\class" onDisk="True" adql="hidden" namePath="ogle/aux#rrlyr_p">
+        <meta name="description">The table from the base of original \source \
+                  with parameters of \subclass stars \
+                  from OGLE RR Lyr \\field collection</meta>
+        <LOOP>
+          <codeItems>
+              for col in context.resolveId("ogle/aux#rrlyr_p").columns:
+                yield {'item': col.name}
+          </codeItems>
+          <events>
+                <column original="\item"/>
+          </events>
+        </LOOP>
+      </table>
+
+      <data id="import_blg_\class">
+        <sources>data/blg/rrlyr/\source</sources>
+        <columnGrammar>
+          <colDefs>
+            object_id:   1-20
+            mean_I:     23-28
+            mean_V:     30-35
+            period1:     38-47
+            period1_err: 49-58
+            ampl_I:     73-77
+            period:     106-115
+            period_err: 117-126
+            epoch:      129-138
+          </colDefs>
+        </columnGrammar>
+        <make table="param_blg_\class">
+          <rowmaker idmaps="*">
+            <LOOP listItems="mean_I mean_V ampl_I period period_err period1 period1_err">
+              <events>
+                <map dest="\item">parseWithNull(@\item, float, "-")</map>
+              </events>
+            </LOOP>
+            <map dest="epoch">float(@epoch)+49999.5</map>
+          </rowmaker>
+        </make>
+      </data>
+    </events>
+  </LOOP>
+
+<!-- ======================= t2cep (Type II Cepheids) ================================== -->
+
+  <macDef name="class_desc">Type II Cepheids</macDef>
+
+  <table id="ident_blg_t2cep" onDisk="True" adql="hidden" namePath="ogle/aux#t2cep_id">
+    <meta name="description">The original table with identifications of \class_desc \field</meta>
+
+    <LOOP>
+      <codeItems>
+         for col in context.resolveId("ogle/aux#t2cep_id").columns:
+           yield {'item': col.name}
+      </codeItems>
+      <events>
+        <column original="\item"/>
+      </events>
+    </LOOP>
+  </table>
+
+  <data id="import_blg_t2cep">
+    <sources>data/blg/t2cep/ident.dat</sources>
+    <columnGrammar>
+      <colDefs>
+        object_id:     1-19
+	    subtype:      22-26
+        alphaHMS:     29-39
+        deltaDMS:     41-51
+        ogle4_id:     54-69
+        ogle3_id:     71-85
+        ogle2_id:     87-101
+        vsx:         103-150
+      </colDefs>
+    </columnGrammar>
+    <make table="ident_blg_t2cep">
+      <rowmaker idmaps="*">
+        <FEED source="makeCommonRowsIdent"/>
+        <map dest="subtype">parseWithNull(@subtype, str, "")</map>
+        <var name="ogle_vartype">"T2Cep"</var>
+        <var name="ssa_targclass">"WV*"</var>
+        <var name="ssa_collection">"\prefix-T2CEP"</var>
+        <var name="ssa_reference">"\referenceT2Cep"</var>
+      </rowmaker>
+    </make>
+  </data>
+
+<!-- ================================= Param t2cep (Type II Cepheids) ============= -->
+
+  <table id="param_blg_t2cep" onDisk="True" adql="hidden" namePath="ogle/aux#t2cep_p">
+    <meta name="description">The table from original t2cep.dat from OGLE Type II Cepheids \field collection</meta>
+    <LOOP>
+      <codeItems>
+          for col in context.resolveId("ogle/aux#t2cep_p").columns:
+              yield {'item': col.name}
+      </codeItems>
+      <events>
+            <column original="\item"/>
+      </events>
+    </LOOP>
+  </table>
+
+  <data id="import_param_blg_t2cep">
+    <sources>data/blg/t2cep/t2cep.dat</sources>
+    <columnGrammar>
+      <colDefs>
+        object_id:   1-19
+        mean_I:     22-27
+        mean_V:     29-34
+        period:     37-46
+        period_err: 48-56
+        epoch:      59-70
+        ampl_I:     73-77
+      </colDefs>
+    </columnGrammar>
+    <make table="param_blg_t2cep">
+      <rowmaker idmaps="*">
+        <LOOP listItems="mean_I mean_V ampl_I period period_err">
+          <events>
+            <map dest="\item">parseWithNull(@\item, float, "-")</map>
+          </events>
+        </LOOP>
+        <map dest="epoch">float(@epoch)-JD_MJD</map>
+      </rowmaker>
+    </make>
+  </data>
+
+<!-- ======================= Transits ================================== -->
+
+  <table id="ident_blg_transit" onDisk="True" adql="hidden" namePath="ogle/aux#transit_id">
+    <meta name="description">The original table with identification of candidates for transiting \
+                   planets \field collection</meta>
+
+    <LOOP>
+      <codeItems>
+         for col in context.resolveId("ogle/aux#transit_id").columns:
+           yield {'item': col.name}
+      </codeItems>
+      <events>
+        <column original="\item"/>
+      </events>
+    </LOOP>
+  </table>
+
+  <data id="import_blg_transits">
+    <sources>data/blg/transits/ident.dat</sources>
+    <columnGrammar>
+      <colDefs>
+        object_id:     1-12
+        alphaHMS:     14-24
+        deltaDMS:     26-36
+        ogle4_id:     38-53
+        ogle3_id:     55-69
+        ogle2_id:     71-85
+        vsx:          87-150
+      </colDefs>
+    </columnGrammar>
+    <make table="ident_blg_transit">
+      <rowmaker idmaps="*">
+        <FEED source="makeCommonRowsIdent"/>
+        <var name="subtype">None</var>
+        <var name="ssa_targclass">"V*,Pl"</var>
+        <var name="ogle_vartype">"Transit"</var>
+        <var name="ssa_collection">"\prefix-TR"</var>
+        <var name="ssa_reference">"\referenceTransits"</var>
+      </rowmaker>
+    </make>
+  </data>
+
+  <!-- =============== Transits parameters ======================== -->
+
+  <table id="param_blg_transit" onDisk="True" adql="hidden" namePath="ogle/aux#transit_p">
+    <meta name="description">The table from original transits.dat from OGLE \
+                catalog of candidates for transiting planets \field</meta>
+
+    <LOOP>
+      <codeItems>
+          for col in context.resolveId("ogle/aux#transit_p").columns:
+              yield {'item': col.name}
+      </codeItems>
+      <events>
+            <column original="\item"/>
+      </events>
+    </LOOP>
+  </table>
+
+  <!-- There is an incorrect format description in the README file -->
+  <data id="import_param_blg_transit">
+    <sources>data/blg/transits/transits.dat</sources>
+    <columnGrammar>
+      <colDefs>
+        object_id:    1-12
+        mean_I:      14-19
+        mean_V:      21-26
+        period:      28-38
+        epoch:       40-49
+        duration:    51-56
+        depth:       58-65
+        probability: 67-71
+        snr:         73-78
+      </colDefs>
+    </columnGrammar>
+    <make table="param_blg_transit">
+      <rowmaker idmaps="*">
+        <LOOP listItems="mean_I mean_V period duration depth probability snr">
+          <events>
+            <map dest="\item">parseWithNull(@\item, float, "-")</map>
+          </events>
+        </LOOP>
+        <var name="period_err">None</var>
+        <map dest="epoch">float(@epoch)+49999.5</map>
+      </rowmaker>
+    </make>
+  </data>
 
 </resource>

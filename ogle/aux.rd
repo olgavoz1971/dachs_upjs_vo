@@ -61,6 +61,10 @@
       required="False">
     </column>
 
+    <column original="//ssap#instance.ssa_targclass"/>
+    <column original="//ssap#instance.ssa_collection"/>
+    <column original="//ssap#instance.ssa_reference"/>
+
     <column name="mean_I" type="real"
       ucd="phot.mag"
       unit="mag"
@@ -109,20 +113,19 @@
       tablehead="Epoch"
       description="Time of maximum brightness; mjd (HJD)"
       required="False"/>
-
-    <column original="//ssap#instance.ssa_targclass"/>
-    <column original="//ssap#instance.ssa_collection"/>
-    <column original="//ssap#instance.ssa_reference"/>
-
   </table>
 
-  <table id="cepheid" onDisk="False" namePath="object">					<!-- Cepheid -->
-    <meta name="description">Columns relevant for the Cepheid object tables</meta>
-    <LOOP listItems="object_id raj2000 dej2000 ogle4_id ogle3_id ogle2_id vsx
-                     ogle_vartype ssa_targclass ssa_collection ssa_reference
-                     mean_I mean_V ampl_I period period_err epoch">
+  <macDef name="object_id_columns">
+          object_id raj2000 dej2000 ogle4_id ogle3_id ogle2_id vsx 
+          ogle_vartype ssa_targclass ssa_collection ssa_reference  
+  </macDef>
+
+  <table id="cepheid_id" onDisk="False">								<!-- Cepheid id -->
+    <meta name="description">Columns relevant for the Cepheid ident tables</meta>
+
+    <LOOP listItems="\object_id_columns">
       <events>
-        <column original="\item"/>
+        <column original="object.\item"/>
       </events>
     </LOOP>
 
@@ -132,7 +135,18 @@
                    overtone, o2-second, etc"
       required="False">
     </column>
-    <column original="period" description="Period (longest)"/>
+  </table>
+
+  <table id="cepheid_p" onDisk="False" namePath="object">				<!-- Cepheid param -->
+    <meta name="description">Columns relevant for the Cepheid parameters tables</meta>
+    
+    <LOOP listItems="object_id mean_I mean_V ampl_I period_err epoch">
+      <events>
+        <column original="\item"/>
+      </events>
+    </LOOP>
+    <column original="object.period" description="Period (longest)"/>
+
     <column name="period_short" type="double precision"
       ucd="src.var;time.period"
       unit="d"
@@ -162,17 +176,27 @@
       required="False"/>
   </table>
 
-  <table id="dsct" onDisk="False" namePath="object">					<!-- d Sct -->
-    <meta name="description">Columns relevant for the Delta Sct object tables</meta>
-    <LOOP listItems="object_id raj2000 dej2000 ogle4_id ogle3_id ogle2_id vsx
-                     ogle_vartype ssa_targclass ssa_collection ssa_reference
-                     mean_I mean_V ampl_I period period_err epoch">
+  <table id="dsct_id" onDisk="False" namePath="object">					<!-- d Sct id -->
+    <meta name="description">Columns relevant for the Delta Sct ident  tables</meta>
+
+    <LOOP listItems="\object_id_columns">
       <events>
         <column original="\item"/>
       </events>
     </LOOP>
 
     <column original="subtype" description="singlemode, multimode"/>
+  </table>
+
+  <table id="dsct_p" onDisk="False" namePath="object">					<!-- d Sct param-->
+    <meta name="description">Columns relevant for the Delta Sct object parameters tables</meta>
+   
+    <LOOP listItems="object_id mean_I mean_V ampl_I period_err epoch">
+      <events>
+        <column original="\item"/>
+      </events>
+    </LOOP>
+
     <column original="period" description="Primary period"/>
     <column name="period2" type="double precision"
       ucd="src.var;time.period"
@@ -203,29 +227,33 @@
       required="False"/>
   </table>
 
-  <table id="mira" onDisk="False" namePath="object">					<!-- LPV -->
-    <meta name="description">Columns relevant for the Mira (LPV) object tables</meta>
-    <LOOP listItems="object_id raj2000 dej2000 ogle4_id ogle3_id ogle2_id vsx
-                     ogle_vartype ssa_targclass ssa_collection ssa_reference
-                     mean_I mean_V ampl_I period period_err">
+  <table id="ecl_id" onDisk="False" namePath="object">							<!-- Ecl ID-->
+    <meta name="description">Columns relevant for the Eclipsing and Ellipsoidal Binary Systems ident tables</meta>
+    <LOOP listItems="\object_id_columns">
       <events>
         <column original="\item"/>
       </events>
     </LOOP>
+
+    <LOOP listItems="object_id raj2000 dej2000 ogle4_id ogle3_id ogle2_id vsx
+                     ogle_vartype ssa_targclass ssa_collection ssa_reference">
+      <events>
+        <column original="\item"/>
+      </events>
+    </LOOP>
+    <column original="subtype" tablehead="Subtype" description="C(contact), NC(non-contact), \
+                                   CV(cataclysmic), ELL(ellipsoidal)"/>
   </table>
 
-  <table id="ecl" onDisk="False" namePath="object">					<!-- Ecl -->
-    <meta name="description">Columns relevant for the Eclipsing and Ellipsoidal Binary Systems tables</meta>
-    <LOOP listItems="object_id raj2000 dej2000 ogle4_id ogle3_id ogle2_id vsx
-                     ogle_vartype ssa_targclass subtype ssa_collection ssa_reference
-                     period_err">
-      <events>
-        <column original="\item"/>
-      </events>
-    </LOOP>
+  <table id="ecl_p" onDisk="False" namePath="object">							<!-- Ecl param -->
+    <meta name="description">Columns relevant for the Eclipsing and \
+                                 Ellipsoidal Binary Systems parameters tables</meta>
+
+    <column original="object_id"/>
     <column original="mean_I" tablehead="I at max" description="I-band magnitude at the maximum light"/>
     <column original="mean_V" tablehead="V at max" description="V-band magnitude at the maximum light"/>
     <column original="period" description="Orbital period"/>
+    <column original="period_err"/>
     <column original="epoch" description="Epoch of of the primary eclipse, MJD"/>
 
     <column name="depth1" type="double precision"
@@ -241,7 +269,202 @@
       tablehead="Depth 2"
       description="Depth of the secondary eclipse"
       required="False"/>
+  </table>
 
+  <table id="hb_id" onDisk="False" namePath="object">					<!-- HB ID -->
+    <meta name="description">Columns relevant for the HB ident tables</meta>
+
+    <LOOP listItems="\object_id_columns">
+      <events>
+        <column original="\item"/>
+      </events>
+    </LOOP>
+    <column original="subtype" description="RG(system with red giant star) \
+                     MS(system with a (post)main-sequence star)"/>
+
+  </table>
+
+  <table id="hb_p" onDisk="False" namePath="object">					<!-- HB param -->
+    <meta name="description">Columns relevant for the HB object parameters tables</meta>
+    <LOOP listItems="object_id mean_I mean_V ampl_I period period_err">
+      <events>
+        <column original="\item"/>
+      </events>
+    </LOOP>
+    <column original="period" description="Orbital period"/>
+    <column original="epoch" description="Epoch of the periastron passage"/>
+
+    <column name="ecc" type="real"
+      ucd="src.orbital.eccentricity"
+      unit="deg"
+      tablehead="Eccentricity"
+      description="Orbital eccentricity"
+      required="False"/>
+
+    <column name="incl" type="real"
+      ucd="src.orbital.inclination"
+      unit="deg"
+      tablehead="Inclination"
+      description="Orbital inclination"
+      required="False"/>
+
+    <column name="omega" type="real"
+      ucd="src.orbital.periastron"
+      unit="deg"
+      tablehead="Omega"
+      description="Argument of periastron"
+      required="False"/>
+
+    <column name="add_var" type="text" 
+      ucd="meta.code.class"
+      tablehead="Additional variability" verbLevel="15"
+      description="ECL(eclipses or spots), OSARG(Small Ampl RG oscillations),\
+                   TEO(Tidally-excited oscillations), MISC(miscalloues)"
+      required="False"/>
+  </table>
+
+  <table id="mira_id" onDisk="False" namePath="object">					<!-- LPV ID -->
+    <meta name="description">Columns relevant for the Mira (LPV) ident tables</meta>
+
+    <LOOP listItems="\object_id_columns">
+      <events>
+        <column original="\item"/>
+      </events>
+    </LOOP>
+
+  </table>
+
+  <table id="mira_p" onDisk="False" namePath="object">					<!-- LPV param -->
+    <meta name="description">Columns relevant for the Mira (LPV) object parameters tables</meta>
+    <LOOP listItems="object_id mean_I mean_V ampl_I period period_err">
+      <events>
+        <column original="\item"/>
+      </events>
+    </LOOP>
+  </table>
+
+  <table id="rot_id" onDisk="False" namePath="object">					<!-- ROT id -->
+    <meta name="description">Columns relevant for the Rotating Variables ident  tables</meta>
+    <LOOP listItems="\object_id_columns">
+      <events>
+        <column original="\item"/>
+      </events>
+    </LOOP>
+  </table>
+
+  <table id="rot_p" onDisk="False" namePath="object">					<!-- ROT param-->
+    <meta name="description">Columns relevant for the Rotating Variables parameters tables</meta>
+   
+    <LOOP listItems="object_id mean_I mean_V ampl_I ampl_V period period_err">
+      <events>
+        <column original="\item"/>
+      </events>
+    </LOOP>
+  </table>
+
+  <table id="rrlyr_id" onDisk="False" namePath="object">					<!-- RR Lyr id -->
+    <meta name="description">Columns relevant for the RR Lyr ident  tables</meta>
+    <LOOP listItems="\object_id_columns">
+      <events>
+        <column original="\item"/>
+      </events>
+    </LOOP>
+    <column original="subtype"/>
+  </table>
+
+  <table id="rrlyr_p" onDisk="False" namePath="object">					<!-- RR Lyr param-->
+    <meta name="description">Columns relevant for the RR Lyr parameters tables</meta>
+
+    <LOOP listItems="object_id mean_I mean_V ampl_I period period_err epoch">
+      <events>
+        <column original="\item"/>
+      </events>
+    </LOOP>
+    <column original="period" description="Fundamental mode period"/>
+    <column name="period1" type="double precision"
+      ucd="src.var;time.period"
+      unit="d"
+      tablehead="o1 period"
+      description="First-overtone period"
+      required="False"/>
+
+    <column name="period1_err" type="double precision"
+      ucd="src.var;time.period"
+      unit="d"
+      tablehead="o1 period_err"
+      description="Uncertainty of the first-overtone period"
+      required="False"/>
+
+  </table>
+
+  <table id="t2cep_id" onDisk="False" namePath="object">					<!-- t2cep id -->
+    <meta name="description">Columns relevant for the Type II Cepheids ident  tables</meta>
+    <LOOP listItems="\object_id_columns">
+      <events>
+        <column original="\item"/>
+      </events>
+    </LOOP>
+    <column original="subtype"/>
+  </table>
+
+  <table id="t2cep_p" onDisk="False" namePath="object">					<!-- t2cep param-->
+    <meta name="description">Columns relevant for the Type II Cepheids parameters tables</meta>
+   
+    <LOOP listItems="object_id mean_I mean_V ampl_I period period_err epoch">
+      <events>
+        <column original="\item"/>
+      </events>
+    </LOOP>
+  </table>
+
+  <table id="transit_id" onDisk="False" namePath="object">					<!-- transit id -->
+    <meta name="description">Columns relevant for the candidates for transiting planets ident  tables</meta>
+    <LOOP listItems="\object_id_columns">
+      <events>
+        <column original="\item"/>
+      </events>
+    </LOOP>
+  </table>
+
+  <table id="transit_p" onDisk="False" namePath="object">					<!-- transit param-->
+    <meta name="description">Columns relevant for the candidates for transiting planets parameters tables</meta>
+   
+    <LOOP listItems="object_id mean_I mean_V ampl_I period_err">
+      <events>
+        <column original="\item"/>
+      </events>
+    </LOOP>
+    <column original="period" description="Orbital period"/>
+    <column original="epoch" description="Time of inferior conjunction (transit)"/>
+
+    <column name="duration"
+      type="real"
+      ucd="time.duration"
+      unit="d"
+      tablehead="Duration"
+      description="Duration of transit from 1st contact to 4th contact"
+      required="False"/>
+
+    <column name="depth"
+      type="real"
+      ucd="src.var.amplitude"
+      tablehead="Depth"
+      description="Transit depth"
+      required="False"/>
+
+    <column name="probability"
+      type="real"
+      ucd="stat.probability"
+      tablehead="Probability"
+      description="Probability(planet signal)"
+      required="False"/>
+
+    <column name="snr"
+      type="real"
+      ucd="stat.snr"
+      tablehead="SNR"
+      description="Signal-to-noise ratio"
+      required="False"/>
   </table>
 
 <!-- ============ lightcurve ================= -->
