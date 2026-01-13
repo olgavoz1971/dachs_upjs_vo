@@ -66,176 +66,6 @@
       ]]></code>
   </job></execute>
 
-<!-- ======================= United Objects View ============================= -->
-
-  <macDef name="objects_description">
-    This table is a unified catalogue of objects from the OGLE Collection of Variable Star Light Curves.
-    It was constructed by merging variable-type–specific ident.dat tables with selected columns 
-    from tables containing parameters: cep.dat, cepF.dat, cep1O.dat, cepF1O.dat, cep1O2O.dat, cep1O2O3O.dat, 
-    cep2O3O.dat, Miras.dat, and others.
-
-    The corresponding light curves can be discovered via TAP through the ts_ssa or obscore tables, 
-    or through the SSA service. Light curves can be extracted using the associated DataLink services.
-  </macDef>
-
-  <macDef name="object_common_cols">
-    object_id, raj2000, dej2000, period, period_err, ampl_I, mean_I, mean_V, ssa_targclass,
-    ogle_vartype, ssa_reference, ssa_collection
-  </macDef>
-
-  <macDef name="param_common_cols">
-    object_id, period, period_err, ampl_I, mean_I, mean_V
-  </macDef>
-
-
-<!-- Supposed to be serviced by scs -->
-<!-- Check uniqueness of object_id in the Regression test 
-     select object_id, count(*) AS n
-       from ogle.objects_all
-       group by object_id
-       having count(*) > 1;
--->
-  <table id="objects_all" adql="True" onDisk="True"
-         mixin="//scs#pgs-pos-index" namePath="ogle/aux#object">
-
-    <meta name="table-rank">100</meta>
-    <meta name="description">
-      \objects_description
-     </meta>
-
-    <index columns="object_id"/>
-    <index columns="ssa_collection"/>
-
-    <stc>
-      Position ICRS "raj2000" "dej2000"
-    </stc>
-
-    <LOOP listItems="object_id raj2000 dej2000 period period_err ampl_I
-               mean_I mean_V vsx ssa_targclass ogle_vartype subtype ssa_reference ssa_collection">
-      <events>
-        <column original="\item"/>
-      </events>
-    </LOOP>
-
-    <viewStatement>
-      CREATE MATERIALIZED VIEW \curtable AS (
-        SELECT \colNames FROM (
-          WITH 
-            param_blg_cep_all AS (													-- blg cep
-              SELECT \param_common_cols FROM \schema.param_blg_cep_cepf
-              UNION ALL
-              SELECT \param_common_cols FROM \schema.param_blg_cep_cepf1o
-              UNION ALL
-              SELECT \param_common_cols FROM \schema.param_blg_cep_cep1o
-              UNION ALL
-              SELECT \param_common_cols FROM \schema.param_blg_cep_cep1o2o
-              UNION ALL
-              SELECT \param_common_cols FROM \schema.param_blg_cep_cep1o2o3o
-              UNION ALL
-              SELECT \param_common_cols FROM \schema.param_blg_cep_cep2o3o
-            ),
-            param_blg_rr_all AS (													-- blg rrlyr
-              SELECT \param_common_cols FROM \schema.param_blg_rr_ab
-              UNION ALL
-              SELECT \param_common_cols FROM \schema.param_blg_rr_c
-              UNION ALL
-              SELECT \param_common_cols FROM \schema.param_blg_rr_d
-              UNION ALL
-              SELECT \param_common_cols FROM \schema.param_blg_arr_d
-            ),
-            param_blg_ecl_all AS (													-- blg ecl
-              SELECT \param_common_cols FROM \schema.param_blg_ecl
-              UNION ALL
-              SELECT \param_common_cols FROM \schema.param_blg_ell
-            )
-          SELECT \object_common_cols, vsx, pulse_mode AS subtype					-- blg cep
-          FROM \schema.ident_blg_cep
-          LEFT JOIN param_blg_cep_all USING (object_id)
-        UNION ALL
-          SELECT \object_common_cols, vsx, subtype									-- blg rrlyr
-          FROM \schema.ident_blg_rr
-          LEFT JOIN param_blg_rr_all USING (object_id)
-        UNION ALL
-          SELECT \object_common_cols, vsx, subtype									-- blg ecl
-          FROM \schema.ident_blg_ecl
-          LEFT JOIN param_blg_ecl_all USING (object_id)
-        UNION ALL
-          SELECT \object_common_cols, vsx, NULL AS subtype							-- blg lpv
-          FROM \schema.ident_blg_lpv
-          LEFT JOIN \schema.param_blg_lpv USING (object_id)
-        UNION ALL
-          SELECT \object_common_cols, vsx, subtype									-- blg dsct
-          FROM \schema.ident_blg_dsct
-          LEFT JOIN \schema.param_blg_dsct USING (object_id)
-        UNION ALL
-          SELECT \object_common_cols, vsx, subtype									-- blg t2cep
-          FROM \schema.ident_blg_t2cep
-          LEFT JOIN \schema.param_blg_t2cep USING (object_id)
-        UNION ALL
-          SELECT \object_common_cols, vsx, subtype									-- blg hb
-          FROM \schema.ident_blg_hb
-          LEFT JOIN \schema.param_blg_hb USING (object_id)
-        UNION ALL
-          SELECT \object_common_cols, vsx, subtype									-- blg rot 
-          FROM \schema.ident_blg_rot
-          LEFT JOIN \schema.param_blg_rot USING (object_id)
-        UNION ALL
-          SELECT \object_common_cols, vsx, subtype									-- blg transits
-          FROM \schema.ident_blg_transits
-          LEFT JOIN \schema.param_blg_transits USING (object_id)
-        UNION ALL
-          SELECT \object_common_cols, NULL AS vsx, NULL AS subtype					-- misc m54
-          FROM \schema.m54
-        ) AS all_objects)           
-
-    </viewStatement>
-  </table>
-
-  <data id="create-objects_all-view">
-    <make table="objects_all"/>
-  </data>
-
-<!--
-  <coverage>   
-    <updater spaceTable="objects_all"/>
-    <spatial/>
-  </coverage>
--->
-
-<!--   Cone Search  -->
-  <service id="ogle-objects" allowed="form,scs.xml">
-    <publish render="scs.xml" sets="ivo_managed"/>
-    <publish render="form" sets="local,ivo_managed"/>
-
-    <meta name="shortName">All OGLE Objects</meta>
-    <meta name="title">OGLE objects Cone Search</meta>
-    <meta name="description">
-      \objects_description
-    </meta>
-    <meta name="_related" title="OGLE Varable Stars Time series"
-            >\internallink{\rdId/ts-web/info}
-    </meta>
-
-    <meta>
-      testQuery.ra: 263.562625
-      testQuery.dec: -27.398250
-      testQuery.sr:   0.0001
-    </meta>
-
-    <scsCore queriedTable="objects_all">
-      <FEED source="//scs#coreDescs"/>
-        <condDesc buildFrom="mean_I"/>
-        <condDesc buildFrom="mean_V"/>
-        <condDesc buildFrom="period"/>
-        <condDesc buildFrom="vsx"/>
-        <condDesc>
-          <inputKey original="vsx">
-            <values fromdb="vsx from \schema.objects_all"/>
-          </inputKey>
-        </condDesc>
-    </scsCore>
-  </service>
-
 <!--   =========================== raw_data ======================== -->
 
   <table id="raw_data" onDisk="True" adql="True"
@@ -304,7 +134,7 @@
         verbLevel="1"
         required="False"/>   <!-- And this column is worth showing to users -->
 
-    <column original="objects_all.period" name="p_period"/>
+    <column original="ogle/o#objects_all.period" name="p_period"/>
 
     <!-- ssap#fill-plainlocation mixin converts rd,dec into ssa_location
       (spoint) and ssa_region, but do not forget add aperture 
@@ -400,6 +230,7 @@
       ssa_creator="'OGLE Team'"
       ssa_csysName="'ICRS'"
       ssa_datasource="'survey'"
+      ssa_targetpos="NULL"
     >//ssap#view</mixin>
     
     <mixin
