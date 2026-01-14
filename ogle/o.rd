@@ -44,6 +44,61 @@
     ogle_vartype, ssa_reference, ssa_collection
   </macDef>
 
+<!-- ======================= All Anomalous Cepheids ============================= -->
+
+  <macDef name="param_acepheid_common_cols">
+    object_id, epoch, period, period_err, ampl_I, mean_I, mean_V
+  </macDef>
+
+  <table id="acepheids" adql="True" onDisk="True">
+
+    <meta name="table-rank">150</meta>
+    <meta name="description" format="rst">
+      Coordinates and variability parameters of all Anomalous Cepheids from the OGLE Variable Star Collection.
+      The table was constructed by merging all A.Cepheid-related data from all OGLE fields, such as GD, LMC, and SMC.
+    </meta>
+
+    <!-- Pull all columns from the prototype tables: -->
+    <LOOP>
+       <codeItems>
+         for col in context.resolveId("ogle/aux#acepheid_id").columns:
+           yield {'item': col.name}
+       </codeItems>
+       <events>
+         <column original="ogle/aux#acepheid_id.\item"/>
+       </events>
+    </LOOP>
+    <LOOP>			<!-- I duplicate there obs_id columns, but seems DaCHS handles this correctly -->
+       <codeItems>
+         for col in context.resolveId("ogle/aux#acepheid_p").columns:
+           yield {'item': col.name}
+       </codeItems>
+       <events>
+         <column original="ogle/aux#acepheid_p.\item"/>
+       </events>
+    </LOOP>
+
+    <index columns="object_id"/>
+    <index columns="ssa_collection"/>
+
+    <viewStatement>
+      CREATE MATERIALIZED VIEW \curtable AS (
+        WITH  param_acep_all AS ( 
+            SELECT * FROM \schema.param_lmc_acep_acepf
+            UNION ALL
+            SELECT * FROM \schema.param_lmc_acep_acep1o
+        )
+        SELECT \colNames FROM \schema.ident_lmc_acep		-- lmc acep
+        LEFT JOIN param_acep_all USING (object_id)
+															-- no acep in blg
+      )
+    </viewStatement>
+  </table>
+
+  <data id="create-acepheids-view">
+    <make table="acepheids"/>
+  </data>
+
 <!-- ======================= All Classical Cepheids ============================= -->
 
   <macDef name="param_cepheid_common_cols">
@@ -86,7 +141,9 @@
     <viewStatement>
       CREATE MATERIALIZED VIEW \curtable AS (
         WITH  param_cep_all AS ( 
-            SELECT * FROM \schema.param_blg_cep_cep1o2o3o
+            SELECT * FROM \schema.param_blg_cep_cepf
+            UNION ALL
+            SELECT * FROM \schema.param_blg_cep_cep1o
             UNION ALL
             SELECT * FROM \schema.param_blg_cep_cepf1o
             UNION ALL
@@ -94,11 +151,31 @@
             UNION ALL
             SELECT * FROM \schema.param_blg_cep_cep2o3o
             UNION ALL
-            SELECT * FROM \schema.param_blg_cep_cepf
+            SELECT * FROM \schema.param_blg_cep_cep1o2o3o
             UNION ALL
-            SELECT * FROM \schema.param_blg_cep_cep1o
+
+            SELECT * FROM \schema.param_lmc_cep_cepf
+            UNION ALL
+            SELECT * FROM \schema.param_lmc_cep_cep1o
+            UNION ALL
+            SELECT * FROM \schema.param_lmc_cep_cep2o
+            UNION ALL
+            SELECT * FROM \schema.param_lmc_cep_cepf1o
+            UNION ALL
+            SELECT * FROM \schema.param_lmc_cep_cep1o2o
+            UNION ALL
+            SELECT * FROM \schema.param_lmc_cep_cep1o3o
+            UNION ALL
+            SELECT * FROM \schema.param_lmc_cep_cep2o3o
+            UNION ALL
+            SELECT * FROM \schema.param_lmc_cep_cepF1o2o
+            UNION ALL
+            SELECT * FROM \schema.param_lmc_cep_cep1o2o3o
         )
         SELECT \colNames FROM \schema.ident_blg_cep
+        LEFT JOIN param_cep_all USING (object_id)
+        UNION ALL
+        SELECT \colNames FROM \schema.ident_lmc_cep
         LEFT JOIN param_cep_all USING (object_id)
       )
     </viewStatement>
@@ -143,9 +220,11 @@
 
     <viewStatement>
       CREATE MATERIALIZED VIEW \curtable AS (
-        SELECT *													-- blg dsct
-        FROM \schema.ident_blg_dsct
+        SELECT * FROM \schema.ident_blg_dsct						-- blg dsct
         LEFT JOIN \schema.param_blg_dsct USING (object_id)
+        UNION ALL
+        SELECT * FROM \schema.ident_lmc_dsct						-- lmc dsct
+        LEFT JOIN \schema.param_lmc_dsct USING (object_id)
       )
     </viewStatement>
   </table>
@@ -162,7 +241,7 @@
     <meta name="description" format="rst">
       Coordinates and variability parameters of all Eclipsing and Ellipsoidal Binary Systems \
       from the OGLE Variable Star Collection. \
-      The table was constructed by merging all Cepheid-related data from all OGLE fields, \
+      The table was constructed by merging all EB-related data from all OGLE fields, \
       such as BLG, GD, LMC, and SMC.
     </meta>
 
@@ -195,8 +274,16 @@
             SELECT * FROM \schema.param_blg_ecl
             UNION ALL
             SELECT * FROM \schema.param_blg_ell
+            UNION ALL
+            SELECT * FROM \schema.param_lmc_ecl
+            UNION ALL
+            SELECT * FROM \schema.param_lmc_ell
+
         )
-        SELECT \colNames FROM \schema.ident_blg_ecl
+        SELECT \colNames FROM \schema.ident_blg_ecl			-- blg ecl
+        LEFT JOIN param_ecl_all USING (object_id)
+        UNION ALL
+        SELECT \colNames FROM \schema.ident_lmc_ecl         -- lmc ecl
         LEFT JOIN param_ecl_all USING (object_id)
       )
     </viewStatement>
@@ -241,9 +328,11 @@
 
     <viewStatement>
       CREATE MATERIALIZED VIEW \curtable AS (
-        SELECT *														-- blg hb
-        FROM \schema.ident_blg_hb
+        SELECT * FROM \schema.ident_blg_hb							-- blg hb
         LEFT JOIN \schema.param_blg_hb USING (object_id)
+        UNION ALL
+        SELECT * FROM \schema.ident_lmc_hb                          -- lmc hb
+        LEFT JOIN \schema.param_lmc_hb USING (object_id)
       )
     </viewStatement>
   </table>
@@ -288,9 +377,9 @@
 
     <viewStatement>
       CREATE MATERIALIZED VIEW \curtable AS (
-        SELECT *													-- blg lpv
-        FROM \schema.ident_blg_lpv
+        SELECT * FROM \schema.ident_blg_lpv							-- blg lpv
         LEFT JOIN \schema.param_blg_lpv USING (object_id)
+																-- no lpv in lmc
       )
     </viewStatement>
   </table>
@@ -335,8 +424,8 @@
     <viewStatement>
       CREATE MATERIALIZED VIEW \curtable AS (
         SELECT *													
-        FROM \schema.ident_blg_rot					-- blg rot
-        LEFT JOIN \schema.param_blg_rot USING (object_id)
+        FROM \schema.ident_blg_rot LEFT JOIN \schema.param_blg_rot USING (object_id)	-- blg rot
+																				-- no rot in lmc
       )
     </viewStatement>
   </table>
@@ -388,8 +477,20 @@
           SELECT * FROM \schema.param_blg_rr_d
           UNION ALL
           SELECT * FROM \schema.param_blg_arr_d
+          UNION ALL
+
+          SELECT * FROM \schema.param_lmc_rr_ab
+          UNION ALL
+          SELECT * FROM \schema.param_lmc_rr_c
+          UNION ALL
+          SELECT * FROM \schema.param_lmc_rr_d
+          UNION ALL
+          SELECT * FROM \schema.param_lmc_arr_d
         )
         SELECT * FROM \schema.ident_blg_rr					-- blg rrlyr
+        LEFT JOIN param_rr_all USING (object_id)
+        UNION ALL
+        SELECT * FROM \schema.ident_lmc_rr					-- lmc rrlyr
         LEFT JOIN param_rr_all USING (object_id)
       )
     </viewStatement>
@@ -434,9 +535,11 @@
 
     <viewStatement>
       CREATE MATERIALIZED VIEW \curtable AS (
-        SELECT *													
-        FROM \schema.ident_blg_t2cep					-- blg t2cep
+        SELECT * FROM \schema.ident_blg_t2cep					-- blg t2cep
         LEFT JOIN \schema.param_blg_t2cep USING (object_id)
+        UNION ALL
+        SELECT * FROM \schema.ident_lmc_t2cep                   -- lmc t2cep
+        LEFT JOIN \schema.param_lmc_t2cep USING (object_id)
       )
     </viewStatement>
   </table>
@@ -479,9 +582,9 @@
 
     <viewStatement>
       CREATE MATERIALIZED VIEW \curtable AS (
-        SELECT *													
-        FROM \schema.ident_blg_transit					-- blg transit
+        SELECT * FROM \schema.ident_blg_transit					-- blg transit
         LEFT JOIN \schema.param_blg_transit USING (object_id)
+					-- not transits in lmc
       )
     </viewStatement>
   </table>

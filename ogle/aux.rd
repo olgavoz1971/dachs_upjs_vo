@@ -120,6 +120,33 @@
           ogle_vartype ssa_targclass ssa_collection ssa_reference  
   </macDef>
 
+  <table id="acepheid_id" onDisk="False">							<!-- Anonalous Cepheid id -->
+    <meta name="description">Columns relevant for the Anomalous Cepheid ident tables</meta>
+
+    <LOOP listItems="\object_id_columns">
+      <events>
+        <column original="object.\item"/>
+      </events>
+    </LOOP>
+
+    <column name="pulse_mode" type="text" ucd="meta.code.class"
+      tablehead="Pulsation Mode" verbLevel="15"
+      description="Cepheid Mode(s) of pulsation: F-fundamental, o1-first \
+                   overtone, o2-second, etc"
+      required="False">
+    </column>
+  </table>
+
+  <table id="acepheid_p" onDisk="False" namePath="object">			<!-- Anomalous Cepheid param -->
+    <meta name="description">Columns relevant for the Anomalous Cepheid parameters tables</meta>
+    
+    <LOOP listItems="object_id mean_I mean_V ampl_I period period_err epoch">
+      <events>
+        <column original="\item"/>
+      </events>
+    </LOOP>
+  </table>
+
   <table id="cepheid_id" onDisk="False">								<!-- Cepheid id -->
     <meta name="description">Columns relevant for the Cepheid ident tables</meta>
 
