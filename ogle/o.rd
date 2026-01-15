@@ -645,28 +645,31 @@
 
     <viewStatement>
       CREATE MATERIALIZED VIEW \curtable AS (
-        SELECT \common_cols, ampl_I, pulse_mode AS subtype					-- blg cep
+        SELECT \common_cols, ampl_I, pulse_mode AS subtype					--acep
+          FROM \schema.acepheids
+        UNION ALL
+        SELECT \common_cols, ampl_I, pulse_mode AS subtype					-- cep
           FROM \schema.cepheids
         UNION ALL
-          SELECT \common_cols, ampl_I, subtype								-- blg dsct
+          SELECT \common_cols, ampl_I, subtype								-- dsct
           FROM \schema.dsct
         UNION ALL
-          SELECT \common_cols, depth1 AS ampl_I, subtype					-- blg ecl
+          SELECT \common_cols, depth1 AS ampl_I, subtype					-- ecl
           FROM \schema.eclipsing
         UNION ALL
-          SELECT \common_cols, ampl_I, subtype								-- blg hb
+          SELECT \common_cols, ampl_I, subtype								-- hb
           FROM \schema.heartbeat
         UNION ALL
-          SELECT \common_cols, ampl_I, NULL AS subtype						-- blg lpv
+          SELECT \common_cols, ampl_I, NULL AS subtype						-- lpv
           FROM \schema.miras
         UNION ALL
-          SELECT \common_cols, ampl_I, NULL AS subtype						-- blg rot 
+          SELECT \common_cols, ampl_I, NULL AS subtype						-- rot 
           FROM \schema.rotating
         UNION ALL
-          SELECT \common_cols, ampl_I, subtype								-- blg rrlyr
+          SELECT \common_cols, ampl_I, subtype								-- rrlyr
           FROM \schema.rrlyr
         UNION ALL
-          SELECT \common_cols, ampl_I, subtype								-- blg t2cep
+          SELECT \common_cols, ampl_I, subtype								-- t2cep
           FROM \schema.t2cep
         UNION ALL
           SELECT \common_cols, ampl_I, NULL AS subtype						-- blg transits

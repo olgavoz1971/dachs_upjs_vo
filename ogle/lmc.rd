@@ -6,19 +6,14 @@
   <macDef name="prefix">OGLE-LMC</macDef>
 
 <!-- Assign each collection its own ssa_reference --> 
-  <macDef name="referenceDefault">TBD2015AcA....65....1U</macDef>
-  <macDef name="referenceACep">TBD2017AcA....67..297S</macDef>
-  <macDef name="referenceCep">TBD2017AcA....67..297S</macDef>
-  <macDef name="referenceLPV">TBD2022ApJS..260...46I</macDef>
-  <macDef name="referenceRRLyr">TBD2014AcA....64..177S</macDef>
-  <macDef name="referenceDPV">TBD\referenceDefault</macDef>
-  <macDef name="referenceDSct">TBD2020AcA....70..241P</macDef>
-  <macDef name="referenceEcl">TBD2016AcA....66..405S</macDef>
-  <macDef name="referenceHB">TBD2022ApJS..259...16W</macDef>
-  <macDef name="referenceRot">TBD\referenceDefault</macDef>
-  <macDef name="referenceShortEcl">TBD2015AcA....65...39S</macDef>
-  <macDef name="referenceT2Cep">TBD2017AcA....67..297S</macDef>
-  <macDef name="referenceTransits">TBD2023AcA....73..127M</macDef>
+  <macDef name="referenceDefault">2015AcA....65....1U</macDef>
+  <macDef name="referenceACep">2015AcA....65..233S</macDef>
+  <macDef name="referenceCep">2015AcA....65..297S</macDef>
+  <macDef name="referenceRRLyr">2016AcA....66..131S</macDef>
+  <macDef name="referenceDSct">2023AcA....73..105S</macDef>
+  <macDef name="referenceEcl">2024AcA....74..241G</macDef>
+  <macDef name="referenceHB">2022ApJS..259...16W</macDef>
+  <macDef name="referenceT2Cep">2018AcA....68...89S</macDef>
 
   <meta name="title">Original OGLE Variable Stars tables form the \field Collection.</meta>
   <meta name="description" format="rst">

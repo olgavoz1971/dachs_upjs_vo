@@ -62,6 +62,17 @@
 
   <data id="import_lightcurves" updating="True">
 
+    <sources pattern="data/blg/t2cep/phot*/[VI]/*.dat"/>
+    <!-- <sources pattern="data/lmc/acep/phot*/[VI]/*.dat"/> -->
+    <!-- <sources pattern="data/lmc/cep/phot*/[VI]/*.dat"/> -->
+    <!-- <sources pattern="data/lmc/dsct/phot*/[VI]/*.dat"/> -->
+
+    <!-- <sources pattern="data/lmc/ecl/phot*/[VI]/*.dat"/> -->
+    <!-- <sources pattern="data/lmc/hb/phot*/[VI]/*.dat"/>  -->
+    <!-- <sources pattern="data/lmc/rrlyr/phot*/[VI]/*.dat"/> -->
+
+    <!-- <sources pattern="data/lmc/t2cep/phot*/[VI]/*.dat"/> -->
+
     <!-- <sources pattern="data/blg/lpv/phot_ogle2/[VI]/*.dat"/> -->
     <!-- <sources pattern="data/misc/m54/phot/I/*.dat"/> -->
     <!-- <sources pattern="data/blg/rrlyr/phot/I/*.dat"/> -->
@@ -70,8 +81,7 @@
     <!-- <sources pattern="data/blg/rot/phot*/I/*.dat"/> -->
     <!-- <sources pattern="data/blg/cep/phot*/V/*.dat"/> -->
     <!-- <sources pattern="data/blg/ecl/phot*/I/*.dat"/> -->
-    <!-- <sources pattern="data/blg/t2cep/phot*/[VI]/*.dat"/> -->
-    <sources pattern="data/blg/transits/phot*/[VI]/*.dat"/>
+    <!-- <sources pattern="data/blg/transits/phot*/[VI]/*.dat"/> -->
 
     <csvGrammar delimiter=" " strip="True" names="dateobs_jd, magnitude, mag_err"/>
 
@@ -79,7 +89,8 @@
       <rowmaker idmaps="*">
         <!-- OGLE jds come with different "time zero-points" unfortunately -->
         <var name="to_mjd">
-          2400000.5 if ("blg/cep" in \rootlessPath or "blg/rot" in \rootlessPath) else -49999.5
+          2400000.5 if ("blg/cep" in \rootlessPath or "blg/rot" in \rootlessPath or \
+                        "blg/t2cep" in \rootlessPath or "lmc/ecl" in \rootlessPath) else -49999.5
         </var>
         <var name="obs_time">float(@dateobs_jd)-@to_mjd</var>
 
