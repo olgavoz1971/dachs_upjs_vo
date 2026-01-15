@@ -407,6 +407,7 @@
         <column original="\item"/>
       </events>
     </LOOP>
+    <column original="ampl_I" description="I-band amplitude of the fundamental-mode period"/>
     <column original="period" description="Fundamental mode period"/>
     <column name="period1" type="double precision"
       ucd="src.var;time.period"

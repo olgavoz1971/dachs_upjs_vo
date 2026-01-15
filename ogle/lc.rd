@@ -62,7 +62,7 @@
 
   <data id="import_lightcurves" updating="True">
 
-    <sources pattern="data/blg/t2cep/phot*/[VI]/*.dat"/>
+    <sources pattern="data/???/*/phot*/[VI]/*.dat"/>
     <!-- <sources pattern="data/lmc/acep/phot*/[VI]/*.dat"/> -->
     <!-- <sources pattern="data/lmc/cep/phot*/[VI]/*.dat"/> -->
     <!-- <sources pattern="data/lmc/dsct/phot*/[VI]/*.dat"/> -->

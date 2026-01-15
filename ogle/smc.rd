@@ -3,14 +3,14 @@
   <meta name="creationDate">2025-12-21T20:06:30Z</meta>
 
   <macDef name="field">in the Large Magellanic Cloud</macDef>
-  <macDef name="prefix">OGLE-LMC</macDef>
+  <macDef name="prefix">OGLE-SMC</macDef>
 
 <!-- Assign each collection its own ssa_reference --> 
   <macDef name="referenceDefault">2015AcA....65....1U</macDef>
   <macDef name="referenceACep">2015AcA....65..233S</macDef>
   <macDef name="referenceCep">2015AcA....65..297S</macDef>
   <macDef name="referenceRRLyr">2016AcA....66..131S</macDef>
-  <macDef name="referenceDSct">2023AcA....73..105S</macDef>
+  <macDef name="referenceDSct">2022AcA....72..245S</macDef>
   <macDef name="referenceEcl">2024AcA....74..241G</macDef>
   <macDef name="referenceHB">2022ApJS..259...16W</macDef>
   <macDef name="referenceT2Cep">2018AcA....68...89S</macDef>
@@ -73,7 +73,7 @@
 
 <!-- ================================= Anomalous Cepheids ============================== -->
 
-  <table id="ident_lmc_acep" onDisk="True" adql="hidden" namePath="ogle/aux#acepheid_id">
+  <table id="ident_smc_acep" onDisk="True" adql="hidden" namePath="ogle/aux#acepheid_id">
     <meta name="description">The original table with identification of \
                        Anomalous Cepheids \field collection</meta>
 
@@ -89,8 +89,8 @@
     </LOOP>
   </table>
 
-  <data id="import_lmc_acep">
-    <sources>data/lmc/acep/ident.dat</sources>
+  <data id="import_smc_acep">
+    <sources>data/smc/acep/ident.dat</sources>
 
     <columnGrammar>
       <colDefs>
@@ -105,7 +105,7 @@
       </colDefs>
     </columnGrammar>
 
-    <make table="ident_lmc_acep">
+    <make table="ident_smc_acep">
       <rowmaker idmaps="*">
         <FEED source="makeCommonRowsIdent"/>
         <map dest="pulse_mode">parseWithNull(@pulse_mode, str, "")</map>
@@ -127,7 +127,7 @@
       acep1o,         acep1O.dat, first-overtone-(1O)-A.Cepheids
     </csvItems>
     <events>
-      <table id="param_lmc_acep_\class" onDisk="True" adql="hidden" namePath="ogle/aux#acepheid_p">
+      <table id="param_smc_acep_\class" onDisk="True" adql="hidden" namePath="ogle/aux#acepheid_p">
         <meta name="description">The table from the base of original \source with parameters of \subclass \
                 from OGLE Anomalous Cepheids \\field collection</meta>
 
@@ -141,8 +141,8 @@
           </events>
         </LOOP>
       </table>
-      <data id="import_param_lmc_\class">
-        <sources>data/lmc/acep/\source</sources>
+      <data id="import_param_smc_\class">
+        <sources>data/smc/acep/\source</sources>
         <columnGrammar>
           <colDefs>
               object_id:   1-17
@@ -154,7 +154,7 @@
               ampl_I:     68-72
           </colDefs>
         </columnGrammar>
-        <make table="param_lmc_acep_\class">
+        <make table="param_smc_acep_\class">
           <rowmaker idmaps="*">
             <LOOP listItems="mean_I mean_V ampl_I period period_err">
               <events>
@@ -170,7 +170,7 @@
 
 <!-- ================================= Classical Cepheids ============================== -->
 
-  <table id="ident_lmc_cep" onDisk="True" adql="hidden" namePath="ogle/aux#cepheid_id">
+  <table id="ident_smc_cep" onDisk="True" adql="hidden" namePath="ogle/aux#cepheid_id">
     <meta name="description">The original table with identification of \
                        Classical Cepheids \field collection</meta>
 
@@ -186,8 +186,8 @@
     </LOOP>
   </table>
 
-  <data id="import_lmc_cep">
-    <sources>data/lmc/cep/ident.dat</sources>
+  <data id="import_smc_cep">
+    <sources>data/smc/cep/ident.dat</sources>
 
     <columnGrammar>
       <colDefs>
@@ -202,7 +202,7 @@
       </colDefs>
     </columnGrammar>
 
-    <make table="ident_lmc_cep">
+    <make table="ident_smc_cep">
       <rowmaker idmaps="*">
         <FEED source="makeCommonRowsIdent"/>
         <map dest="pulse_mode">parseWithNull(@pulse_mode, str, "")</map>
@@ -225,7 +225,7 @@
       cep2o,         cep2O.dat, second-overtone-(2O)-Cepheids
     </csvItems>
     <events>
-      <table id="param_lmc_cep_\class" onDisk="True" adql="hidden" namePath="ogle/aux#cepheid_p">
+      <table id="param_smc_cep_\class" onDisk="True" adql="hidden" namePath="ogle/aux#cepheid_p">
         <meta name="description">The table from the base of original \source with parameters of \subclass \
                 from OGLE classical Cepheids \\field collection</meta>
 
@@ -239,8 +239,8 @@
           </events>
         </LOOP>
       </table>
-      <data id="import_param_lmc_\class">
-        <sources>data/lmc/cep/\source</sources>
+      <data id="import_param_smc_\class">
+        <sources>data/smc/cep/\source</sources>
         <columnGrammar>
           <colDefs>
               object_id:   1-17
@@ -252,7 +252,7 @@
               ampl_I:     68-73
           </colDefs>
         </columnGrammar>
-        <make table="param_lmc_cep_\class">
+        <make table="param_smc_cep_\class">
           <rowmaker idmaps="*">
             <LOOP listItems="mean_I mean_V ampl_I period period_err">
               <events>
@@ -283,11 +283,9 @@
       class,             source, subclass
       cepf1o,       cepF1O.dat, double-mode-(F/1O)-Cepheids
       cep1o2o,     cep1O2O.dat, double-mode-(1O/2O)-Cepheids
-      cep1o3o,     cep1O3O.dat, double-mode-(1O/3O)-Cepheids
-      cep2o3o,     cep2O3O.dat, double-mode-(2O/30)-Cepheids
     </csvItems>
     <events>
-      <table id="param_lmc_cep_\class" onDisk="True" adql="hidden" namePath="ogle/aux#cepheid_p">
+      <table id="param_smc_cep_\class" onDisk="True" adql="hidden" namePath="ogle/aux#cepheid_p">
         <meta name="description">The table from the base of original \source \
                 with parameters of \subclass \
                 from OGLE classical Cepheids \\field collection</meta>
@@ -301,8 +299,8 @@
           </events>
         </LOOP>
       </table>
-      <data id="import_param_lmc_\class">
-        <sources>data/lmc/cep/\source</sources>
+      <data id="import_param_smc_\class">
+        <sources>data/smc/cep/\source</sources>
         <columnGrammar>
           <colDefs>
               object_id:   1-17
@@ -316,7 +314,7 @@
               period_short_err: 112-120
           </colDefs>
         </columnGrammar>
-        <make table="param_lmc_cep_\class">
+        <make table="param_smc_cep_\class">
           <rowmaker idmaps="*">
             <LOOP listItems="mean_I mean_V ampl_I period period_err period_short period_short_err">
               <events>
@@ -342,11 +340,10 @@
   <LOOP>
     <csvItems>
       class,             source, subclass
-      cepF1o2o, cepF1O2O.dat, triple-mode-(F/2O/30)-Cepheids
       cep1o2o3o, cep1O2O3O.dat, triple-mode-(1O/2O/30)-Cepheids
     </csvItems>
     <events>
-      <table id="param_lmc_cep_\class" onDisk="True" adql="hidden" namePath="ogle/aux#cepheid_p">
+      <table id="param_smc_cep_\class" onDisk="True" adql="hidden" namePath="ogle/aux#cepheid_p">
         <meta name="description">The table from the base of original \source \
                 with parameters of \subclass \
                 from OGLE classical Cepheids \\field collection</meta>
@@ -360,8 +357,8 @@
           </events>
         </LOOP>
       </table>
-      <data id="import_param_lmc_\class">
-        <sources>data/lmc/cep/\source</sources>
+      <data id="import_param_smc_\class">
+        <sources>data/smc/cep/\source</sources>
         <columnGrammar>
           <colDefs>
               object_id:   1-17
@@ -377,7 +374,7 @@
               period_short_err: 178-186
           </colDefs>
         </columnGrammar>
-        <make table="param_lmc_cep_\class">
+        <make table="param_smc_cep_\class">
           <rowmaker idmaps="*">
             <LOOP listItems="mean_I mean_V ampl_I period period_err 
                   period_med period_med_err period_short period_short_err">
@@ -394,7 +391,7 @@
 
 <!-- ============================= DSct (Delta Sct) ============================================ -->
 
-  <table id="ident_lmc_dsct" onDisk="True" adql="hidden" namePath="ogle/aux#dsct_id">
+  <table id="ident_smc_dsct" onDisk="True" adql="hidden" namePath="ogle/aux#dsct_id">
     <meta name="description">The original table with identifications of delta Scuti-type stars \field collection</meta>
 
     <!-- Pull all columns from the prototype id table: -->
@@ -409,21 +406,21 @@
     </LOOP>
   </table>
 
-  <data id="import_lmc_dsct">
-    <sources>data/lmc/dsct/ident.dat</sources>
+  <data id="import_smc_dsct">
+    <sources>data/smc/dsct/ident.dat</sources>
     <columnGrammar>
       <colDefs>
-        object_id:     1-19
-	    subtype:      22-31
-        alphaHMS:     34-44
-        deltaDMS:     46-56
-        ogle4_id:     59-74
-        ogle3_id:     76-90
-        ogle2_id:     92-107
-        vsx:         109-150
+        object_id:     1-18
+	    subtype:      21-30
+        alphaHMS:     33-43
+        deltaDMS:     45-55
+        ogle4_id:     58-73
+        ogle3_id:     75-89
+        ogle2_id:     91-106
+        vsx:         108-150
       </colDefs>
     </columnGrammar>
-    <make table="ident_lmc_dsct">
+    <make table="ident_smc_dsct">
       <rowmaker idmaps="*">
         <FEED source="makeCommonRowsIdent"/>
         <map dest="subtype">parseWithNull(@subtype, str, "")</map>
@@ -437,7 +434,7 @@
 
 <!-- ================================= Param DSCT (Delta Sct) ============= -->
 
-  <table id="param_lmc_dsct" onDisk="True" adql="hidden" namePath="ogle/aux#dsct_p">
+  <table id="param_smc_dsct" onDisk="True" adql="hidden" namePath="ogle/aux#dsct_p">
     <meta name="description">The table from original dsct.dat from OGLE Delta Scuti Stars \field collection</meta>
     <LOOP>
       <codeItems>
@@ -450,24 +447,24 @@
     </LOOP>
   </table>
 
-  <data id="import_param_lmc_dsct">
-    <sources>data/lmc/dsct/dsct.dat</sources>
+  <data id="import_param_smc_dsct">
+    <sources>data/smc/dsct/dsct.dat</sources>
     <columnGrammar>
       <colDefs>
-        object_id:     1-19
-        mean_I:       22-27
-        mean_V:       29-34
-        period:       37-46
-        period_err:   48-57
-        epoch:        60-69
-        ampl_I:       72-76
-        period2:     105-114
-        period2_err: 116-125
-        period3:     173-182
-        period3_err: 184-193
+        object_id:     1-18
+        mean_I:       21-26
+        mean_V:       28-33
+        period:       36-45
+        period_err:   47-56
+        epoch:        59-68
+        ampl_I:       71-75
+        period2:     104-113
+        period2_err: 115-124
+        period3:     172-181
+        period3_err: 183-192
       </colDefs>
     </columnGrammar>
-    <make table="param_lmc_dsct">
+    <make table="param_smc_dsct">
       <rowmaker idmaps="*">
         <LOOP listItems="mean_I mean_V ampl_I period period_err">
           <events>
@@ -487,7 +484,7 @@
 
 <!-- ========================= Ecl (Eclipsing and Ellipsoidal) ================================== -->
 
-  <table id="ident_lmc_ecl" onDisk="True" adql="hidden" namePath="ogle/aux#ecl_id">
+  <table id="ident_smc_ecl" onDisk="True" adql="hidden" namePath="ogle/aux#ecl_id">
     <meta name="description">The original table with identifications of Eclipsing and Ellipsoidal \
                  binary systems \field colection</meta>
 
@@ -502,8 +499,8 @@
     </LOOP>
   </table>
 
-  <data id="import_lmc_ecl">
-    <sources>data/lmc/ecl/ident.dat</sources>
+  <data id="import_smc_ecl">
+    <sources>data/smc/ecl/ident.dat</sources>
     <columnGrammar>
       <colDefs>
         object_id:     1-18
@@ -516,7 +513,7 @@
         vsx:          99-150
       </colDefs>
     </columnGrammar>
-    <make table="ident_lmc_ecl">
+    <make table="ident_smc_ecl">
       <rowmaker idmaps="*">
         <FEED source="makeCommonRowsIdent"/>
         <map key="subtype">parseWithNull(@subtype, str, "")</map>
@@ -549,7 +546,7 @@
       ell,    ell.dat, ellipsoidal-binaries
     </csvItems>
     <events>
-      <table id="param_lmc_\class" onDisk="True" adql="hidden" namePath="ogle/aux#ecl_p">
+      <table id="param_smc_\class" onDisk="True" adql="hidden" namePath="ogle/aux#ecl_p">
         <meta name="description">The table from the base of original \source file with parameters \
               of \subclass stars from OGLE Eclipsing and Ellipsoidal Binary Systems  \\field collection</meta>
  
@@ -564,8 +561,8 @@
         </LOOP>
       </table>
 
-      <data id="import_param_lmc_\class">
-        <sources>data/lmc/ecl/\source</sources>
+      <data id="import_param_smc_\class">
+        <sources>data/smc/ecl/\source</sources>
         <columnGrammar>
           <colDefs>
             object_id:   1-18
@@ -577,7 +574,7 @@
             depth2:     69-73            
           </colDefs>
         </columnGrammar>
-        <make table="param_lmc_\class">
+        <make table="param_smc_\class">
           <rowmaker idmaps="*">
             <LOOP listItems="mean_I mean_V period depth1 depth2">
               <events>
@@ -594,7 +591,7 @@
 
 <!-- ======================= HB (Heartbeat stars) ================================== -->
 
-  <table id="ident_lmc_hb" onDisk="True" adql="hidden" namePath="ogle/aux#hb_id">
+  <table id="ident_smc_hb" onDisk="True" adql="hidden" namePath="ogle/aux#hb_id">
     <meta name="description">The original table with identifications of Heartbeat binary systems \
                 in the Galactic bulge and Magellanic Clouds</meta>
 
@@ -609,8 +606,8 @@
     </LOOP>
   </table>
 
-  <data id="import_lmc_hb">
-    <sources>data/lmc/hb/ident.dat</sources>
+  <data id="import_smc_hb">
+    <sources>data/smc/hb/ident.dat</sources>
     <columnGrammar>
       <colDefs>
         object_id:     1-16
@@ -623,7 +620,7 @@
         vsx:         94-123
       </colDefs>
     </columnGrammar>
-    <make table="ident_lmc_hb">
+    <make table="ident_smc_hb">
       <rowmaker idmaps="*">
         <FEED source="makeCommonRowsIdent" sep=" "/>
         <map dest="subtype">parseWithNull(@subtype, str, "")</map>
@@ -637,7 +634,7 @@
 
 <!-- ====================== Param HB (heartbeat binary systems) ============ -->
 
-  <table id="param_lmc_hb" onDisk="True" adql="hidden" namePath="ogle/aux#hb_p">
+  <table id="param_smc_hb" onDisk="True" adql="hidden" namePath="ogle/aux#hb_p">
     <meta name="description">The table from original hb.dat from OGLE \
                          Heartbeat binary systems \field collection</meta>
     <LOOP>
@@ -651,8 +648,8 @@
     </LOOP>
   </table>
 
-  <data id="import_param_lmc_hb">
-    <sources>data/lmc/hb/hb.dat</sources>
+  <data id="import_param_smc_hb">
+    <sources>data/smc/hb/hb.dat</sources>
     <columnGrammar>
       <colDefs>
         object_id:   1-16
@@ -667,7 +664,7 @@
         add_var:    83-91
       </colDefs>
     </columnGrammar>
-    <make table="param_lmc_hb">
+    <make table="param_smc_hb">
       <rowmaker idmaps="*">
         <LOOP listItems="mean_I mean_V ampl_I period ">
           <events>
@@ -683,7 +680,7 @@
 
 <!-- ======================= RR Lyr ================================== -->
 
-  <table id="ident_lmc_rr" onDisk="True" adql="hidden" namePath="ogle/aux#rrlyr_id">
+  <table id="ident_smc_rr" onDisk="True" adql="hidden" namePath="ogle/aux#rrlyr_id">
     <meta name="description">The original table with identification of RR Lyr stars \field collection</meta>
 
     <LOOP>
@@ -697,21 +694,21 @@
     </LOOP>
   </table>
 
-  <data id="import_lmc_rr">
-    <sources>data/lmc/rrlyr/ident.dat</sources>
+  <data id="import_smc_rr">
+    <sources>data/smc/rrlyr/ident.dat</sources>
     <columnGrammar>
       <colDefs>
-        object_id:     1-20
-        subtype:      23-26
-        alphaHMS:     29-39
-        deltaDMS:     41-51
-        ogle4_id:     54-69
-        ogle3_id:     71-85
-        ogle2_id:     87-101
-        vsx:         103-150
+        object_id:     1-19
+        subtype:      22-25
+        alphaHMS:     28-38
+        deltaDMS:     40-50
+        ogle4_id:     53-68
+        ogle3_id:     70-84
+        ogle2_id:     86-100
+        vsx:         102-150
       </colDefs>
     </columnGrammar>
-    <make table="ident_lmc_rr">
+    <make table="ident_smc_rr">
       <rowmaker idmaps="*">
         <FEED source="makeCommonRowsIdent"/>
 
@@ -742,7 +739,7 @@
       rr_c,   RRc.dat, first-overtone
     </csvItems>
     <events>
-      <table id="param_lmc_\class" onDisk="True" adql="hidden" namePath="ogle/aux#rrlyr_p">
+      <table id="param_smc_\class" onDisk="True" adql="hidden" namePath="ogle/aux#rrlyr_p">
         <meta name="description">The table from the base of original \source \
                   with parameters of \subclass stars \
                   from OGLE RR Lyr \\field collection</meta>
@@ -757,20 +754,20 @@
         </LOOP>
       </table>
 
-      <data id="import_lmc_\class">
-        <sources>data/lmc/rrlyr/\source</sources>
+      <data id="import_smc_\class">
+        <sources>data/smc/rrlyr/\source</sources>
         <columnGrammar>
           <colDefs>
-            object_id:   1-20
-            mean_I:     23-28
-            mean_V:     30-35
-            period:     38-46
-            period_err: 48-56
-            epoch:      59-68
-            ampl_I:     71-75
+            object_id:   1-19
+            mean_I:     22-27
+            mean_V:     29-34
+            period:     37-45
+            period_err: 47-55
+            epoch:      58-67
+            ampl_I:     70-74
           </colDefs>
         </columnGrammar>
-        <make table="param_lmc_\class">
+        <make table="param_smc_\class">
           <rowmaker idmaps="*">
             <LOOP listItems="mean_I mean_V ampl_I period  period_err">
               <events>
@@ -791,7 +788,7 @@
       arr_d, aRRd.dat, anomalous-RRd
     </csvItems>
     <events>
-      <table id="param_lmc_\class" onDisk="True" adql="hidden" namePath="ogle/aux#rrlyr_p">
+      <table id="param_smc_\class" onDisk="True" adql="hidden" namePath="ogle/aux#rrlyr_p">
         <meta name="description">The table from the base of original \source \
                   with parameters of \subclass stars \
                   from OGLE RR Lyr \\field collection</meta>
@@ -806,23 +803,23 @@
         </LOOP>
       </table>
 
-      <data id="import_lmc_\class">
-        <sources>data/lmc/rrlyr/\source</sources>
+      <data id="import_smc_\class">
+        <sources>data/smc/rrlyr/\source</sources>
         <columnGrammar>
           <colDefs>
-            object_id:    1-20
-            mean_I:      23-28
-            mean_V:      30-35
-            period1:     38-46
-            period1_err: 48-56
-            epoch:       59-68
-            ampl_I:     137-141
-            period:     104-112
-            period_err: 114-122
-            epoch:      125-134
+            object_id:     1-19
+            mean_I:       22-27
+            mean_V:       29-34
+            period1:      37-45
+            period1_err:  47-55
+            epoch:        58-67
+            ampl_I:      136-140
+            period:      103-111
+            period_err:  113-121
+            epoch:       124-133
           </colDefs>
         </columnGrammar>
-        <make table="param_lmc_\class">
+        <make table="param_smc_\class">
           <rowmaker idmaps="*">
             <LOOP listItems="mean_I mean_V ampl_I period period_err period1 period1_err">
               <events>
@@ -840,7 +837,7 @@
 
   <macDef name="class_desc">Type II Cepheids</macDef>
 
-  <table id="ident_lmc_t2cep" onDisk="True" adql="hidden" namePath="ogle/aux#t2cep_id">
+  <table id="ident_smc_t2cep" onDisk="True" adql="hidden" namePath="ogle/aux#t2cep_id">
     <meta name="description">The original table with identifications of \class_desc \field</meta>
 
     <LOOP>
@@ -854,21 +851,21 @@
     </LOOP>
   </table>
 
-  <data id="import_lmc_t2cep">
-    <sources>data/lmc/t2cep/ident.dat</sources>
+  <data id="import_smc_t2cep">
+    <sources>data/smc/t2cep/ident.dat</sources>
     <columnGrammar>
       <colDefs>
-        object_id:     1-18
-	    subtype:      21-25
-        alphaHMS:     28-38
-        deltaDMS:     40-50
-        ogle4_id:     53-68
-        ogle3_id:     70-84
-        ogle2_id:     86-100
-        vsx:         102-150
+        object_id:     1-17
+	    subtype:      20-24
+        alphaHMS:     27-37
+        deltaDMS:     39-49
+        ogle4_id:     52-67
+        ogle3_id:     69-83
+        ogle2_id:     85-99
+        vsx:         101-150
       </colDefs>
     </columnGrammar>
-    <make table="ident_lmc_t2cep">
+    <make table="ident_smc_t2cep">
       <rowmaker idmaps="*">
         <FEED source="makeCommonRowsIdent"/>
         <map dest="subtype">parseWithNull(@subtype, str, "")</map>
@@ -882,7 +879,7 @@
 
 <!-- ================================= Param t2cep (Type II Cepheids) ============= -->
 
-  <table id="param_lmc_t2cep" onDisk="True" adql="hidden" namePath="ogle/aux#t2cep_p">
+  <table id="param_smc_t2cep" onDisk="True" adql="hidden" namePath="ogle/aux#t2cep_p">
     <meta name="description">The table from original t2cep.dat from OGLE Type II Cepheids \field collection</meta>
     <LOOP>
       <codeItems>
@@ -895,20 +892,20 @@
     </LOOP>
   </table>
 
-  <data id="import_param_lmc_t2cep">
-    <sources>data/lmc/t2cep/t2cep.dat</sources>
+  <data id="import_param_smc_t2cep">
+    <sources>data/smc/t2cep/t2cep.dat</sources>
     <columnGrammar>
       <colDefs>
-        object_id:   1-18
-        mean_I:     21-26
-        mean_V:     28-33
-        period:     36-45
-        period_err: 47-55
-        epoch:      58-67
-        ampl_I:     70-74
+        object_id:   1-17
+        mean_I:     20-25
+        mean_V:     27-32
+        period:     35-44
+        period_err: 46-54
+        epoch:      57-66
+        ampl_I:     69-73
       </colDefs>
     </columnGrammar>
-    <make table="param_lmc_t2cep">
+    <make table="param_smc_t2cep">
       <rowmaker idmaps="*">
         <LOOP listItems="mean_I mean_V ampl_I period period_err">
           <events>
