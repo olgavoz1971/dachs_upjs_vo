@@ -83,14 +83,24 @@
 
     <viewStatement>
       CREATE MATERIALIZED VIEW \curtable AS (
-        WITH  param_acep_all AS ( 
+        WITH
+        param_acep_lmc_all AS ( 
             SELECT * FROM \schema.param_lmc_acep_acepf
             UNION ALL
             SELECT * FROM \schema.param_lmc_acep_acep1o
+        ),
+        param_acep_smc_all AS (
+            SELECT * FROM \schema.param_smc_acep_acepf
+            UNION ALL
+            SELECT * FROM \schema.param_smc_acep_acep1o
         )
-        SELECT \colNames FROM \schema.ident_lmc_acep		-- lmc acep
-        LEFT JOIN param_acep_all USING (object_id)
-															-- no acep in blg
+
+        SELECT \colNames FROM \schema.ident_lmc_acep      -- lmc acep
+        LEFT JOIN param_acep_lmc_all USING (object_id)
+        UNION ALL
+        SELECT \colNames FROM \schema.ident_smc_acep      -- smc acep
+        LEFT JOIN param_acep_smc_all USING (object_id)
+        												-- no acep in blg
       )
     </viewStatement>
   </table>
@@ -112,6 +122,8 @@
       Coordinates and variability parameters of all Classical Cepheids from the OGLE Variable Star Collection.
       The table was constructed by merging all Cepheid-related data from all OGLE fields, such as BLG, GD, LMC, and SMC.
     </meta>
+
+    <meta name="source">TBD Ref1; Ref2</meta>
 
     <!-- Pull all columns from the prototype tables: -->
     <LOOP>
@@ -140,7 +152,8 @@
           where all columns are present (to define correct column types) -->
     <viewStatement>
       CREATE MATERIALIZED VIEW \curtable AS (
-        WITH  param_cep_all AS ( 
+        WITH
+        param_blg_cep_all AS ( 
             SELECT * FROM \schema.param_blg_cep_cepf
             UNION ALL
             SELECT * FROM \schema.param_blg_cep_cep1o
@@ -152,8 +165,8 @@
             SELECT * FROM \schema.param_blg_cep_cep2o3o
             UNION ALL
             SELECT * FROM \schema.param_blg_cep_cep1o2o3o
-            UNION ALL
-
+        ),
+        param_lmc_cep_all AS (
             SELECT * FROM \schema.param_lmc_cep_cepf
             UNION ALL
             SELECT * FROM \schema.param_lmc_cep_cep1o
@@ -171,12 +184,28 @@
             SELECT * FROM \schema.param_lmc_cep_cepF1o2o
             UNION ALL
             SELECT * FROM \schema.param_lmc_cep_cep1o2o3o
+        ),
+        param_smc_cep_all AS (
+            SELECT * FROM \schema.param_smc_cep_cepf
+            UNION ALL
+            SELECT * FROM \schema.param_smc_cep_cep1o
+            UNION ALL
+            SELECT * FROM \schema.param_smc_cep_cep2o
+            UNION ALL
+            SELECT * FROM \schema.param_smc_cep_cepf1o
+            UNION ALL
+            SELECT * FROM \schema.param_smc_cep_cep1o2o
+            UNION ALL
+            SELECT * FROM \schema.param_smc_cep_cep1o2o3o
         )
-        SELECT \colNames FROM \schema.ident_blg_cep
-        LEFT JOIN param_cep_all USING (object_id)
+        SELECT \colNames FROM \schema.ident_blg_cep			-- blg cep
+        LEFT JOIN param_blg_cep_all USING (object_id)
         UNION ALL
-        SELECT \colNames FROM \schema.ident_lmc_cep
-        LEFT JOIN param_cep_all USING (object_id)
+        SELECT \colNames FROM \schema.ident_lmc_cep			-- lmc cep
+        LEFT JOIN param_lmc_cep_all USING (object_id)
+        UNION ALL
+        SELECT \colNames FROM \schema.ident_smc_cep			-- smc cep
+        LEFT JOIN param_smc_cep_all USING (object_id)
       )
     </viewStatement>
   </table>
@@ -220,11 +249,14 @@
 
     <viewStatement>
       CREATE MATERIALIZED VIEW \curtable AS (
-        SELECT * FROM \schema.ident_blg_dsct						-- blg dsct
+        SELECT \colNames FROM \schema.ident_blg_dsct						-- blg dsct
         LEFT JOIN \schema.param_blg_dsct USING (object_id)
         UNION ALL
-        SELECT * FROM \schema.ident_lmc_dsct						-- lmc dsct
+        SELECT \colNames FROM \schema.ident_lmc_dsct						-- lmc dsct
         LEFT JOIN \schema.param_lmc_dsct USING (object_id)
+        UNION ALL
+        SELECT \colNames FROM \schema.ident_smc_dsct						-- smc dsct
+        LEFT JOIN \schema.param_smc_dsct USING (object_id)
       )
     </viewStatement>
   </table>
@@ -270,21 +302,30 @@
 
     <viewStatement>
       CREATE MATERIALIZED VIEW \curtable AS (
-        WITH  param_ecl_all AS ( 
+        WITH
+        param_blg_all AS ( 
             SELECT * FROM \schema.param_blg_ecl
             UNION ALL
             SELECT * FROM \schema.param_blg_ell
-            UNION ALL
+        ),
+        param_lmc_all AS (
             SELECT * FROM \schema.param_lmc_ecl
             UNION ALL
             SELECT * FROM \schema.param_lmc_ell
-
+        ),
+        param_smc_all AS (
+            SELECT * FROM \schema.param_smc_ecl
+            UNION ALL
+            SELECT * FROM \schema.param_smc_ell
         )
         SELECT \colNames FROM \schema.ident_blg_ecl			-- blg ecl
-        LEFT JOIN param_ecl_all USING (object_id)
+        LEFT JOIN param_blg_all USING (object_id)
         UNION ALL
         SELECT \colNames FROM \schema.ident_lmc_ecl         -- lmc ecl
-        LEFT JOIN param_ecl_all USING (object_id)
+        LEFT JOIN param_lmc_all USING (object_id)
+        UNION ALL
+        SELECT \colNames FROM \schema.ident_smc_ecl         -- smc ecl
+        LEFT JOIN param_smc_all USING (object_id)
       )
     </viewStatement>
   </table>
@@ -328,11 +369,14 @@
 
     <viewStatement>
       CREATE MATERIALIZED VIEW \curtable AS (
-        SELECT * FROM \schema.ident_blg_hb							-- blg hb
+        SELECT \colNames FROM \schema.ident_blg_hb							-- blg hb
         LEFT JOIN \schema.param_blg_hb USING (object_id)
         UNION ALL
-        SELECT * FROM \schema.ident_lmc_hb                          -- lmc hb
+        SELECT \colNames FROM \schema.ident_lmc_hb                          -- lmc hb
         LEFT JOIN \schema.param_lmc_hb USING (object_id)
+        UNION ALL
+        SELECT \colNames FROM \schema.ident_smc_hb                          -- smc hb
+        LEFT JOIN \schema.param_smc_hb USING (object_id)
       )
     </viewStatement>
   </table>
@@ -377,9 +421,9 @@
 
     <viewStatement>
       CREATE MATERIALIZED VIEW \curtable AS (
-        SELECT * FROM \schema.ident_blg_lpv							-- blg lpv
+        SELECT \colNames FROM \schema.ident_blg_lpv							-- blg lpv
         LEFT JOIN \schema.param_blg_lpv USING (object_id)
-																-- no lpv in lmc
+																-- no lpv in lmc or smc
       )
     </viewStatement>
   </table>
@@ -423,9 +467,9 @@
 
     <viewStatement>
       CREATE MATERIALIZED VIEW \curtable AS (
-        SELECT *													
-        FROM \schema.ident_blg_rot LEFT JOIN \schema.param_blg_rot USING (object_id)	-- blg rot
-																				-- no rot in lmc
+        SELECT \colNames FROM \schema.ident_blg_rot			-- blg rot
+        LEFT JOIN \schema.param_blg_rot USING (object_id)
+															-- no rot in lmc or smc
       )
     </viewStatement>
   </table>
@@ -469,7 +513,8 @@
 
     <viewStatement>
       CREATE MATERIALIZED VIEW \curtable AS (
-        WITH  param_rr_all AS (
+        WITH
+        param_blg_rr_all AS (
           SELECT * FROM \schema.param_blg_rr_ab
           UNION ALL
           SELECT * FROM \schema.param_blg_rr_c
@@ -477,8 +522,8 @@
           SELECT * FROM \schema.param_blg_rr_d
           UNION ALL
           SELECT * FROM \schema.param_blg_arr_d
-          UNION ALL
-
+        ),
+        param_lmc_rr_all AS (
           SELECT * FROM \schema.param_lmc_rr_ab
           UNION ALL
           SELECT * FROM \schema.param_lmc_rr_c
@@ -486,12 +531,24 @@
           SELECT * FROM \schema.param_lmc_rr_d
           UNION ALL
           SELECT * FROM \schema.param_lmc_arr_d
+        ),
+        param_smc_rr_all AS (
+          SELECT * FROM \schema.param_smc_rr_ab
+          UNION ALL
+          SELECT * FROM \schema.param_smc_rr_c
+          UNION ALL
+          SELECT * FROM \schema.param_smc_rr_d
+          UNION ALL
+          SELECT * FROM \schema.param_smc_arr_d
         )
-        SELECT * FROM \schema.ident_blg_rr					-- blg rrlyr
-        LEFT JOIN param_rr_all USING (object_id)
+        SELECT \colNames FROM \schema.ident_blg_rr					-- blg rrlyr
+        LEFT JOIN param_blg_rr_all USING (object_id)
         UNION ALL
-        SELECT * FROM \schema.ident_lmc_rr					-- lmc rrlyr
-        LEFT JOIN param_rr_all USING (object_id)
+        SELECT \colNames FROM \schema.ident_lmc_rr					-- lmc rrlyr
+        LEFT JOIN param_lmc_rr_all USING (object_id)
+        UNION ALL
+        SELECT \colNames FROM \schema.ident_smc_rr					-- smc rrlyr
+        LEFT JOIN param_smc_rr_all USING (object_id)
       )
     </viewStatement>
   </table>
@@ -535,11 +592,14 @@
 
     <viewStatement>
       CREATE MATERIALIZED VIEW \curtable AS (
-        SELECT * FROM \schema.ident_blg_t2cep					-- blg t2cep
+        SELECT \colNames FROM \schema.ident_blg_t2cep					-- blg t2cep
         LEFT JOIN \schema.param_blg_t2cep USING (object_id)
         UNION ALL
-        SELECT * FROM \schema.ident_lmc_t2cep                   -- lmc t2cep
+        SELECT \colNames FROM \schema.ident_lmc_t2cep                   -- lmc t2cep
         LEFT JOIN \schema.param_lmc_t2cep USING (object_id)
+        UNION ALL
+        SELECT \colNames FROM \schema.ident_smc_t2cep                   -- smc t2cep
+        LEFT JOIN \schema.param_smc_t2cep USING (object_id)
       )
     </viewStatement>
   </table>
@@ -582,9 +642,9 @@
 
     <viewStatement>
       CREATE MATERIALIZED VIEW \curtable AS (
-        SELECT * FROM \schema.ident_blg_transit					-- blg transit
+        SELECT \colNames FROM \schema.ident_blg_transit					-- blg transit
         LEFT JOIN \schema.param_blg_transit USING (object_id)
-					-- not transits in lmc
+					-- not transits in lmc or smc
       )
     </viewStatement>
   </table>
