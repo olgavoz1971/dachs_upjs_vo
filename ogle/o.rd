@@ -58,6 +58,22 @@
       The table was constructed by merging all A.Cepheid-related data from all OGLE fields, such as GD, LMC, and SMC.
     </meta>
 
+    <!-- Unfortunately, I've failed to wrap this into something reusable, so I put up with vulgar copypasting ;-( -->
+    <LOOP>
+      <codeItems>
+        # Collect references from all involved tables
+        with base.getTableConn() as conn:
+          refs=[list(conn.query("SELECT ssa_reference FROM ogle.ident_lmc_acep LIMIT 1"))[0][0], 
+                list(conn.query("SELECT ssa_reference FROM ogle.ident_smc_acep LIMIT 1"))[0][0]]
+          # remove duplicates
+          uniq_refs = list(dict.fromkeys(refs))
+          yield {"db_source": "; ".join(uniq_refs)}
+       </codeItems>
+      <events>
+        <meta name="source">\db_source</meta>
+      </events>
+    </LOOP>
+
     <!-- Pull all columns from the prototype tables: -->
     <LOOP>
        <codeItems>
@@ -123,7 +139,21 @@
       The table was constructed by merging all Cepheid-related data from all OGLE fields, such as BLG, GD, LMC, and SMC.
     </meta>
 
-    <meta name="source">TBD Ref1; Ref2</meta>
+    <LOOP>
+      <codeItems>
+        # Collect references from all involved tables
+        with base.getTableConn() as conn:
+          refs = [list(conn.query("SELECT ssa_reference FROM ogle.ident_blg_cep LIMIT 1"))[0][0], 
+                  list(conn.query("SELECT ssa_reference FROM ogle.ident_lmc_cep LIMIT 1"))[0][0], 
+                  list(conn.query("SELECT ssa_reference FROM ogle.ident_smc_cep LIMIT 1"))[0][0]]
+          # remove duplicates
+          uniq_refs = list(dict.fromkeys(refs))
+          yield {"db_source": "; ".join(uniq_refs)}
+       </codeItems>
+      <events>
+        <meta name="source">\db_source</meta>
+      </events>
+    </LOOP>
 
     <!-- Pull all columns from the prototype tables: -->
     <LOOP>
@@ -224,6 +254,22 @@
       The table was constructed by merging all d Sct-related data from all OGLE fields, such as BLG, GD, LMC, and SMC.
     </meta>
 
+    <LOOP>
+      <codeItems>
+        # Collect references from all involved tables
+        with base.getTableConn() as conn:
+          refs = [list(conn.query("SELECT ssa_reference FROM ogle.ident_blg_dsct LIMIT 1"))[0][0], 
+                  list(conn.query("SELECT ssa_reference FROM ogle.ident_lmc_dsct LIMIT 1"))[0][0], 
+                  list(conn.query("SELECT ssa_reference FROM ogle.ident_smc_dsct LIMIT 1"))[0][0]]
+          # remove duplicates
+          uniq_refs = list(dict.fromkeys(refs))
+          yield {"db_source": "; ".join(uniq_refs)}
+       </codeItems>
+      <events>
+        <meta name="source">\db_source</meta>
+      </events>
+    </LOOP>
+
     <!-- Pull all columns from the prototype tables: -->
     <LOOP>
        <codeItems>
@@ -276,6 +322,23 @@
       The table was constructed by merging all EB-related data from all OGLE fields, \
       such as BLG, GD, LMC, and SMC.
     </meta>
+
+    <LOOP>
+      <codeItems>
+        # Collect references from all involved tables
+        with base.getTableConn() as conn:
+          refs = [list(conn.query("SELECT ssa_reference FROM ogle.ident_blg_ecl LIMIT 1"))[0][0], 
+                  list(conn.query("SELECT ssa_reference FROM ogle.ident_lmc_ecl LIMIT 1"))[0][0], 
+                  list(conn.query("SELECT ssa_reference FROM ogle.ident_smc_ecl LIMIT 1"))[0][0]]
+          # remove duplicates
+          uniq_refs = list(dict.fromkeys(refs))
+          yield {"db_source": "; ".join(uniq_refs)}
+       </codeItems>
+      <events>
+        <meta name="source">\db_source</meta>
+      </events>
+    </LOOP>
+
 
     <!-- Pull all columns from the prototype tables: -->
     <LOOP>
@@ -344,6 +407,23 @@
       The table was constructed by merging all Hb-related data from all OGLE fields, \
       such as BLG, GD, LMC, and SMC.
     </meta>
+
+    <LOOP>
+      <codeItems>
+        # Collect references from all involved tables
+        with base.getTableConn() as conn:
+          refs = [list(conn.query("SELECT ssa_reference FROM ogle.ident_blg_hb LIMIT 1"))[0][0], 
+                  list(conn.query("SELECT ssa_reference FROM ogle.ident_lmc_hb LIMIT 1"))[0][0], 
+                  list(conn.query("SELECT ssa_reference FROM ogle.ident_smc_hb LIMIT 1"))[0][0]]
+          # remove duplicates
+          uniq_refs = list(dict.fromkeys(refs))
+          yield {"db_source": "; ".join(uniq_refs)}
+       </codeItems>
+      <events>
+        <meta name="source">\db_source</meta>
+      </events>
+    </LOOP>
+
    <!-- Pull all columns from the prototype tables: -->
     <LOOP>
        <codeItems>
@@ -396,6 +476,20 @@
       such as BLG, GD, LMC, and SMC.
     </meta>
 
+    <LOOP>
+      <codeItems>
+        # Collect references from all involved tables
+        with base.getTableConn() as conn:
+          refs = [list(conn.query("SELECT ssa_reference FROM ogle.ident_blg_lpv LIMIT 1"))[0][0]]
+          # remove duplicates
+          uniq_refs = list(dict.fromkeys(refs))
+          yield {"db_source": "; ".join(uniq_refs)}
+       </codeItems>
+      <events>
+        <meta name="source">\db_source</meta>
+      </events>
+    </LOOP>
+
     <!-- Pull all columns from the prototype tables: -->
     <LOOP>
        <codeItems>
@@ -444,6 +538,20 @@
     </meta>
 
     <LOOP>
+      <codeItems>
+        # Collect references from all involved tables
+        with base.getTableConn() as conn:
+          refs = [list(conn.query("SELECT ssa_reference FROM ogle.ident_blg_rot LIMIT 1"))[0][0]]
+          # remove duplicates
+          uniq_refs = list(dict.fromkeys(refs))
+          yield {"db_source": "; ".join(uniq_refs)}
+       </codeItems>
+      <events>
+        <meta name="source">\db_source</meta>
+      </events>
+    </LOOP>
+
+    <LOOP>
        <codeItems>
          for col in context.resolveId("ogle/aux#rot_id").columns:
            yield {'item': col.name}
@@ -488,6 +596,23 @@
       The table was constructed by merging all RR Lyr-related data from all OGLE fields, \
       such as BLG, GD, LMC, and SMC.
     </meta>
+
+    <!-- Pull references -->
+    <LOOP>
+      <codeItems>
+        # Collect references from all involved tables
+        with base.getTableConn() as conn:
+          refs = [list(conn.query("SELECT ssa_reference FROM ogle.ident_blg_rr LIMIT 1"))[0][0],
+                  list(conn.query("SELECT ssa_reference FROM ogle.ident_lmc_rr LIMIT 1"))[0][0],
+                  list(conn.query("SELECT ssa_reference FROM ogle.ident_smc_rr LIMIT 1"))[0][0]]
+          # remove duplicates
+          uniq_refs = list(dict.fromkeys(refs))
+          yield {"db_source": "; ".join(uniq_refs)}
+       </codeItems>
+      <events>
+        <meta name="source">\db_source</meta>
+      </events>
+    </LOOP>
 
     <LOOP>
        <codeItems>
@@ -568,6 +693,23 @@
       such as BLG, GD, LMC, and SMC.
     </meta>
 
+    <!-- Pull references -->
+    <LOOP>
+      <codeItems>
+        # Collect references from all involved tables
+        with base.getTableConn() as conn:
+          refs = [list(conn.query("SELECT ssa_reference FROM ogle.ident_blg_t2cep LIMIT 1"))[0][0],
+                  list(conn.query("SELECT ssa_reference FROM ogle.ident_lmc_t2cep LIMIT 1"))[0][0],
+                  list(conn.query("SELECT ssa_reference FROM ogle.ident_smc_t2cep LIMIT 1"))[0][0]]
+          # remove duplicates
+          uniq_refs = list(dict.fromkeys(refs))
+          yield {"db_source": "; ".join(uniq_refs)}
+       </codeItems>
+      <events>
+        <meta name="source">\db_source</meta>
+      </events>
+    </LOOP>
+
     <LOOP>
        <codeItems>
          for col in context.resolveId("ogle/aux#t2cep_id").columns:
@@ -617,6 +759,21 @@
       from the OGLE Variable Star Collection.\
       The table was constructed by merging all transits-related data
     </meta>
+
+    <!-- Pull references -->
+    <LOOP>
+      <codeItems>
+        # Collect references from all involved tables
+        with base.getTableConn() as conn:
+          refs = [list(conn.query("SELECT ssa_reference FROM ogle.ident_blg_transit LIMIT 1"))[0][0]]
+          # remove duplicates
+          uniq_refs = list(dict.fromkeys(refs))
+          yield {"db_source": "; ".join(uniq_refs)}
+       </codeItems>
+      <events>
+        <meta name="source">\db_source</meta>
+      </events>
+    </LOOP>
 
     <LOOP>
        <codeItems>
