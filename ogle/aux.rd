@@ -6,494 +6,472 @@
 
   <meta name="title">Auxiliary things</meta>
 
-  <table id="object" onDisk="False">
-  <meta name="description">A stuff for motley OGLE tables to pull columns from</meta>
+  <STREAM id="object_ident_columns">
+      <column name="object_id" type="text" ucd="meta.id;meta.main"
+        tablehead="Star ID" verbLevel="1" 
+        description="Star identifier"
+        required="True">
+      </column>
 
-    <column name="object_id" type="text" ucd="meta.id;meta.main"
-      tablehead="Star ID" verbLevel="1" 
-      description="Star identifier"
-      required="True">
-    </column>
+      <column name="raj2000" type="double precision" ucd="pos.eq.ra;meta.main"
+        tablehead="RA" verbLevel="1" unit="deg"
+        description="Right ascension"
+        required="True" displayHint="sf=10"/>
 
-    <column name="raj2000" type="double precision" ucd="pos.eq.ra;meta.main"
-      tablehead="RA" verbLevel="1" unit="deg"
-      description="Right ascension"
-      required="True" displayHint="sf=10"/>
+      <column name="dej2000" type="double precision" ucd="pos.eq.dec;meta.main"
+        tablehead="Dec" verbLevel="1" unit="deg"
+        description="Declination"
+        required="True" displayHint="sf=10"/>
 
-    <column name="dej2000" type="double precision" ucd="pos.eq.dec;meta.main"
-      tablehead="Dec" verbLevel="1" unit="deg"
-      description="Declination"
-      required="True" displayHint="sf=10"/>
+      <column name="ogle4_id" type="text" ucd="meta.id"
+        tablehead="OGLE-IV ID" verbLevel="25"
+        description="OGLE-IV Identifier"
+        required="False">
+      </column>
 
-    <column name="ogle4_id" type="text" ucd="meta.id"
-      tablehead="OGLE-IV ID" verbLevel="25"
-      description="OGLE-IV Identifier"
-      required="False">
-    </column>
+      <column name="ogle3_id" type="text" ucd="meta.id"
+        tablehead="OGLE-III ID" verbLevel="25"
+        description="OGLE-III Identifier"
+        required="False">
+      </column>
 
-    <column name="ogle3_id" type="text" ucd="meta.id"
-      tablehead="OGLE-III ID" verbLevel="25"
-      description="OGLE-III Identifier"
-      required="False">
-    </column>
+      <column name="ogle2_id" type="text" ucd="meta.id"
+        tablehead="OGLE-II ID" verbLevel="25"
+        description="OGLE-II Identifier"
+        required="False">
+      </column>
 
-    <column name="ogle2_id" type="text" ucd="meta.id"
-      tablehead="OGLE-II ID" verbLevel="25"
-      description="OGLE-II Identifier"
-      required="False">
-    </column>
+      <column name="vsx" type="text" ucd="meta.id"
+        tablehead="VSX" verbLevel="1"
+        description="VSX/GCVS/Macho or other designation"
+        required="False">
+      </column>
 
-    <column name="vsx" type="text" ucd="meta.id"
-      tablehead="VSX" verbLevel="1"
-      description="VSX/GCVS/Macho or other designation"
-      required="False">
-    </column>
+      <column name="ogle_vartype" type="text" ucd="meta.code.class"
+        tablehead="Variability type" verbLevel="15"
+        description="OGLE type of variable star"
+        required="False">
+      </column>
 
-    <column name="ogle_vartype" type="text" ucd="meta.code.class"
-      tablehead="Variability type" verbLevel="15"
-      description="OGLE type of variable star"
-      required="False">
-    </column>
+      <column name="subtype" type="text" ucd="meta.code.class"
+        tablehead="Subtype of Variable Star" verbLevel="15"
+        description="Subtype of Variable Star"
+        required="False">
+      </column>
+      <column original="//ssap#instance.ssa_targclass"/>
+      <column original="//ssap#instance.ssa_collection"/>
+      <column original="//ssap#instance.ssa_reference"/>
+  </STREAM>
 
-    <column name="subtype" type="text" ucd="meta.code.class"
-      tablehead="Subtype of Variable Star" verbLevel="15"
-      description="Subtype of Variable Star"
-      required="False">
-    </column>
+  <STREAM id="object_param_columns">
+      <column name="object_id" type="text" ucd="meta.id;meta.main"
+        tablehead="Star ID" verbLevel="1" 
+        description="Star identifier"
+        required="True">
+      </column>
 
-    <column original="//ssap#instance.ssa_targclass"/>
-    <column original="//ssap#instance.ssa_collection"/>
-    <column original="//ssap#instance.ssa_reference"/>
+      <column name="mean_I" type="real"
+        ucd="phot.mag"
+        unit="mag"
+        tablehead="Mean I"
+        description="Intensity mean I-band magnitude"
+        required="False"/>
 
-    <column name="mean_I" type="real"
-      ucd="phot.mag"
-      unit="mag"
-      tablehead="Mean I"
-      description="Intensity mean I-band magnitude"
-      required="False"/>
+      <column name="mean_V" type="real"
+        ucd="phot.mag"
+        unit="mag"
+        tablehead="Mean V"
+        description="Intensity mean V-band magnitude"
+        required="False"/>
 
-    <column name="mean_V" type="real"
-      ucd="phot.mag"
-      unit="mag"
-      tablehead="Mean V"
-      description="Intensity mean V-band magnitude"
-      required="False"/>
+      <column name="ampl_I" type="double precision"
+        ucd="phot.mag"
+        unit="mag"
+        tablehead="Ampl I"
+        description="I-band amplitude of the primary period"
+        required="False"/>
 
-    <column name="ampl_I" type="double precision"
-      ucd="phot.mag"
-      unit="mag"
-      tablehead="Ampl I"
-      description="I-band amplitude of the primary period"
-      required="False"/>
+      <column name="period" type="double precision"
+        ucd="src.var;time.period"
+        unit="d"
+        tablehead="Period"
+        description="Period of the variable star (primary/longest)"
+        required="False"/>
 
-    <column name="ampl_V" type="double precision"
-      ucd="phot.mag"
-      unit="mag"
-      tablehead="Ampl V"
-      description="V-band amplitude of the primary period"
-      required="False"/>
+      <column name="period_err" type="double precision"
+        ucd="src.var;time.period"
+        unit="d"
+        tablehead="Period err"
+        description="Uncertainty of period"
+        required="False"/>
 
-    <column name="period" type="double precision"
-      ucd="src.var;time.period"
-      unit="d"
-      tablehead="Period"
-      description="Period of the variable star (primary/longest)"
-      required="False"/>
+      <column name="epoch" type="double precision"
+        ucd="src.var;time.epoch"
+        unit="d"
+        tablehead="Epoch"
+        description="Time of maximum brightness; mjd (HJD)"
+        required="False"/>
+  </STREAM>
 
-    <column name="period_err" type="double precision"
-      ucd="src.var;time.period"
-      unit="d"
-      tablehead="Period err"
-      description="Uncertainty of period"
-      required="False"/>
+  <STREAM id="makeCommonRowsIdent">
+    <DEFAULTS sep=":"/>
 
-    <column name="epoch" type="double precision"
-      ucd="src.var;time.epoch"
-      unit="d"
-      tablehead="Epoch"
-      description="Time of maximum brightness; mjd (HJD)"
-      required="False"/>
-  </table>
+    <!-- Input HMS/DMS fields are quite diverse: separators may be spaces or
+         colons; leading  zeros may be replaced by extra spaces -->
+    <var name="raj2000">hmsToDeg(@alphaHMS.replace(" \sep", "\sep"), "\sep")</var>
+    <var name="dej2000">dmsToDeg(@deltaDMS.replace(" \sep", "\sep"), "\sep")</var>
 
-  <macDef name="object_id_columns">
-          object_id raj2000 dej2000 ogle4_id ogle3_id ogle2_id vsx 
-          ogle_vartype ssa_targclass ssa_collection ssa_reference  
-  </macDef>
+    <map dest="ogle4_id">parseWithNull(@ogle4_id, str, "")</map>
+    <map dest="ogle3_id">parseWithNull(@ogle3_id, str, "")</map>
+    <map dest="ogle2_id">parseWithNull(@ogle2_id, str, "")</map>
+    <map dest="vsx">parseWithNull(@vsx, str, "")</map>
+  </STREAM>
 
-  <table id="acepheid_id" onDisk="False">							<!-- Anonalous Cepheid id -->
-    <meta name="description">Columns relevant for the Anomalous Cepheid ident tables</meta>
+  <mixinDef id="acepheid_id">
+    <doc>
+        Columns relevant for the Anomalous Cepheid ident tables
+    </doc>
+    <events>
+      <FEED source="object_ident_columns">
+        <PRUNE name="subtype"/>
+      </FEED>      
+      <column name="pulse_mode" type="text" ucd="meta.code.class"
+        tablehead="Pulsation Mode" verbLevel="15"
+        description="Cepheid Mode(s) of pulsation: F-fundamental, o1-first \
+                     overtone, o2-second, etc"
+        required="False">
+      </column>
+    </events>
+  </mixinDef>
 
-    <LOOP listItems="\object_id_columns">
-      <events>
-        <column original="object.\item"/>
-      </events>
-    </LOOP>
+  <mixinDef id="acepheid_p">					<!-- Anomalous Cepheid param -->
+    <doc>
+      Columns relevant for the Anomalous Cepheid parameters tables
+    </doc>
+    <events>
+      <FEED source="object_param_columns">
+        <PRUNE id="ampl_V"/>"
+      </FEED>
+    </events>
+  </mixinDef>
 
-    <column name="pulse_mode" type="text" ucd="meta.code.class"
-      tablehead="Pulsation Mode" verbLevel="15"
-      description="Cepheid Mode(s) of pulsation: F-fundamental, o1-first \
-                   overtone, o2-second, etc"
-      required="False">
-    </column>
-  </table>
+  <mixinDef id="cepheid_id">
+    <doc>
+        Columns relevant for the Classical Cepheid ident tables
+    </doc>
+    <events>
+      <FEED source="object_ident_columns">
+        <PRUNE name="subtype"/>
+      </FEED>
 
-  <table id="acepheid_p" onDisk="False" namePath="object">			<!-- Anomalous Cepheid param -->
-    <meta name="description">Columns relevant for the Anomalous Cepheid parameters tables</meta>
-    
-    <LOOP listItems="object_id mean_I mean_V ampl_I period period_err epoch">
-      <events>
-        <column original="\item"/>
-      </events>
-    </LOOP>
-  </table>
+      <column name="pulse_mode" type="text" ucd="meta.code.class"
+        tablehead="Pulsation Mode" verbLevel="15"
+        description="Cepheid Mode(s) of pulsation: F-fundamental, o1-first \
+                     overtone, o2-second, etc"
+        required="False">
+      </column>
+    </events>
+  </mixinDef>
 
-  <table id="cepheid_id" onDisk="False">								<!-- Cepheid id -->
-    <meta name="description">Columns relevant for the Cepheid ident tables</meta>
+  <mixinDef id="cepheid_p">							<!-- Cepheid param -->
+    <doc>
+        Columns relevant for the Classical Cepheid parameter tables
+    </doc>
+    <events>
+      <FEED source="object_param_columns">
+        <PRUNE id="ampl_V"/>"
+      </FEED>
+      <column original="period" description="Period (longest)"/>
 
-    <LOOP listItems="\object_id_columns">
-      <events>
-        <column original="object.\item"/>
-      </events>
-    </LOOP>
+      <column name="period_short" type="double precision"
+        ucd="src.var;time.period"
+        unit="d"
+        tablehead="Shortest Period"
+        description="The shortest period of the Cepheid"
+        required="False"/>
 
-    <column name="pulse_mode" type="text" ucd="meta.code.class"
-      tablehead="Pulsation Mode" verbLevel="15"
-      description="Cepheid Mode(s) of pulsation: F-fundamental, o1-first \
-                   overtone, o2-second, etc"
-      required="False">
-    </column>
-  </table>
+      <column name="period_short_err" type="double precision"
+        ucd="src.var;time.period"
+        unit="d"
+        tablehead="Period err"
+        description="Uncertainty of the shortest period"
+        required="False"/>
 
-  <table id="cepheid_p" onDisk="False" namePath="object">				<!-- Cepheid param -->
-    <meta name="description">Columns relevant for the Cepheid parameters tables</meta>
-    
-    <LOOP listItems="object_id mean_I mean_V ampl_I period_err epoch">
-      <events>
-        <column original="\item"/>
-      </events>
-    </LOOP>
-    <column original="object.period" description="Period (longest)"/>
+      <column name="period_med" type="double precision"
+        ucd="src.var;time.period"
+        unit="d"
+        tablehead=" Period"
+        description="The medium period of the Cepheid"
+        required="False"/>
 
-    <column name="period_short" type="double precision"
-      ucd="src.var;time.period"
-      unit="d"
-      tablehead="Shortest Period"
-      description="The shortest period of the Cepheid"
-      required="False"/>
+      <column name="period_med_err" type="double precision"
+        ucd="src.var;time.period"
+        unit="d"
+        tablehead="Period err"
+        description="Uncertainty of the medium period"
+        required="False"/>
+    </events>
+  </mixinDef>
 
-    <column name="period_short_err" type="double precision"
-      ucd="src.var;time.period"
-      unit="d"
-      tablehead="Period err"
-      description="Uncertainty of the shortest period"
-      required="False"/>
+  <mixinDef id="dsct_id">												<!-- d Sct id -->    
+    <doc>"description">Columns relevant for the Delta Sct ident  tables</doc>
+    <events>
+      <FEED source="object_ident_columns"/>
+      <column original="subtype" description="singlemode, multimode"/>
+    </events>
+  </mixinDef>
 
-    <column name="period_med" type="double precision"
-      ucd="src.var;time.period"
-      unit="d"
-      tablehead=" Period"
-      description="The medium period of the Cepheid"
-      required="False"/>
+  <mixinDef id="dsct_p">												<!-- d Sct param-->
+    <doc>"description">Columns relevant for the Delta Sct object parameters tables</doc>
 
-    <column name="period_med_err" type="double precision"
-      ucd="src.var;time.period"
-      unit="d"
-      tablehead="Period err"
-      description="Uncertainty of the medium period"
-      required="False"/>
-  </table>
+    <events>   
+      <FEED source="object_param_columns"/>
+      <column original="period" description="Primary period"/>
+      <column name="period2" type="double precision"
+        ucd="src.var;time.period"
+        unit="d"
+        tablehead="Secondary Period"
+        description="The secondary period"
+        required="False"/>
 
-  <table id="dsct_id" onDisk="False" namePath="object">					<!-- d Sct id -->
-    <meta name="description">Columns relevant for the Delta Sct ident  tables</meta>
+      <column name="period2_err" type="double precision"
+        ucd="src.var;time.period"
+        unit="d"
+        tablehead="Period2 err"
+        description="Uncertainty of the secondary period"
+        required="False"/>
 
-    <LOOP listItems="\object_id_columns">
-      <events>
-        <column original="\item"/>
-      </events>
-    </LOOP>
+      <column name="period3" type="double precision"
+        ucd="src.var;time.period"
+        unit="d"
+        tablehead="Tertiary Period"
+        description="The tertiary period"
+        required="False"/>
 
-    <column original="subtype" description="singlemode, multimode"/>
-  </table>
+      <column name="period3_err" type="double precision"
+        ucd="src.var;time.period"
+        unit="d"
+        tablehead="Period3 err"
+        description="Uncertainty of the tertiary period"
+        required="False"/>
+    </events>
+  </mixinDef>
 
-  <table id="dsct_p" onDisk="False" namePath="object">					<!-- d Sct param-->
-    <meta name="description">Columns relevant for the Delta Sct object parameters tables</meta>
-   
-    <LOOP listItems="object_id mean_I mean_V ampl_I period_err epoch">
-      <events>
-        <column original="\item"/>
-      </events>
-    </LOOP>
-
-    <column original="period" description="Primary period"/>
-    <column name="period2" type="double precision"
-      ucd="src.var;time.period"
-      unit="d"
-      tablehead="Secondary Period"
-      description="The secondary period"
-      required="False"/>
-
-    <column name="period2_err" type="double precision"
-      ucd="src.var;time.period"
-      unit="d"
-      tablehead="Period2 err"
-      description="Uncertainty of the secondary period"
-      required="False"/>
-
-    <column name="period3" type="double precision"
-      ucd="src.var;time.period"
-      unit="d"
-      tablehead="Tertiary Period"
-      description="The tertiary period"
-      required="False"/>
-
-    <column name="period3_err" type="double precision"
-      ucd="src.var;time.period"
-      unit="d"
-      tablehead="Period3 err"
-      description="Uncertainty of the tertiary period"
-      required="False"/>
-  </table>
-
-  <table id="ecl_id" onDisk="False" namePath="object">							<!-- Ecl ID-->
-    <meta name="description">Columns relevant for the Eclipsing and Ellipsoidal Binary Systems ident tables</meta>
-    <LOOP listItems="\object_id_columns">
-      <events>
-        <column original="\item"/>
-      </events>
-    </LOOP>
-
-    <LOOP listItems="object_id raj2000 dej2000 ogle4_id ogle3_id ogle2_id vsx
-                     ogle_vartype ssa_targclass ssa_collection ssa_reference">
-      <events>
-        <column original="\item"/>
-      </events>
-    </LOOP>
-    <column original="subtype" tablehead="Subtype" description="C(contact), NC(non-contact), \
+  <mixinDef id="ecl_id">													<!-- Ecl ID-->
+    <doc>"description">Columns relevant for the Eclipsing and Ellipsoidal Binary Systems ident tables</doc>
+    <events>
+      <FEED source="object_ident_columns"/>
+      <column original="subtype" tablehead="Subtype" description="C(contact), NC(non-contact), \
                                    CV(cataclysmic), ELL(ellipsoidal)"/>
-  </table>
+    </events>  
+  </mixinDef>
 
-  <table id="ecl_p" onDisk="False" namePath="object">							<!-- Ecl param -->
-    <meta name="description">Columns relevant for the Eclipsing and \
-                                 Ellipsoidal Binary Systems parameters tables</meta>
+  <mixinDef id="ecl_p">													<!-- Ecl param -->
+    <doc>"description">Columns relevant for the Eclipsing and \
+                                 Ellipsoidal Binary Systems parameters tables</doc>
 
-    <column original="object_id"/>
-    <column original="mean_I" tablehead="I at max" description="I-band magnitude at the maximum light"/>
-    <column original="mean_V" tablehead="V at max" description="V-band magnitude at the maximum light"/>
-    <column original="period" description="Orbital period"/>
-    <column original="period_err"/>
-    <column original="epoch" description="Epoch of of the primary eclipse, MJD"/>
+    <events>
+      <FEED source="object_param_columns"/>
+      <column original="mean_I" tablehead="I at max" description="I-band magnitude at the maximum light"/>
+      <column original="mean_V" tablehead="V at max" description="V-band magnitude at the maximum light"/>
+      <column original="period" description="Orbital period"/>
+      <column original="epoch" description="Epoch of of the primary eclipse, MJD"/>
 
-    <column name="depth1" type="double precision"
-      ucd="phot.mag"
-      unit="mag"
-      tablehead="Depth 1"
-      description="Depth of the primary eclipse"
-      required="False"/>
+      <column name="depth1" type="double precision"
+        ucd="phot.mag"
+        unit="mag"
+        tablehead="Depth 1"
+        description="Depth of the primary eclipse"
+        required="False"/>
 
-    <column name="depth2" type="double precision"
-      ucd="phot.mag"
-      unit="mag"
-      tablehead="Depth 2"
-      description="Depth of the secondary eclipse"
-      required="False"/>
-  </table>
+      <column name="depth2" type="double precision"
+        ucd="phot.mag"
+        unit="mag"
+        tablehead="Depth 2"
+        description="Depth of the secondary eclipse"
+        required="False"/>
+    </events>
+  </mixinDef>
 
-  <table id="hb_id" onDisk="False" namePath="object">					<!-- HB ID -->
-    <meta name="description">Columns relevant for the HB ident tables</meta>
-
-    <LOOP listItems="\object_id_columns">
-      <events>
-        <column original="\item"/>
-      </events>
-    </LOOP>
-    <column original="subtype" description="RG(system with red giant star) \
+  <mixinDef id="hb_id">												<!-- HB ID -->
+    <doc>"description">Columns relevant for the HB ident tables</doc>
+    <events>
+      <FEED source="object_ident_columns"/>
+      <column original="subtype" description="RG(system with red giant star) \
                      MS(system with a (post)main-sequence star)"/>
 
-  </table>
+    </events>
+  </mixinDef>
 
-  <table id="hb_p" onDisk="False" namePath="object">					<!-- HB param -->
-    <meta name="description">Columns relevant for the HB object parameters tables</meta>
-    <LOOP listItems="object_id mean_I mean_V ampl_I period period_err">
-      <events>
-        <column original="\item"/>
-      </events>
-    </LOOP>
-    <column original="period" description="Orbital period"/>
-    <column original="epoch" description="Epoch of the periastron passage"/>
+  <mixinDef id="hb_p">												<!-- HB param -->
+    <doc>"description">Columns relevant for the HB object parameters tables</doc>
+    <events>
+      <FEED source="object_param_columns"/>
+      <column original="period" description="Orbital period"/>
+      <column original="epoch" description="Epoch of the periastron passage"/>
 
-    <column name="ecc" type="real"
-      ucd="src.orbital.eccentricity"
-      unit="deg"
-      tablehead="Eccentricity"
-      description="Orbital eccentricity"
-      required="False"/>
+      <column name="ecc" type="real"
+        ucd="src.orbital.eccentricity"
+        unit="deg"
+        tablehead="Eccentricity"
+        description="Orbital eccentricity"
+        required="False"/>
 
-    <column name="incl" type="real"
-      ucd="src.orbital.inclination"
-      unit="deg"
-      tablehead="Inclination"
-      description="Orbital inclination"
-      required="False"/>
+      <column name="incl" type="real"
+        ucd="src.orbital.inclination"
+        unit="deg"
+        tablehead="Inclination"
+        description="Orbital inclination"
+        required="False"/>
 
-    <column name="omega" type="real"
-      ucd="src.orbital.periastron"
-      unit="deg"
-      tablehead="Omega"
-      description="Argument of periastron"
-      required="False"/>
+      <column name="omega" type="real"
+        ucd="src.orbital.periastron"
+        unit="deg"
+        tablehead="Omega"
+        description="Argument of periastron"
+        required="False"/>
 
-    <column name="add_var" type="text" 
-      ucd="meta.code.class"
-      tablehead="Additional variability" verbLevel="15"
-      description="ECL(eclipses or spots), OSARG(Small Ampl RG oscillations),\
-                   TEO(Tidally-excited oscillations), MISC(miscalloues)"
-      required="False"/>
-  </table>
+      <column name="add_var" type="text" 
+        ucd="meta.code.class"
+        tablehead="Additional variability" verbLevel="15"
+        description="ECL(eclipses or spots), OSARG(Small Ampl RG oscillations),\
+                     TEO(Tidally-excited oscillations), MISC(miscalloues)"
+        required="False"/>
+    </events>
+  </mixinDef>
 
-  <table id="mira_id" onDisk="False" namePath="object">					<!-- LPV ID -->
-    <meta name="description">Columns relevant for the Mira (LPV) ident tables</meta>
+  <mixinDef id="mira_id">													<!-- LPV ID -->
+    <doc>"description">Columns relevant for the Mira (LPV) ident tables</doc>
+    <events>  
+      <FEED source="object_ident_columns">
+        <PRUNE name="subtype"/>
+      </FEED>      
 
-    <LOOP listItems="\object_id_columns">
-      <events>
-        <column original="\item"/>
-      </events>
-    </LOOP>
+    </events>
+  </mixinDef>
 
-  </table>
+  <mixinDef id="mira_p">													<!-- LPV param -->
+    <doc>"description">Columns relevant for the Mira (LPV) object parameters tables</doc>
+    <events>
+      <FEED source="object_param_columns">
+        <PRUNE id="epoch"/>
+      </FEED>
+    </events>
+  </mixinDef>
 
-  <table id="mira_p" onDisk="False" namePath="object">					<!-- LPV param -->
-    <meta name="description">Columns relevant for the Mira (LPV) object parameters tables</meta>
-    <LOOP listItems="object_id mean_I mean_V ampl_I period period_err">
-      <events>
-        <column original="\item"/>
-      </events>
-    </LOOP>
-  </table>
+  <mixinDef id="rot_id">													<!-- ROT id -->
+    <doc>"description">Columns relevant for the Rotating Variables ident  tables</doc>
+    <events>
+      <FEED source="object_ident_columns">
+        <PRUNE name="subtype"/>
+      </FEED>      
+    </events>
+  </mixinDef>
 
-  <table id="rot_id" onDisk="False" namePath="object">					<!-- ROT id -->
-    <meta name="description">Columns relevant for the Rotating Variables ident  tables</meta>
-    <LOOP listItems="\object_id_columns">
-      <events>
-        <column original="\item"/>
-      </events>
-    </LOOP>
-  </table>
+  <mixinDef id="rot_p">														<!-- ROT param-->
+    <doc>"description">Columns relevant for the Rotating Variables parameters tables</doc>
+    <events>
+      <FEED source="object_param_columns">
+        <PRUNE id="epoch"/>
+      </FEED>
+      <column name="ampl_V" type="double precision"
+        ucd="phot.mag"
+        unit="mag"
+        tablehead="Ampl V"
+        description="V-band amplitude of the primary period"
+        required="False"/>
+    </events>   
+  </mixinDef>
 
-  <table id="rot_p" onDisk="False" namePath="object">					<!-- ROT param-->
-    <meta name="description">Columns relevant for the Rotating Variables parameters tables</meta>
-   
-    <LOOP listItems="object_id mean_I mean_V ampl_I ampl_V period period_err">
-      <events>
-        <column original="\item"/>
-      </events>
-    </LOOP>
-  </table>
+  <mixinDef id="rrlyr_id">													<!-- RR Lyr id -->
+    <doc>"description">Columns relevant for the RR Lyr ident  tables</doc>
+    <events>
+      <FEED source="object_ident_columns"/>
+    </events>
+  </mixinDef>
 
-  <table id="rrlyr_id" onDisk="False" namePath="object">					<!-- RR Lyr id -->
-    <meta name="description">Columns relevant for the RR Lyr ident  tables</meta>
-    <LOOP listItems="\object_id_columns">
-      <events>
-        <column original="\item"/>
-      </events>
-    </LOOP>
-    <column original="subtype"/>
-  </table>
+  <mixinDef id="rrlyr_p">													<!-- RR Lyr param-->
+    <doc>"description">Columns relevant for the RR Lyr parameters tables</doc>
+    <events>
+      <FEED source="object_param_columns"/>
+      <column original="ampl_I" description="I-band amplitude of the fundamental-mode period"/>
+      <column original="period" description="Fundamental mode period"/>
+      <column name="period1" type="double precision"
+          ucd="src.var;time.period"
+          unit="d"
+          tablehead="o1 period"
+          description="First-overtone period"
+          required="False"/>
 
-  <table id="rrlyr_p" onDisk="False" namePath="object">					<!-- RR Lyr param-->
-    <meta name="description">Columns relevant for the RR Lyr parameters tables</meta>
+      <column name="period1_err" type="double precision"
+          ucd="src.var;time.period"
+          unit="d"
+          tablehead="o1 period_err"
+          description="Uncertainty of the first-overtone period"
+          required="False"/>
+    </events>
+  </mixinDef>
 
-    <LOOP listItems="object_id mean_I mean_V ampl_I period period_err epoch">
-      <events>
-        <column original="\item"/>
-      </events>
-    </LOOP>
-    <column original="ampl_I" description="I-band amplitude of the fundamental-mode period"/>
-    <column original="period" description="Fundamental mode period"/>
-    <column name="period1" type="double precision"
-      ucd="src.var;time.period"
-      unit="d"
-      tablehead="o1 period"
-      description="First-overtone period"
-      required="False"/>
+  <mixinDef id="t2cep_id">												<!-- t2cep id -->
+    <doc>"description">Columns relevant for the Type II Cepheids ident  tables</doc>
+    <events>
+      <FEED source="object_ident_columns"/>
+    </events>
+  </mixinDef>
 
-    <column name="period1_err" type="double precision"
-      ucd="src.var;time.period"
-      unit="d"
-      tablehead="o1 period_err"
-      description="Uncertainty of the first-overtone period"
-      required="False"/>
+  <mixinDef id="t2cep_p">												<!-- t2cep param -->
+    <doc>"description">Columns relevant for the Type II Cepheids parameters tables</doc>
+    <events>
+      <FEED source="object_param_columns"/>   
+    </events>
+  </mixinDef>
 
-  </table>
+  <mixinDef id="transit_id">											<!-- transit id -->
+    <doc>"description">Columns relevant for the candidates for transiting planets ident  tables</doc>
+    <events>
+      <FEED source="object_ident_columns">
+        <PRUNE name="subtype"/>
+      </FEED>      
+    </events>
+  </mixinDef>
 
-  <table id="t2cep_id" onDisk="False" namePath="object">					<!-- t2cep id -->
-    <meta name="description">Columns relevant for the Type II Cepheids ident  tables</meta>
-    <LOOP listItems="\object_id_columns">
-      <events>
-        <column original="\item"/>
-      </events>
-    </LOOP>
-    <column original="subtype"/>
-  </table>
+  <mixinDef id="transit_p">												<!-- transit param -->
+    <doc>"description">Columns relevant for the candidates for transiting planets parameters tables</doc>
+    <events>
+      <FEED source="object_param_columns"/>
+      <column original="period" description="Orbital period"/>
+      <column original="epoch" description="Time of inferior conjunction (transit)"/>
 
-  <table id="t2cep_p" onDisk="False" namePath="object">					<!-- t2cep param-->
-    <meta name="description">Columns relevant for the Type II Cepheids parameters tables</meta>
-   
-    <LOOP listItems="object_id mean_I mean_V ampl_I period period_err epoch">
-      <events>
-        <column original="\item"/>
-      </events>
-    </LOOP>
-  </table>
+      <column name="duration"
+        type="real"
+        ucd="time.duration"
+        unit="d"
+        tablehead="Duration"
+        description="Duration of transit from 1st contact to 4th contact"
+        required="False"/>
 
-  <table id="transit_id" onDisk="False" namePath="object">					<!-- transit id -->
-    <meta name="description">Columns relevant for the candidates for transiting planets ident  tables</meta>
-    <LOOP listItems="\object_id_columns">
-      <events>
-        <column original="\item"/>
-      </events>
-    </LOOP>
-  </table>
+      <column name="depth"
+        type="real"
+        ucd="src.var.amplitude"
+        tablehead="Depth"
+        description="Transit depth"
+        required="False"/>
 
-  <table id="transit_p" onDisk="False" namePath="object">					<!-- transit param-->
-    <meta name="description">Columns relevant for the candidates for transiting planets parameters tables</meta>
-   
-    <LOOP listItems="object_id mean_I mean_V ampl_I period_err">
-      <events>
-        <column original="\item"/>
-      </events>
-    </LOOP>
-    <column original="period" description="Orbital period"/>
-    <column original="epoch" description="Time of inferior conjunction (transit)"/>
+      <column name="probability"
+        type="real"
+        ucd="stat.probability"
+        tablehead="Probability"
+        description="Probability(planet signal)"
+        required="False"/>
 
-    <column name="duration"
-      type="real"
-      ucd="time.duration"
-      unit="d"
-      tablehead="Duration"
-      description="Duration of transit from 1st contact to 4th contact"
-      required="False"/>
-
-    <column name="depth"
-      type="real"
-      ucd="src.var.amplitude"
-      tablehead="Depth"
-      description="Transit depth"
-      required="False"/>
-
-    <column name="probability"
-      type="real"
-      ucd="stat.probability"
-      tablehead="Probability"
-      description="Probability(planet signal)"
-      required="False"/>
-
-    <column name="snr"
-      type="real"
-      ucd="stat.snr"
-      tablehead="SNR"
-      description="Signal-to-noise ratio"
-      required="False"/>
-  </table>
+      <column name="snr"
+        type="real"
+        ucd="stat.snr"
+        tablehead="SNR"
+        description="Signal-to-noise ratio"
+        required="False"/>
+    </events>
+  </mixinDef>
 
 <!-- ============ lightcurve ================= -->
   <table id="lc" onDisk="False">

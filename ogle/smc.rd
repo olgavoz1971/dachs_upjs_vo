@@ -57,36 +57,12 @@
     TBD
   </meta>
 
-  <STREAM id="makeCommonRowsIdent">
-    <DEFAULTS sep=":"/>
-
-    <!-- Input HMS/DMS fields are quite diverse: separators may be spaces or
-         colons; leading  zeros may be replaced by extra spaces -->
-    <var name="raj2000">hmsToDeg(@alphaHMS.replace(" \sep", "\sep"), "\sep")</var>
-    <var name="dej2000">dmsToDeg(@deltaDMS.replace(" \sep", "\sep"), "\sep")</var>
-
-    <map dest="ogle4_id">parseWithNull(@ogle4_id, str, "")</map>
-    <map dest="ogle3_id">parseWithNull(@ogle3_id, str, "")</map>
-    <map dest="ogle2_id">parseWithNull(@ogle2_id, str, "")</map>
-    <map dest="vsx">parseWithNull(@vsx, str, "")</map>
-  </STREAM>
-
 <!-- ================================= Anomalous Cepheids ============================== -->
 
-  <table id="ident_smc_acep" onDisk="True" adql="hidden" namePath="ogle/aux#acepheid_id">
+  <table id="ident_smc_acep" onDisk="True" adql="hidden">
     <meta name="description">The original table with identification of \
                        Anomalous Cepheids \field collection</meta>
-
-    <!-- Pull all columns from the prototype id table: -->
-    <LOOP>
-       <codeItems>
-         for col in context.resolveId("ogle/aux#acepheid_id").columns:
-           yield {'item': col.name}
-       </codeItems>
-       <events>
-         <column original="\item"/>
-       </events>
-    </LOOP>
+    <mixin>ogle/aux#acepheid_id</mixin>
   </table>
 
   <data id="import_smc_acep">
@@ -107,7 +83,7 @@
 
     <make table="ident_smc_acep">
       <rowmaker idmaps="*">
-        <FEED source="makeCommonRowsIdent"/>
+        <FEED source="ogle/aux#makeCommonRowsIdent"/>
         <map dest="pulse_mode">parseWithNull(@pulse_mode, str, "")</map>
         <var name="ogle_vartype">"ACep"</var>
         <var name="ssa_targclass">"Ce*"</var>
@@ -127,20 +103,13 @@
       acep1o,         acep1O.dat, first-overtone-(1O)-A.Cepheids
     </csvItems>
     <events>
-      <table id="param_smc_acep_\class" onDisk="True" adql="hidden" namePath="ogle/aux#acepheid_p">
+      <table id="param_smc_acep_\class" onDisk="True" adql="hidden">
         <meta name="description">The table from the base of original \source with parameters of \subclass \
                 from OGLE Anomalous Cepheids \\field collection</meta>
 
-        <LOOP>
-          <codeItems>
-            for col in context.resolveId("ogle/aux#acepheid_p").columns:
-              yield {'item': col.name}
-          </codeItems>
-          <events>
-            <column original="\item"/>
-          </events>
-        </LOOP>
+        <mixin>ogle/aux#acepheid_p</mixin>
       </table>
+
       <data id="import_param_smc_\class">
         <sources>data/smc/acep/\source</sources>
         <columnGrammar>
@@ -170,20 +139,10 @@
 
 <!-- ================================= Classical Cepheids ============================== -->
 
-  <table id="ident_smc_cep" onDisk="True" adql="hidden" namePath="ogle/aux#cepheid_id">
+  <table id="ident_smc_cep" onDisk="True" adql="hidden">
     <meta name="description">The original table with identification of \
                        Classical Cepheids \field collection</meta>
-
-    <!-- Pull all columns from the prototype id table: -->
-    <LOOP>
-       <codeItems>
-         for col in context.resolveId("ogle/aux#cepheid_id").columns:
-           yield {'item': col.name}
-       </codeItems>
-       <events>
-         <column original="\item"/>
-       </events>
-    </LOOP>
+    <mixin>ogle/aux#cepheid_id</mixin>
   </table>
 
   <data id="import_smc_cep">
@@ -204,7 +163,7 @@
 
     <make table="ident_smc_cep">
       <rowmaker idmaps="*">
-        <FEED source="makeCommonRowsIdent"/>
+        <FEED source="ogle/aux#makeCommonRowsIdent"/>
         <map dest="pulse_mode">parseWithNull(@pulse_mode, str, "")</map>
         <var name="ogle_vartype">"Cep"</var>
         <var name="ssa_targclass">"cC*"</var>
@@ -225,20 +184,12 @@
       cep2o,         cep2O.dat, second-overtone-(2O)-Cepheids
     </csvItems>
     <events>
-      <table id="param_smc_cep_\class" onDisk="True" adql="hidden" namePath="ogle/aux#cepheid_p">
+      <table id="param_smc_cep_\class" onDisk="True" adql="hidden">
         <meta name="description">The table from the base of original \source with parameters of \subclass \
                 from OGLE classical Cepheids \\field collection</meta>
-
-        <LOOP>
-          <codeItems>
-            for col in context.resolveId("ogle/aux#cepheid_p").columns:
-              yield {'item': col.name}
-          </codeItems>
-          <events>
-            <column original="\item"/>
-          </events>
-        </LOOP>
+        <mixin>ogle/aux#cepheid_p</mixin>   
       </table>
+
       <data id="import_param_smc_\class">
         <sources>data/smc/cep/\source</sources>
         <columnGrammar>
@@ -285,20 +236,13 @@
       cep1o2o,     cep1O2O.dat, double-mode-(1O/2O)-Cepheids
     </csvItems>
     <events>
-      <table id="param_smc_cep_\class" onDisk="True" adql="hidden" namePath="ogle/aux#cepheid_p">
+      <table id="param_smc_cep_\class" onDisk="True" adql="hidden">
         <meta name="description">The table from the base of original \source \
                 with parameters of \subclass \
                 from OGLE classical Cepheids \\field collection</meta>
-        <LOOP>
-          <codeItems>
-            for col in context.resolveId("ogle/aux#cepheid_p").columns:
-              yield {'item': col.name}
-          </codeItems>
-          <events>
-            <column original="\item"/>
-          </events>
-        </LOOP>
+        <mixin>ogle/aux#cepheid_p</mixin>   
       </table>
+
       <data id="import_param_smc_\class">
         <sources>data/smc/cep/\source</sources>
         <columnGrammar>
@@ -343,20 +287,13 @@
       cep1o2o3o, cep1O2O3O.dat, triple-mode-(1O/2O/30)-Cepheids
     </csvItems>
     <events>
-      <table id="param_smc_cep_\class" onDisk="True" adql="hidden" namePath="ogle/aux#cepheid_p">
+      <table id="param_smc_cep_\class" onDisk="True" adql="hidden">
         <meta name="description">The table from the base of original \source \
                 with parameters of \subclass \
                 from OGLE classical Cepheids \\field collection</meta>
-        <LOOP>
-          <codeItems>
-            for col in context.resolveId("ogle/aux#cepheid_p").columns:
-              yield {'item': col.name}
-          </codeItems>
-          <events>
-            <column original="\item"/>
-          </events>
-        </LOOP>
+        <mixin>ogle/aux#cepheid_p</mixin>
       </table>
+
       <data id="import_param_smc_\class">
         <sources>data/smc/cep/\source</sources>
         <columnGrammar>
@@ -391,19 +328,9 @@
 
 <!-- ============================= DSct (Delta Sct) ============================================ -->
 
-  <table id="ident_smc_dsct" onDisk="True" adql="hidden" namePath="ogle/aux#dsct_id">
+  <table id="ident_smc_dsct" onDisk="True" adql="hidden">
     <meta name="description">The original table with identifications of delta Scuti-type stars \field collection</meta>
-
-    <!-- Pull all columns from the prototype id table: -->
-    <LOOP>
-       <codeItems>
-         for col in context.resolveId("ogle/aux#dsct_id").columns:
-           yield {'item': col.name}
-       </codeItems>
-       <events>
-         <column original="\item"/>
-       </events>
-    </LOOP>
+    <mixin>ogle/aux#dsct_id</mixin>
   </table>
 
   <data id="import_smc_dsct">
@@ -422,7 +349,7 @@
     </columnGrammar>
     <make table="ident_smc_dsct">
       <rowmaker idmaps="*">
-        <FEED source="makeCommonRowsIdent"/>
+        <FEED source="ogle/aux#makeCommonRowsIdent"/>
         <map dest="subtype">parseWithNull(@subtype, str, "")</map>
         <var name="ogle_vartype">"dSct"</var>
         <var name="ssa_targclass">"dS*"</var>
@@ -434,17 +361,9 @@
 
 <!-- ================================= Param DSCT (Delta Sct) ============= -->
 
-  <table id="param_smc_dsct" onDisk="True" adql="hidden" namePath="ogle/aux#dsct_p">
+  <table id="param_smc_dsct" onDisk="True" adql="hidden">
     <meta name="description">The table from original dsct.dat from OGLE Delta Scuti Stars \field collection</meta>
-    <LOOP>
-      <codeItems>
-          for col in context.resolveId("ogle/aux#dsct_p").columns:
-              yield {'item': col.name}
-      </codeItems>
-      <events>
-            <column original="\item"/>
-      </events>
-    </LOOP>
+    <mixin>ogle/aux#dsct_p</mixin>
   </table>
 
   <data id="import_param_smc_dsct">
@@ -484,19 +403,10 @@
 
 <!-- ========================= Ecl (Eclipsing and Ellipsoidal) ================================== -->
 
-  <table id="ident_smc_ecl" onDisk="True" adql="hidden" namePath="ogle/aux#ecl_id">
+  <table id="ident_smc_ecl" onDisk="True" adql="hidden">
     <meta name="description">The original table with identifications of Eclipsing and Ellipsoidal \
                  binary systems \field colection</meta>
-
-    <LOOP>
-       <codeItems>
-         for col in context.resolveId("ogle/aux#ecl_id").columns:
-           yield {'item': col.name}
-       </codeItems>
-       <events>
-         <column original="\item"/>
-       </events>
-    </LOOP>
+    <mixin>ogle/aux#ecl_id</mixin>
   </table>
 
   <data id="import_smc_ecl">
@@ -515,7 +425,7 @@
     </columnGrammar>
     <make table="ident_smc_ecl">
       <rowmaker idmaps="*">
-        <FEED source="makeCommonRowsIdent"/>
+        <FEED source="ogle/aux#makeCommonRowsIdent"/>
         <map key="subtype">parseWithNull(@subtype, str, "")</map>
         <map key="ogle_vartype">@object_id.split("-")[2].capitalize()</map>
 
@@ -546,19 +456,10 @@
       ell,    ell.dat, ellipsoidal-binaries
     </csvItems>
     <events>
-      <table id="param_smc_\class" onDisk="True" adql="hidden" namePath="ogle/aux#ecl_p">
+      <table id="param_smc_\class" onDisk="True" adql="hidden">
         <meta name="description">The table from the base of original \source file with parameters \
               of \subclass stars from OGLE Eclipsing and Ellipsoidal Binary Systems  \\field collection</meta>
- 
-       <LOOP>
-          <codeItems>
-            for col in context.resolveId("ogle/aux#ecl_p").columns:
-              yield {'item': col.name}
-          </codeItems>
-          <events>
-            <column original="\item"/>
-          </events>
-        </LOOP>
+       <mixin>ogle/aux#ecl_p</mixin>
       </table>
 
       <data id="import_param_smc_\class">
@@ -591,19 +492,10 @@
 
 <!-- ======================= HB (Heartbeat stars) ================================== -->
 
-  <table id="ident_smc_hb" onDisk="True" adql="hidden" namePath="ogle/aux#hb_id">
+  <table id="ident_smc_hb" onDisk="True" adql="hidden">
     <meta name="description">The original table with identifications of Heartbeat binary systems \
                 in the Galactic bulge and Magellanic Clouds</meta>
-
-    <LOOP>
-       <codeItems>
-         for col in context.resolveId("ogle/aux#hb_id").columns:
-           yield {'item': col.name}
-       </codeItems>
-       <events>
-         <column original="\item"/>
-       </events>
-    </LOOP>
+    <mixin>ogle/aux#hb_id</mixin>
   </table>
 
   <data id="import_smc_hb">
@@ -622,7 +514,7 @@
     </columnGrammar>
     <make table="ident_smc_hb">
       <rowmaker idmaps="*">
-        <FEED source="makeCommonRowsIdent" sep=" "/>
+        <FEED source="ogle/aux#makeCommonRowsIdent" sep=" "/>
         <map dest="subtype">parseWithNull(@subtype, str, "")</map>
         <var name="ogle_vartype">"Hb"</var>
         <var name="ssa_targclass">"Pu*,El*"</var>
@@ -634,18 +526,10 @@
 
 <!-- ====================== Param HB (heartbeat binary systems) ============ -->
 
-  <table id="param_smc_hb" onDisk="True" adql="hidden" namePath="ogle/aux#hb_p">
+  <table id="param_smc_hb" onDisk="True" adql="hidden">
     <meta name="description">The table from original hb.dat from OGLE \
                          Heartbeat binary systems \field collection</meta>
-    <LOOP>
-      <codeItems>
-          for col in context.resolveId("ogle/aux#hb_p").columns:
-              yield {'item': col.name}
-      </codeItems>
-      <events>
-            <column original="\item"/>
-      </events>
-    </LOOP>
+    <mixin>ogle/aux#hb_p</mixin>
   </table>
 
   <data id="import_param_smc_hb">
@@ -680,18 +564,9 @@
 
 <!-- ======================= RR Lyr ================================== -->
 
-  <table id="ident_smc_rr" onDisk="True" adql="hidden" namePath="ogle/aux#rrlyr_id">
+  <table id="ident_smc_rr" onDisk="True" adql="hidden">
     <meta name="description">The original table with identification of RR Lyr stars \field collection</meta>
-
-    <LOOP>
-      <codeItems>
-          for col in context.resolveId("ogle/aux#rrlyr_id").columns:
-              yield {'item': col.name}
-      </codeItems>
-      <events>
-            <column original="\item"/>
-      </events>
-    </LOOP>
+    <mixin>ogle/aux#rrlyr_id</mixin>
   </table>
 
   <data id="import_smc_rr">
@@ -710,7 +585,7 @@
     </columnGrammar>
     <make table="ident_smc_rr">
       <rowmaker idmaps="*">
-        <FEED source="makeCommonRowsIdent"/>
+        <FEED source="ogle/aux#makeCommonRowsIdent"/>
 
         <var name="ssa_targclass">@subtype</var>
         <apply name="rr_to_simbad_otype" procDef="//procs#dictMap">
@@ -739,19 +614,11 @@
       rr_c,   RRc.dat, first-overtone
     </csvItems>
     <events>
-      <table id="param_smc_\class" onDisk="True" adql="hidden" namePath="ogle/aux#rrlyr_p">
+      <table id="param_smc_\class" onDisk="True" adql="hidden">
         <meta name="description">The table from the base of original \source \
                   with parameters of \subclass stars \
                   from OGLE RR Lyr \\field collection</meta>
-        <LOOP>
-          <codeItems>
-              for col in context.resolveId("ogle/aux#rrlyr_p").columns:
-                yield {'item': col.name}
-          </codeItems>
-          <events>
-                <column original="\item"/>
-          </events>
-        </LOOP>
+        <mixin>ogle/aux#rrlyr_p</mixin>
       </table>
 
       <data id="import_smc_\class">
@@ -788,19 +655,11 @@
       arr_d, aRRd.dat, anomalous-RRd
     </csvItems>
     <events>
-      <table id="param_smc_\class" onDisk="True" adql="hidden" namePath="ogle/aux#rrlyr_p">
+      <table id="param_smc_\class" onDisk="True" adql="hidden">
         <meta name="description">The table from the base of original \source \
                   with parameters of \subclass stars \
                   from OGLE RR Lyr \\field collection</meta>
-        <LOOP>
-          <codeItems>
-              for col in context.resolveId("ogle/aux#rrlyr_p").columns:
-                yield {'item': col.name}
-          </codeItems>
-          <events>
-                <column original="\item"/>
-          </events>
-        </LOOP>
+        <mixin>ogle/aux#rrlyr_p</mixin>
       </table>
 
       <data id="import_smc_\class">
@@ -837,18 +696,9 @@
 
   <macDef name="class_desc">Type II Cepheids</macDef>
 
-  <table id="ident_smc_t2cep" onDisk="True" adql="hidden" namePath="ogle/aux#t2cep_id">
+  <table id="ident_smc_t2cep" onDisk="True" adql="hidden">
     <meta name="description">The original table with identifications of \class_desc \field</meta>
-
-    <LOOP>
-      <codeItems>
-         for col in context.resolveId("ogle/aux#t2cep_id").columns:
-           yield {'item': col.name}
-      </codeItems>
-      <events>
-        <column original="\item"/>
-      </events>
-    </LOOP>
+    <mixin>ogle/aux#t2cep_id</mixin>
   </table>
 
   <data id="import_smc_t2cep">
@@ -867,7 +717,7 @@
     </columnGrammar>
     <make table="ident_smc_t2cep">
       <rowmaker idmaps="*">
-        <FEED source="makeCommonRowsIdent"/>
+        <FEED source="ogle/aux#makeCommonRowsIdent"/>
         <map dest="subtype">parseWithNull(@subtype, str, "")</map>
         <var name="ogle_vartype">"T2Cep"</var>
         <var name="ssa_targclass">"WV*"</var>
@@ -879,17 +729,9 @@
 
 <!-- ================================= Param t2cep (Type II Cepheids) ============= -->
 
-  <table id="param_smc_t2cep" onDisk="True" adql="hidden" namePath="ogle/aux#t2cep_p">
+  <table id="param_smc_t2cep" onDisk="True" adql="hidden">
     <meta name="description">The table from original t2cep.dat from OGLE Type II Cepheids \field collection</meta>
-    <LOOP>
-      <codeItems>
-          for col in context.resolveId("ogle/aux#t2cep_p").columns:
-              yield {'item': col.name}
-      </codeItems>
-      <events>
-            <column original="\item"/>
-      </events>
-    </LOOP>
+    <mixin>ogle/aux#t2cep_p</mixin>
   </table>
 
   <data id="import_param_smc_t2cep">
@@ -916,4 +758,5 @@
       </rowmaker>
     </make>
   </data>
+
 </resource>
