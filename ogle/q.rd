@@ -233,6 +233,7 @@
       ssa_targetpos="NULL"
     >//ssap#view</mixin>
     
+    <!-- TODO add correct preview url -->
     <mixin
       calibLevel="2"
       t_min="t_min"

@@ -49,8 +49,11 @@
 
   <table id="lightcurves" onDisk="True" adql="True"  namePath="ogle/aux#lc">
     <meta name="description">The united table with photometry points of all OGLE Lightcurves</meta>
+    <index columns="object_id, passband">
+<!-- <index columns="object_id, passband" cluster=True>
     <index columns="object_id"/>
     <index columns="passband"/>
+-->
     <index columns="obs_time"/>
 
     <LOOP listItems="object_id passband obs_time magnitude mag_err ogle_phase">
