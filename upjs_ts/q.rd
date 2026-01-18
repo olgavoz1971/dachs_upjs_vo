@@ -94,6 +94,7 @@
 		<column original="//obscore#ObsCore.t_min"/>
 		<column original="//obscore#ObsCore.t_max"/>
 		<column original="//products#products.accref"/>
+        <column original="//products#products.preview"/>
 
 		<mixin>//ssap#plainlocation</mixin>		<!-- injects ssa_location -->
 		<mixin>//ssap#simpleCoverage</mixin>	<!-- ssa_region -->
@@ -154,6 +155,7 @@
 				'\getConfig{web}{serverURL}/\rdId/sdl/dlget?ID=' || '\pubDIDBase' || 'upjs/ts/' || o.id || '-' || p.band AS accref,
 				'\pubDIDBase' || 'upjs/ts/' || o.id || '-' || p.band AS ssa_pubdid,
 				'application/x-votable+xml' AS mime,
+				'\getConfig{web}{serverURL}/\rdId/preview/qp/' || 'upjs/ts/' || o.id || '-' || p.band AS preview,
 				50000 AS accsize,
 				NULL AS embargo,
 				NULL AS owner,
@@ -212,10 +214,11 @@
 		JK: [!p]* ([^p]* does not work) excludes my private columns from the ssa view  - ??? this excludes t_min column too
 		copied SSA columns cannot be overridden in mixin parameter (like ssa_bandpass)
 			ssa_pubDID="\sql_standardPubDID"  -  we do it manullay in the raw_data
+			copiedcolumns="[!p]*"
 		-->
 		<mixin
 			sourcetable="raw_data"
-			copiedcolumns="[!p]*"
+			copiedcolumns="*"
 			ssa_aperture="1/3600."
 			ssa_collection="'Kolonica live timeseries'"
 			ssa_dstype="'timeseries'"
@@ -244,6 +247,7 @@
 			coverage="ssa_region"
 			oUCD="'phot.mag'"
 			createDIDIndex="True"
+			preview="preview"
 		>//obscore#publishSSAPMIXC</mixin>	<!-- JK: Note: We need to pass t_min/t_max parameters explicitly
 			in the case of timeseries: defaults are appropriate for spectra only -->
 
@@ -578,7 +582,11 @@
 		</meta>
 
 		<ssapCore queriedTable="ts_ssa">
+		<!--
 			<property key="previews">auto</property>
+			JK: auto produces wrong URLs in my case. Would it work properly if I populate products table?
+			And does this really make sense?
+		-->
 			<FEED source="//ssap#hcd_condDescs"/>
 		</ssapCore>
 	</service>

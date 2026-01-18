@@ -85,7 +85,7 @@
 
     <!-- metadata actually varies among data sets -->
     <!-- JK: ssa_region comes from ssap#simpleCoverage mixin, and does not reside in ssap#instance.
-         accref, mime, owner, embargo come from products#table mixin
+         accref, preview, mime, owner, embargo come from products#table mixin
          ssa_location resides in both, ssap#instance and ssap#plainlocation
     -->
     <LOOP listItems="ssa_dstitle ssa_targname ssa_targclass
@@ -97,6 +97,9 @@
     </LOOP>
     <column original="//obscore#ObsCore.t_min"/>
     <column original="//obscore#ObsCore.t_max"/>
+
+    <column original="//products#products.preview"/>
+
 
     <mixin>//products#table</mixin>
     <mixin>//ssap#plainlocation</mixin>
@@ -152,6 +155,7 @@
           NULL::spoly AS ssa_region,
           '\getConfig{web}{serverURL}/\rdId/sdl/dlget?ID=' || '\pubDIDBase' || q.object_id || '-' || q.passband AS accref,
           '\pubDIDBase' || q.object_id || '-' || q.passband AS ssa_pubdid,
+          '\getConfig{web}{serverURL}/\rdId/preview-plot/qp/' || q.object_id || '-' || q.passband AS preview,
           q.passband AS ssa_bandpass,
           p.specmid AS ssa_specmid,
           p.specstart AS ssa_specstart,
@@ -243,6 +247,7 @@
       coverage="ssa_region"
       oUCD="'phot.mag'"
       createDIDIndex="True"
+      preview="preview"
     >//obscore#publishSSAPMIXC</mixin>
 
     <column original="ssa_publisher" type="unicode"/>    <!-- unicode allows diacrtric symbols -->
@@ -610,7 +615,10 @@
     </meta>
 
     <ssapCore queriedTable="ts_ssa">
-      <property key="previews">auto</property>
+      <!-- <property key="previews">auto</property> 
+      auto produces wrong URLs in my case. Would it work properly if I populate products table? 
+      And does this really make sense?
+      -->
       <FEED source="//ssap#hcd_condDescs"/>
     </ssapCore>
   </service>
