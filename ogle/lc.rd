@@ -153,7 +153,7 @@
       <condDesc buildFrom="passband"/>
       <condDesc>
         <inputKey original="ogle_phase">
-          <values fromdb="ogle_phase from \schema.lightcurves"/>
+          <!-- <values fromdb="ogle_phase from \schema.lightcurves"/> -->
         </inputKey>
       </condDesc>
     </dbCore>
