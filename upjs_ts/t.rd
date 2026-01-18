@@ -1,4 +1,5 @@
 <resource schema="upjs_ts" resdir=".">
+  <meta name="schema-rank">100</meta>
   <meta name="creationDate">2025-11-25T12:38:44Z</meta>
 
   <meta name="title">External Tables with Lightcurves From Kolonica Observatory</meta>
@@ -42,6 +43,7 @@
   <meta name="coverage.waveband">Optical</meta>
 
   <table id="lightcurves" onDisk="True" adql="True">
+    <meta name="table-rank">150</meta>
     <meta name="description">The external table with photometric points of all objects</meta>
     <index columns="object_id"/>
     <index columns="photosys_id"/>
