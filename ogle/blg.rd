@@ -730,10 +730,10 @@
             mean_V:      30-35
             period1:     38-47
             period1_err: 49-58
-            ampl_I:     141-145
             period:     106-115
             period_err: 117-126
             epoch:      129-138
+            ampl_I:     141-145
           </colDefs>
         </columnGrammar>
         <make table="param_blg_\class">

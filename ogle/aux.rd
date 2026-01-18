@@ -396,6 +396,7 @@
       <FEED source="object_param_columns"/>
       <column original="ampl_I" description="I-band amplitude of the fundamental-mode period"/>
       <column original="period" description="Fundamental mode period"/>
+      <column original="epoch" description="Time of maximum brightness (fundamental mode)"/>
       <column name="period1" type="double precision"
           ucd="src.var;time.period"
           unit="d"

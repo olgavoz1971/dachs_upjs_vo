@@ -687,11 +687,10 @@
             mean_V:      30-35
             period1:     38-46
             period1_err: 48-56
-            epoch:       59-68
-            ampl_I:     137-141
             period:     104-112
             period_err: 114-122
             epoch:      125-134
+            ampl_I:     137-141
           </colDefs>
         </columnGrammar>
         <make table="param_lmc_\class">

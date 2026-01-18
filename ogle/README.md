@@ -50,3 +50,14 @@ listed in the original OGLE directory structure at https://www.astrouw.edu.pl/og
 
 Unfortunately, it is not possible to include multiple publications in a single row of the table. 
 Therefore, when several relevant papers exist, I selected the “paper1”.
+
+## Issues
+gd/cep/phot/V/OGLE-GD-CEP-1198.dat
+gd/cep/phot/V/OGLE-GD-CEP-1160.dat
+obstime is HJD-2450000.0, not HJD as for all other GD/cep/phot/[VI]/*.dat
+
+## Importing order
+1. Photometric system: phot.rd
+2. Original data: blg, gd, lmc, smc, misc, lc
+3. Object table views: o.rd
+4. Top level: q.rd

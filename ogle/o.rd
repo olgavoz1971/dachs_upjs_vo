@@ -90,7 +90,7 @@
         UNION ALL
         SELECT \colNames FROM \schema.ident_smc_acep      -- smc acep
         LEFT JOIN param_acep_smc_all USING (object_id)
-        												-- no acep in blg
+        												-- no acep in blg or gd
       )
     </viewStatement>
   </table>
@@ -120,6 +120,7 @@
         # Collect references from all involved tables
         with base.getTableConn() as conn:
           refs = [list(conn.query("SELECT ssa_reference FROM ogle.ident_blg_cep LIMIT 1"))[0][0], 
+                  list(conn.query("SELECT ssa_reference FROM ogle.ident_gd_cep LIMIT 1"))[0][0], 
                   list(conn.query("SELECT ssa_reference FROM ogle.ident_lmc_cep LIMIT 1"))[0][0], 
                   list(conn.query("SELECT ssa_reference FROM ogle.ident_smc_cep LIMIT 1"))[0][0]]
           # remove duplicates
@@ -156,6 +157,21 @@
             UNION ALL
             SELECT * FROM \schema.param_blg_cep_cep1o2o3o
         ),
+        param_gd_cep_all AS ( 
+            SELECT * FROM \schema.param_gd_cep_cepf
+            UNION ALL
+            SELECT * FROM \schema.param_gd_cep_cep1o
+            UNION ALL
+            SELECT * FROM \schema.param_gd_cep_cepf1o
+            UNION ALL
+            SELECT * FROM \schema.param_gd_cep_cep1o2o
+            UNION ALL
+            SELECT * FROM \schema.param_gd_cep_cep2o3o
+            UNION ALL
+            SELECT * FROM \schema.param_gd_cep_cepf1o2o
+            UNION ALL
+            SELECT * FROM \schema.param_gd_cep_cep1o2o3o
+        ),
         param_lmc_cep_all AS (
             SELECT * FROM \schema.param_lmc_cep_cepf
             UNION ALL
@@ -191,6 +207,9 @@
         SELECT \colNames FROM \schema.ident_blg_cep			-- blg cep
         LEFT JOIN param_blg_cep_all USING (object_id)
         UNION ALL
+        SELECT \colNames FROM \schema.ident_gd_cep			-- gd cep
+        LEFT JOIN param_gd_cep_all USING (object_id)
+        UNION ALL
         SELECT \colNames FROM \schema.ident_lmc_cep			-- lmc cep
         LEFT JOIN param_lmc_cep_all USING (object_id)
         UNION ALL
@@ -219,6 +238,7 @@
         # Collect references from all involved tables
         with base.getTableConn() as conn:
           refs = [list(conn.query("SELECT ssa_reference FROM ogle.ident_blg_dsct LIMIT 1"))[0][0], 
+                  list(conn.query("SELECT ssa_reference FROM ogle.ident_gd_dsct LIMIT 1"))[0][0], 
                   list(conn.query("SELECT ssa_reference FROM ogle.ident_lmc_dsct LIMIT 1"))[0][0], 
                   list(conn.query("SELECT ssa_reference FROM ogle.ident_smc_dsct LIMIT 1"))[0][0]]
           # remove duplicates
@@ -240,6 +260,9 @@
       CREATE MATERIALIZED VIEW \curtable AS (
         SELECT \colNames FROM \schema.ident_blg_dsct						-- blg dsct
         LEFT JOIN \schema.param_blg_dsct USING (object_id)
+        UNION ALL
+        SELECT \colNames FROM \schema.ident_gd_dsct							-- gd dsct
+        LEFT JOIN \schema.param_gd_dsct USING (object_id)
         UNION ALL
         SELECT \colNames FROM \schema.ident_lmc_dsct						-- lmc dsct
         LEFT JOIN \schema.param_lmc_dsct USING (object_id)
@@ -314,6 +337,7 @@
         UNION ALL
         SELECT \colNames FROM \schema.ident_smc_ecl         -- smc ecl
         LEFT JOIN param_smc_all USING (object_id)
+															-- no ecl in gd
       )
     </viewStatement>
   </table>
@@ -365,6 +389,7 @@
         UNION ALL
         SELECT \colNames FROM \schema.ident_smc_hb                          -- smc hb
         LEFT JOIN \schema.param_smc_hb USING (object_id)
+																			-- no hb in gd
       )
     </viewStatement>
   </table>
@@ -388,7 +413,8 @@
       <codeItems>
         # Collect references from all involved tables
         with base.getTableConn() as conn:
-          refs = [list(conn.query("SELECT ssa_reference FROM ogle.ident_blg_lpv LIMIT 1"))[0][0]]
+          refs = [list(conn.query("SELECT ssa_reference FROM ogle.ident_blg_lpv LIMIT 1"))[0][0],
+                  list(conn.query("SELECT ssa_reference FROM ogle.ident_gd_lpv LIMIT 1"))[0][0]]
           # remove duplicates
           uniq_refs = list(dict.fromkeys(refs))
           yield {"db_source": "; ".join(uniq_refs)}
@@ -408,6 +434,9 @@
       CREATE MATERIALIZED VIEW \curtable AS (
         SELECT \colNames FROM \schema.ident_blg_lpv							-- blg lpv
         LEFT JOIN \schema.param_blg_lpv USING (object_id)
+        UNION ALL
+        SELECT \colNames FROM \schema.ident_gd_lpv							-- blg lpv
+        LEFT JOIN \schema.param_gd_lpv USING (object_id)
 																-- no lpv in lmc or smc
       )
     </viewStatement>
@@ -452,7 +481,7 @@
       CREATE MATERIALIZED VIEW \curtable AS (
         SELECT \colNames FROM \schema.ident_blg_rot			-- blg rot
         LEFT JOIN \schema.param_blg_rot USING (object_id)
-															-- no rot in lmc or smc
+															-- no rot in lmc or smc or gd
       )
     </viewStatement>
   </table>
@@ -478,6 +507,7 @@
         # Collect references from all involved tables
         with base.getTableConn() as conn:
           refs = [list(conn.query("SELECT ssa_reference FROM ogle.ident_blg_rr LIMIT 1"))[0][0],
+                  list(conn.query("SELECT ssa_reference FROM ogle.ident_gd_rr LIMIT 1"))[0][0],
                   list(conn.query("SELECT ssa_reference FROM ogle.ident_lmc_rr LIMIT 1"))[0][0],
                   list(conn.query("SELECT ssa_reference FROM ogle.ident_smc_rr LIMIT 1"))[0][0]]
           # remove duplicates
@@ -507,6 +537,15 @@
           UNION ALL
           SELECT * FROM \schema.param_blg_arr_d
         ),
+        param_gd_rr_all AS (
+          SELECT * FROM \schema.param_gd_rr_ab
+          UNION ALL
+          SELECT * FROM \schema.param_gd_rr_c
+          UNION ALL
+          SELECT * FROM \schema.param_gd_rr_d
+          UNION ALL
+          SELECT * FROM \schema.param_gd_arr_d
+        ),
         param_lmc_rr_all AS (
           SELECT * FROM \schema.param_lmc_rr_ab
           UNION ALL
@@ -527,6 +566,9 @@
         )
         SELECT \colNames FROM \schema.ident_blg_rr					-- blg rrlyr
         LEFT JOIN param_blg_rr_all USING (object_id)
+        UNION ALL
+        SELECT \colNames FROM \schema.ident_gd_rr					-- gd rrlyr
+        LEFT JOIN param_gd_rr_all USING (object_id)
         UNION ALL
         SELECT \colNames FROM \schema.ident_lmc_rr					-- lmc rrlyr
         LEFT JOIN param_lmc_rr_all USING (object_id)
@@ -558,6 +600,7 @@
         # Collect references from all involved tables
         with base.getTableConn() as conn:
           refs = [list(conn.query("SELECT ssa_reference FROM ogle.ident_blg_t2cep LIMIT 1"))[0][0],
+                  list(conn.query("SELECT ssa_reference FROM ogle.ident_gd_t2cep LIMIT 1"))[0][0],
                   list(conn.query("SELECT ssa_reference FROM ogle.ident_lmc_t2cep LIMIT 1"))[0][0],
                   list(conn.query("SELECT ssa_reference FROM ogle.ident_smc_t2cep LIMIT 1"))[0][0]]
           # remove duplicates
@@ -579,6 +622,9 @@
       CREATE MATERIALIZED VIEW \curtable AS (
         SELECT \colNames FROM \schema.ident_blg_t2cep					-- blg t2cep
         LEFT JOIN \schema.param_blg_t2cep USING (object_id)
+        UNION ALL
+        SELECT \colNames FROM \schema.ident_gd_t2cep					-- gd t2cep
+        LEFT JOIN \schema.param_gd_t2cep USING (object_id)
         UNION ALL
         SELECT \colNames FROM \schema.ident_lmc_t2cep                   -- lmc t2cep
         LEFT JOIN \schema.param_lmc_t2cep USING (object_id)
@@ -628,7 +674,7 @@
       CREATE MATERIALIZED VIEW \curtable AS (
         SELECT \colNames FROM \schema.ident_blg_transit					-- blg transit
         LEFT JOIN \schema.param_blg_transit USING (object_id)
-					-- not transits in lmc or smc
+					-- not transits in lmc or smc or gd
       )
     </viewStatement>
   </table>

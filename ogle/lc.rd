@@ -49,7 +49,7 @@
 
   <table id="lightcurves" onDisk="True" adql="True"  namePath="ogle/aux#lc">
     <meta name="description">The united table with photometry points of all OGLE Lightcurves</meta>
-    <index columns="object_id, passband">
+    <index columns="object_id, passband"/>
 <!-- <index columns="object_id, passband" cluster=True>
     <index columns="object_id"/>
     <index columns="passband"/>
@@ -65,7 +65,7 @@
 
   <data id="import_lightcurves" updating="True">
 
-    <sources pattern="data/???/*/phot*/[VI]/*.dat"/>
+    <sources pattern="data/gd/*/phot*/[VI]/*.dat"/>
 
     <!-- <sources pattern="data/smc/acep/phot*/[VI]/*.dat"/>
     <sources pattern="data/smc/cep/phot*/[VI]/*.dat"/>
@@ -101,7 +101,8 @@
         <var name="to_mjd">
           2400000.5 if ("blg/cep" in \rootlessPath or "blg/rot" in \rootlessPath or \
                         "blg/t2cep" in \rootlessPath or "lmc/ecl" in \rootlessPath or \
-                        "smc/ecl" in \rootlessPath) else -49999.5
+                        "smc/ecl" in \rootlessPath or "gd/cep" in \rootlessPath
+                        or "gd/t2cep" in \rootlessPath) else -49999.5
         </var>
         <var name="obs_time">float(@dateobs_jd)-@to_mjd</var>
 
