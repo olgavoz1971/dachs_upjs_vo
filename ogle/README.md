@@ -52,9 +52,12 @@ Unfortunately, it is not possible to include multiple publications in a single r
 Therefore, when several relevant papers exist, I selected the “paper1”.
 
 ## Issues
-gd/cep/phot/V/OGLE-GD-CEP-1198.dat
-gd/cep/phot/V/OGLE-GD-CEP-1160.dat
+gd/cep/phot/V/OGLE-GD-CEP-1198.dat;  gd/cep/phot/V/OGLE-GD-CEP-1160.dat
 obstime is HJD-2450000.0, not HJD as for all other GD/cep/phot/[VI]/*.dat
+
+M54/M54variables.dat
+This file should be cleaned of empty lines with only the first column filled.
+I could not write an appropriate grammar for ingesting this file and gave up
 
 ## Importing order
 1. Photometric system: phot.rd
