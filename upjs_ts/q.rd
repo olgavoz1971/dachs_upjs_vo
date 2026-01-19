@@ -94,7 +94,7 @@
 		<column original="//obscore#ObsCore.t_min"/>
 		<column original="//obscore#ObsCore.t_max"/>
 		<column original="//products#products.accref"/>
-        <column original="//products#products.preview"/>
+		<column original="//products#products.preview"/>
 
 		<mixin>//ssap#plainlocation</mixin>		<!-- injects ssa_location -->
 		<mixin>//ssap#simpleCoverage</mixin>	<!-- ssa_region -->
