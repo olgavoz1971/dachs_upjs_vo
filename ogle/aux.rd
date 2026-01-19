@@ -269,9 +269,10 @@
   <mixinDef id="ecl_p">													<!-- Ecl param -->
     <doc>"description">Columns relevant for the Eclipsing and \
                                  Ellipsoidal Binary Systems parameters tables</doc>
-
     <events>
-      <FEED source="object_param_columns"/>
+      <FEED source="object_param_columns">
+        <PRUNE name="ampl_I"/>
+      </FEED>
       <column original="mean_I" tablehead="I at max" description="I-band magnitude at the maximum light"/>
       <column original="mean_V" tablehead="V at max" description="V-band magnitude at the maximum light"/>
       <column original="period" description="Orbital period"/>
@@ -439,7 +440,9 @@
   <mixinDef id="transit_p">												<!-- transit param -->
     <doc>"description">Columns relevant for the candidates for transiting planets parameters tables</doc>
     <events>
-      <FEED source="object_param_columns"/>
+      <FEED source="object_param_columns">
+        <PRUNE name="ampl_I"/>
+      </FEED>
       <column original="period" description="Orbital period"/>
       <column original="epoch" description="Time of inferior conjunction (transit)"/>
 

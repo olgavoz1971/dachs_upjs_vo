@@ -756,7 +756,7 @@
           SELECT \common_cols, ampl_I, subtype								-- t2cep
           FROM \schema.t2cep
         UNION ALL
-          SELECT \common_cols, ampl_I, NULL AS subtype						-- blg transits
+          SELECT \common_cols, depth AS ampl_I, NULL AS subtype				-- blg transits
           FROM \schema.transits
         )
     </viewStatement>

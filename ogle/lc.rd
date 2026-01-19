@@ -65,7 +65,7 @@
 
   <data id="import_lightcurves" updating="True">
 
-    <sources pattern="data/gd/*/phot*/[VI]/*.dat"/>
+    <!-- <sources pattern="data/gd/*/phot*/[VI]/*.dat"/> -->
 
     <!-- <sources pattern="data/smc/acep/phot*/[VI]/*.dat"/>
     <sources pattern="data/smc/cep/phot*/[VI]/*.dat"/>
@@ -152,8 +152,20 @@
       <condDesc buildFrom="object_id"/>
       <condDesc buildFrom="passband"/>
       <condDesc>
-        <inputKey original="ogle_phase">
-          <!-- <values fromdb="ogle_phase from \schema.lightcurves"/> -->
+        <inputKey original="ogle_phase" required="False">
+          <!-- 
+           JK: I am an ass! Here, DaCHS performs SELECT DISTINCT ogle_phase from
+           ... a huge table with ~2 billions rows without any index on this
+           column!!!! This is performed during validation and at the beginning of the importing. 
+           I really do not need to retrieve this list of phases [0,2,3,4] from db
+          <values fromdb="ogle_phase from \schema.lightcurves"/> 
+          -->
+          <values>
+            <option title="ogle">0</option>
+            <option title="ogle2">2</option>
+            <option title="ogle3">3</option>
+            <option title="ogle4">4</option>
+          </values>
         </inputKey>
       </condDesc>
     </dbCore>
