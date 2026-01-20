@@ -151,8 +151,13 @@
           'OGLE ' || q.passband || ' lightcurve ' || 'for ' || q.object_id AS ssa_dstitle,
           q.object_id AS ssa_targname,
           ssa_targclass,
-          spoint(radians(o.raj2000), radians(o.dej2000)) as ssa_location,
-          NULL::spoly AS ssa_region,		-- todo: think more about this
+          spoint(o.raj_rad, o.dej_rad) as ssa_location,
+          spoly(  -- I'm not crazy enough to draw hexagons there, put up with squares
+               '{(' || (o.raj_rad - o.aperture_rad) || ',' || (o.dej_rad - o.aperture_rad) || '),'
+             || '(' || (o.raj_rad - o.aperture_rad) || ',' || (o.dej_rad + o.aperture_rad) || '),'
+             || '(' || (o.raj_rad + o.aperture_rad) || ',' || (o.dej_rad + o.aperture_rad) || '),'
+             || '(' || (o.raj_rad + o.aperture_rad) || ',' || (o.dej_rad - o.aperture_rad) || ')' || '}'
+          )::spoly AS ssa_region,
           '\getConfig{web}{serverURL}/\rdId/sdl/dlget?ID=' || '\pubDIDBase' || q.object_id || '-' || q.passband AS accref,
           '\pubDIDBase' || q.object_id || '-' || q.passband AS ssa_pubdid,
           '\getConfig{web}{serverURL}/\rdId/preview-plot/qp/' || q.object_id || '-' || q.passband AS preview,
@@ -186,7 +191,13 @@
           FROM \schema.lightcurves AS l
             GROUP BY l.object_id, l.passband
         ) AS q
-        JOIN \schema.objects_all AS o USING (object_id)
+        JOIN (
+          SELECT *,
+            radians(raj2000) AS raj_rad,
+            radians(dej2000) AS dej_rad,
+            radians(0.5/3600) AS aperture_rad
+          FROM \schema.objects_all 
+        ) AS o USING (object_id)
         JOIN \schema.photosys AS p ON p.band_short = q.passband
       )
 
