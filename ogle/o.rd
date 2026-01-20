@@ -701,7 +701,7 @@
     mean_I, mean_V, period, period_err, epoch
   </macDef>
 
-  <table id="objects_all" adql="True" onDisk="True"
+  <table id="objects_all" adql="True" onDisk="True" nrows="800000"
          mixin="//scs#pgs-pos-index">
 
     <meta name="table-rank">100</meta>

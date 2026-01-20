@@ -68,7 +68,7 @@
 
 <!--   =========================== raw_data ======================== -->
 
-  <table id="raw_data" onDisk="True" adql="True"
+  <table id="raw_data" onDisk="True" adql="True" nrows="1000000"
       namePath="//ssap#instance">
     <meta name="description">A united view over original ident tables for SSA/ObsCore ingestion</meta>
 
@@ -89,7 +89,7 @@
          ssa_location resides in both, ssap#instance and ssap#plainlocation
     -->
     <LOOP listItems="ssa_dstitle ssa_targname ssa_targclass
-      ssa_pubDID ssa_bandpass ssa_specmid ssa_specstart ssa_specend ssa_specext 
+      ssa_pubDID ssa_bandpass ssa_specmid ssa_specstart ssa_specend ssa_specext ssa_fluxucd
       ssa_timeExt ssa_length ssa_collection ssa_reference">
       <events>
         <column original="\item"/>
@@ -152,10 +152,11 @@
           q.object_id AS ssa_targname,
           ssa_targclass,
           spoint(radians(o.raj2000), radians(o.dej2000)) as ssa_location,
-          NULL::spoly AS ssa_region,
+          NULL::spoly AS ssa_region,		-- todo: think more about this
           '\getConfig{web}{serverURL}/\rdId/sdl/dlget?ID=' || '\pubDIDBase' || q.object_id || '-' || q.passband AS accref,
           '\pubDIDBase' || q.object_id || '-' || q.passband AS ssa_pubdid,
           '\getConfig{web}{serverURL}/\rdId/preview-plot/qp/' || q.object_id || '-' || q.passband AS preview,
+          'phot.mag;em.opt.' || q.passband AS ssa_fluxucd,
           q.passband AS ssa_bandpass,
           p.specmid AS ssa_specmid,
           p.specstart AS ssa_specstart,
@@ -167,11 +168,10 @@
           q.ssa_length,
           mean_mag AS p_mean_mag,
           o.period AS p_period,
-          'ICRS' AS ssa_csysName,
-          'application/x-votable+xml' AS mime,
           50000 AS accsize,
           NULL AS embargo,
           NULL AS owner,
+          'application/x-votable+xml' AS mime,
           NULL AS datalink,
           o.ssa_collection,
           o.ssa_reference
@@ -201,7 +201,7 @@
 
 <!-- ================================== ts_ssa =========================== -->
 
-  <table id="ts_ssa" onDisk="True" adql="True">
+  <table id="ts_ssa" onDisk="True" adql="True" nrows="1000000">
     <meta name="table-rank">50</meta>
     <meta name="_associatedDatalinkService">
       <meta name="serviceId">sdl</meta>
@@ -228,23 +228,24 @@
       ssa_aperture="1/3600."
       ssa_dstype="'timeseries'"
       ssa_fluxcalib="'CALIBRATED'"
-      ssa_fluxucd="'phot.mag'"
+      ssa_fluxunit="'mag'"
       ssa_spectralucd="NULL"
       ssa_spectralunit="NULL"
-      ssa_creator="'OGLE Team'"
+      ssa_creator="'Soszyński, I. et al'"
       ssa_csysName="'ICRS'"
       ssa_datasource="'survey'"
+      mime="'application/x-votable+xml'"
       ssa_targetpos="NULL"
     >//ssap#view</mixin>
     
-    <!-- TODO add correct preview url -->
+    <!--  coverage param is an alias of s_region param --> 
     <mixin
       calibLevel="2"
       t_min="t_min"
       t_max="t_max"
       em_xel="1"
       t_xel="ssa_length"
-      coverage="ssa_region"
+      s_region="ssa_region"
       oUCD="'phot.mag'"
       createDIDIndex="True"
       preview="preview"
