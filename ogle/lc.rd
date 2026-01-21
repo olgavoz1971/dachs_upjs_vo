@@ -64,6 +64,7 @@
   </table>
 
   <data id="import_lightcurves" updating="True">
+    <sources pattern="data/gal/*/phot*/[VI]/*.dat"/>
 
     <!-- <sources pattern="data/gd/*/phot*/[VI]/*.dat"/> -->
 
@@ -71,7 +72,7 @@
     <sources pattern="data/smc/cep/phot*/[VI]/*.dat"/>
     <sources pattern="data/smc/dsct/phot*/[VI]/*.dat"/>
     <sources pattern="data/smc/ecl/phot*/[VI]/*.dat"/>
-    <sources pattern="data/smc/hb/phot*/[VI]/*.dat"/>
+    <sources pattern="data/smc/hb/phot_o*/[VI]/*.dat"/>
     <sources pattern="data/smc/rrlyr/phot*/[VI]/*.dat"/>
     <sources pattern="data/smc/t2cep/phot*/[VI]/*.dat"/> -->
 
@@ -79,7 +80,7 @@
     <!-- <sources pattern="data/lmc/cep/phot*/[VI]/*.dat"/> -->
     <!-- <sources pattern="data/lmc/dsct/phot*/[VI]/*.dat"/> -->
     <!-- <sources pattern="data/lmc/ecl/phot*/[VI]/*.dat"/> -->
-    <!-- <sources pattern="data/lmc/hb/phot*/[VI]/*.dat"/>  -->
+    <!-- <sources pattern="data/lmc/hb/phot_o*/[VI]/*.dat"/>  -->
     <!-- <sources pattern="data/lmc/rrlyr/phot*/[VI]/*.dat"/> -->
     <!-- <sources pattern="data/lmc/t2cep/phot*/[VI]/*.dat"/> -->
 
@@ -87,7 +88,7 @@
     <!-- <sources pattern="data/misc/m54/phot/I/*.dat"/> -->
     <!-- <sources pattern="data/blg/rrlyr/phot/I/*.dat"/> -->
     <!-- sources pattern="data/blg/dsct/phot*/I/*.dat"/> -->
-    <!-- <sources pattern="data/blg/hb/phot*/[VI]/*.dat"/> -->
+    <!-- <sources pattern="data/blg/hb/phot_o*/[VI]/*.dat"/> -->
     <!-- <sources pattern="data/blg/rot/phot*/I/*.dat"/> -->
     <!-- <sources pattern="data/blg/cep/phot*/V/*.dat"/> -->
     <!-- <sources pattern="data/blg/ecl/phot*/I/*.dat"/> -->
@@ -102,7 +103,7 @@
           2400000.5 if ("blg/cep" in \rootlessPath or "blg/rot" in \rootlessPath or \
                         "blg/t2cep" in \rootlessPath or "lmc/ecl" in \rootlessPath or \
                         "smc/ecl" in \rootlessPath or "gd/cep" in \rootlessPath
-                        or "gd/t2cep" in \rootlessPath) else -49999.5
+                        or "gd/t2cep" in \rootlessPath or "gal/acep" in \rootlessPath) else -49999.5
         </var>
         <var name="obs_time">float(@dateobs_jd)-@to_mjd</var>
 

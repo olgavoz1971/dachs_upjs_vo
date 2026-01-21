@@ -137,8 +137,8 @@
       </FEED>      
       <column name="pulse_mode" type="text" ucd="meta.code.class"
         tablehead="Pulsation Mode" verbLevel="15"
-        description="Cepheid Mode(s) of pulsation: F-fundamental, o1-first \
-                     overtone, o2-second, etc"
+        description="Cepheid Mode(s) of pulsation: F-fundamental, 1O-first \
+                     overtone"
         required="False">
       </column>
     </events>

@@ -55,7 +55,8 @@
         # Collect references from all involved tables
         with base.getTableConn() as conn:
           refs=[list(conn.query("SELECT ssa_reference FROM ogle.ident_lmc_acep LIMIT 1"))[0][0], 
-                list(conn.query("SELECT ssa_reference FROM ogle.ident_smc_acep LIMIT 1"))[0][0]]
+                list(conn.query("SELECT ssa_reference FROM ogle.ident_smc_acep LIMIT 1"))[0][0],
+                list(conn.query("SELECT ssa_reference FROM ogle.ident_gal_acep LIMIT 1"))[0][0]]
           # remove duplicates
           uniq_refs = list(dict.fromkeys(refs))
           yield {"db_source": "; ".join(uniq_refs)}
@@ -83,6 +84,11 @@
             SELECT * FROM \schema.param_smc_acep_acepf
             UNION ALL
             SELECT * FROM \schema.param_smc_acep_acep1o
+        ),
+        param_acep_gal_all AS (
+            SELECT * FROM \schema.param_gal_acep_acepf
+            UNION ALL
+            SELECT * FROM \schema.param_gal_acep_acep1o
         )
 
         SELECT \colNames FROM \schema.ident_lmc_acep      -- lmc acep
@@ -90,6 +96,9 @@
         UNION ALL
         SELECT \colNames FROM \schema.ident_smc_acep      -- smc acep
         LEFT JOIN param_acep_smc_all USING (object_id)
+        UNION ALL
+        SELECT \colNames FROM \schema.ident_gal_acep      -- gal acep
+        LEFT JOIN param_acep_gal_all USING (object_id)
         												-- no acep in blg or gd
       )
     </viewStatement>
