@@ -99,7 +99,7 @@
           <bind key="obs_publisher_did">\standardPubDID</bind>
           <bind key="obs_creator_did">None</bind>
           <bind key="target_name">@OBJECT</bind>
-          <bind key="target_class">"v-star"</bind>
+          <bind key="target_class">"Star"</bind>
 
           <bind key="t_exptime">@EXPTIME</bind>
           <bind key="t_resolution">None</bind>
