@@ -151,7 +151,13 @@
 				o.id AS p_object_id,
 				'Gaia DR3 ' || o.gaia_name AS ssa_targname,
 				o.coordequ AS ssa_location,
-				NULL::spoly AS ssa_region,
+				spoly(  -- draw squares instead of hexagons
+					'{(' || (long(o.coordequ) - aperture_rad) || ',' || (lat(o.coordequ) - aperture_rad) || '),'
+					|| '(' || (long(o.coordequ) - aperture_rad) || ',' || (lat(o.coordequ) + aperture_rad) || '),'
+					|| '(' || (long(o.coordequ) + aperture_rad) || ',' || (lat(o.coordequ) + aperture_rad) || '),'
+					|| '(' || (long(o.coordequ) + aperture_rad) || ',' || (lat(o.coordequ) - aperture_rad) || ')' || '}'
+					)::spoly AS ssa_region,
+				-- NULL::spoly AS ssa_region,
 				'\getConfig{web}{serverURL}/\rdId/sdl/dlget?ID=' || '\pubDIDBase' || 'upjs/ts/' || o.id || '-' || p.band AS accref,
 				'\pubDIDBase' || 'upjs/ts/' || o.id || '-' || p.band AS ssa_pubdid,
 				'application/x-votable+xml' AS mime,
@@ -187,6 +193,7 @@
 				) AS q
 				JOIN \schema.objects AS o ON o.id = q.object_id
 				JOIN \schema.photosys AS p ON p.id = q.photosys_id
+				CROSS JOIN LATERAL (SELECT RADIANS(0.5/3600.) AS aperture_rad) AS c 
 			)
 		</viewStatement>
 	</table>
