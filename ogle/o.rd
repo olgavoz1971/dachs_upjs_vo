@@ -767,6 +767,9 @@
         UNION ALL
           SELECT \common_cols, depth AS ampl_I, NULL AS subtype				-- blg transits
           FROM \schema.transits
+        UNION ALL
+          SELECT \common_cols, ampl_I, NULL AS subtype						-- m54 mingle-mangle
+          FROM \schema.m54
         )
     </viewStatement>
   </table>

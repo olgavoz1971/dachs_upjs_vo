@@ -66,8 +66,9 @@
   <data id="import_lightcurves" updating="True">
     <sources pattern="data/gal/*/phot*/[VI]/*.dat"/>
 
-    <!-- <sources pattern="data/gd/*/phot*/[VI]/*.dat"/> -->
+    <sources pattern="data/misc/m54/phot*/[VI]/*.dat"/>
 
+    <!-- <sources pattern="data/gd/*/phot*/[VI]/*.dat"/> -->
     <!-- <sources pattern="data/smc/acep/phot*/[VI]/*.dat"/>
     <sources pattern="data/smc/cep/phot*/[VI]/*.dat"/>
     <sources pattern="data/smc/dsct/phot*/[VI]/*.dat"/>
@@ -85,7 +86,6 @@
     <!-- <sources pattern="data/lmc/t2cep/phot*/[VI]/*.dat"/> -->
 
     <!-- <sources pattern="data/blg/lpv/phot_ogle2/[VI]/*.dat"/> -->
-    <!-- <sources pattern="data/misc/m54/phot/I/*.dat"/> -->
     <!-- <sources pattern="data/blg/rrlyr/phot/I/*.dat"/> -->
     <!-- sources pattern="data/blg/dsct/phot*/I/*.dat"/> -->
     <!-- <sources pattern="data/blg/hb/phot_o*/[VI]/*.dat"/> -->
