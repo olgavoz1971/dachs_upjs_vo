@@ -4,28 +4,12 @@
   <meta name="creationDate">2025-12-21T20:06:30Z</meta>
 
   <meta name="title">OGLE photometric system description</meta>
-  <meta name="subject">light-curves</meta>
-
-  <meta name="creator">Soszyński, I.; Udalski, A.; Szymański, M.K.; Szymański, G.;  Poleski, R.; Pawlak, M.; 
-                       Pietrukowicz, P.; Wrona, M.; Iwanek, P.; Mróz, M.</meta>
-  <meta name="instrument">1.0-1.3-meter telescopes. TBD</meta>
-  <meta name="facility">OGLE TBD</meta>
-
-  <meta name="source">2015AcA....65....1U</meta>
-  <meta name="contentLevel">Research</meta>
-  <meta name="type">Survey</meta>  <!-- or Archive, Survey, Simulation -->
-
-  <meta name="coverage.waveband">Optical</meta>
-
-  <meta name="copyright" format="rst">
-    If you use or refer to the data obtained from this catalog in your scientific work, please cite the appropriate papers:
-      :bibcode: `2015AcA....65....1U`   (OGLE-IV photometry)
-      :bibcode: `2008AcA....58...69U`   (OGLE-III photometry)
+  <meta name="description">
+    The main purpose of this table is to describe the photometric system
+    as a database table for future use in SSA tables and time-series instances
+    of the Photometry Data Model
   </meta>
-
-  <meta name="_longdoc" format="rst">
-    TBD
-  </meta>
+  <FEED source="ogle/meta#ogle_meta"/>
 
 <!-- ==============  photometric system ===================== -->
 

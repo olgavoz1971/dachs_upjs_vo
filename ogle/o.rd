@@ -3,41 +3,10 @@
   <meta name="creationDate">2026-01-11T16:12:00Z</meta>
 
   <meta name="title">OGLE Variable Star Parameters</meta>
-  <meta name="description" format="rst">
-    The set of tables with variable star parameters from the OGLE Variable Stars
-    Collection. The data are organised into separate tables by variable star class, 
-    with corresponding names such as Classical Cepheids, Eclipsing Binaries, etc.
-    The OGLE team provides different sets of parameters depending on the variability class, 
-    which allows variability-class–specific queries.
 
-    The objects_all table holds the basic parameters of all objects. 
-    It serves as a base for the ts_ssa table (and the OGLE-related part of 
-    the ObsCore table), which provide the main access points for light curves.
-  </meta>
-  <!-- Take keywords from
-    http://www.ivoa.net/rdf/uat
-    if at all possible -->
-  <meta name="subject">light-curves</meta>
-  <meta name="subject">variable-stars</meta>
-  <meta name="subject">surveys</meta>
-
-  <meta name="creator">Soszyński, I.; Udalski, A.; Szymański, M.K.; Szymański, G.;  
-    Poleski, R.; Pawlak, M.; Pietrukowicz, P.; Wrona, M.; Iwanek, P.; Mróz, M.
-  </meta>
-  <meta name="instrument">TBD</meta>
-  <meta name="facility">OGLE TBD</meta>
-
-  <meta name="source">2015AcA....65....1U</meta>
-
-  <meta name="copyright" format="rst">
-    If you use or refer to the data obtained from this catalog in your scientific work, please cite the appropriate papers:
-      :bibcode: `2015AcA....65....1U`  (OGLE-IV photometry)
-      :bibcode: `2008AcA....58...69U`  (OGLE-III photometry)
-  </meta>
-
-  <meta name="contentLevel">Research</meta>
-  <meta name="type">Survey</meta>  <!-- or Archive, Survey, Simulation -->
-  <meta name="coverage.waveband">Optical</meta>
+  <FEED source="ogle/meta#object_table_desc"/>
+  <FEED source="ogle/meta#ogle_meta"/>
+  <FEED source="ogle/meta#longdoc_ogle"/>
 
 <!-- ======================= All Anomalous Cepheids ============================= -->
 

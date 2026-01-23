@@ -5,40 +5,10 @@
   <meta name="creationDate">2025-12-21T16:24:52Z</meta>
 
   <meta name="title">OGLE Time series</meta>
-  <meta name="description" format="rst">
-    I promis, I'll fill this properly before publishing any data from this
-    collection
-    this should be a paragraph or two (take care to mention salient terms)
-  </meta>
-  <!-- Take keywords from
-    http://www.ivoa.net/rdf/uat
-    if at all possible -->
-  <meta name="subject">light-curves</meta>
-  <meta name="subject">variable-stars</meta>
-  <meta name="subject">surveys</meta>
 
-  <meta name="creator">Soszyński, I.; Udalski, A.; Szymański, M.K.; Szymański, G.;  
-    Poleski, R.; Pawlak, M.; Pietrukowicz, P.; Wrona, M.; Iwanek, P.; Mróz, M.
-  </meta>
-  <meta name="instrument">TBD</meta>
-  <meta name="facility">OGLE TBD</meta>
-
-  <meta name="source">2015AcA....65....1U</meta>
-
-  <meta name="copyright" format="rst">
-    If you use or refer to the data obtained from this catalog in your scientific work, please cite the appropriate papers:
-      :bibcode: `2015AcA....65....1U`  (OGLE-IV photometry)
-      :bibcode: `2008AcA....58...69U`  (OGLE-III photometry)
-  </meta>
-
-  <meta name="contentLevel">Research</meta>
-  <meta name="type">Survey</meta>  <!-- or Archive, Survey, Simulation -->
-
-  <!-- Waveband is of Radio, Millimeter,
-      Infrared, Optical, UV, EUV, X-ray, Gamma-ray, can be repeated;
-      remove if there are no messengers involved.  -->
-  <meta name="coverage.waveband">Optical</meta>
-
+  <FEED source="ogle/meta#object_table_desc"/>
+  <FEED source="ogle/meta#ogle_meta"/>
+  <FEED source="ogle/meta#longdoc_ogle"/>
 
   <meta name="ssap.dataSource">survey</meta>
   <meta name="ssap.creationType">archival</meta>
@@ -68,7 +38,7 @@
 
 <!--   =========================== raw_data ======================== -->
 
-  <table id="raw_data" onDisk="True" adql="True" nrows="1000000"
+  <table id="raw_data" onDisk="True" adql="True" nrows="1500000"
       namePath="//ssap#instance">
     <meta name="description">A united view over original ident tables for SSA/ObsCore ingestion</meta>
 
@@ -212,7 +182,7 @@
 
 <!-- ================================== ts_ssa =========================== -->
 
-  <table id="ts_ssa" onDisk="True" adql="True" nrows="1000000">
+  <table id="ts_ssa" onDisk="True" adql="True" nrows="1500000">
     <meta name="table-rank">50</meta>
     <meta name="_associatedDatalinkService">
       <meta name="serviceId">sdl</meta>

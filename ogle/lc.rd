@@ -8,37 +8,12 @@
     The OGLE project consists of several sub-surveys that differ in sky coverage and in the types of variability targeted.
     Here, we build the big table contained all photometry points for all objects from the OGLE Collection of Variable 
     Star Light Curves.
-    The data can be accessed via ADQL, but the main purpose of this table is to serve as a basis for the ssa_timeseries
-    table and to provide input to the timeseries and preview instances in the DataLink service.
+    The data can be accessed via ADQL, but the main purpose of this table is to serve as a basis for the
+    ssa_ts table and to provide input to the timeseries and preview instances in the DataLink service.
   </meta>
 
-  <meta name="subject">light-curves</meta>
-  <meta name="subject">variable-stars</meta>
-  <meta name="subject">surveys</meta>
-
-  <meta name="creator">Soszyński, I.; Udalski, A.; Szymański, M.K.; Szymański, G.;  Poleski, R.; Pawlak, M.; 
-                       Pietrukowicz, P.; Wrona, M.; Iwanek, P.; Mróz, M.</meta>
-  <meta name="instrument">1.0-1.3-meter telescopes. TBD</meta>
-  <meta name="facility">OGLE TBD</meta>
-
-  <meta name="source">2015AcA....65....1U</meta>
-  <meta name="contentLevel">Research</meta>
-  <meta name="type">Survey</meta>  <!-- or Archive, Survey, Simulation -->
-
-  <!-- Waveband is of Radio, Millimeter,
-      Infrared, Optical, UV, EUV, X-ray, Gamma-ray, can be repeated;
-      remove if there are no messengers involved.  -->
-  <meta name="coverage.waveband">Optical</meta>
-
-  <meta name="copyright" format="rst">
-    If you use or refer to the data obtained from this catalog in your scientific work, please cite the appropriate papers:
-      :bibcode: `2015AcA....65....1U`   (OGLE-IV photometry)
-      :bibcode: `2008AcA....58...69U`   (OGLE-III photometry)
-  </meta>
-
-  <meta name="_longdoc" format="rst">
-    TBD
-  </meta>
+  <FEED source="ogle/meta#longdoc_ogle"/>
+  <FEED source="ogle/meta#ogle_meta"/>
 
 <!-- ########################## lightcurves ############################################## -->
 
@@ -47,7 +22,8 @@
      be careful not to double/triple data. Just play with the templates
 -->
 
-  <table id="lightcurves" onDisk="True" adql="True"  namePath="ogle/aux#lc">
+  <table id="lightcurves" onDisk="True" adql="True"  nrows="1700000000" 
+      namePath="ogle/aux#lc">
     <meta name="description">The united table with photometry points of all OGLE Lightcurves</meta>
     <index columns="object_id, passband"/>
 <!-- <index columns="object_id, passband" cluster=True>
