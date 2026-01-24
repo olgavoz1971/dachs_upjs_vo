@@ -152,6 +152,19 @@
       <FEED source="object_param_columns">
         <PRUNE id="ampl_V"/>"
       </FEED>
+      <column name="period_short" type="double precision"
+        ucd="src.var;time.period"
+        unit="d"
+        tablehead="Shortest Period"
+        description="The shortest period of the A.Cepheid"
+        required="False"/>
+
+      <column name="period_short_err" type="double precision"
+        ucd="src.var;time.period"
+        unit="d"
+        tablehead="Period err"
+        description="Uncertainty of the shortest period"
+        required="False"/>
     </events>
   </mixinDef>
 

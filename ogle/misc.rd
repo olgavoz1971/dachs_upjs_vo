@@ -5,7 +5,7 @@
 
   <meta name="title">Original OGLE ident tables outside the main fields</meta>
 
-  <FEED source="ogle/meta#field_table_desc" field="\field"/>
+  <FEED source="ogle/meta#field_table_desc"/>
   <FEED source="ogle/meta#ogle_meta"/>
 
 <!-- ==================== M54 stars  =========================================== -->

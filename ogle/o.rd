@@ -58,6 +58,8 @@
             SELECT * FROM \schema.param_gal_acep_acepf
             UNION ALL
             SELECT * FROM \schema.param_gal_acep_acep1o
+            UNION ALL
+            SELECT * FROM \schema.param_gal_acep_acepf1o
         )
 
         SELECT \colNames FROM \schema.ident_lmc_acep      -- lmc acep

@@ -94,4 +94,47 @@
     </events>
   </LOOP>
 
+  <!-- ================ Double mode =============== -->
+  <LOOP>
+    <csvItems>
+      class,             source, subclass
+      acepf1o,       acepF1O.dat, double-mode-(F/1O)-A.Cepheids
+    </csvItems>
+    <events>
+      <table id="param_gal_acep_\class" onDisk="True" adql="hidden">
+        <meta name="description">The table from the base of original \source with parameters of \subclass \
+                from OGLE Anomalous Cepheids \\field collection</meta>
+
+        <mixin>ogle/aux#acepheid_p</mixin>
+      </table>
+
+      <data id="import_param_gal_\class">
+        <sources>data/gal/acep/\source</sources>
+        <columnGrammar>
+          <colDefs>
+              object_id:   1-17
+              mean_I:     19-24
+              mean_V:     26-31
+              period:     33-42
+              period_err: 44-52
+              epoch:      54-65
+              ampl_I:     67-71
+              period_short:     73-82
+              period_short_err: 84-92
+          </colDefs>
+        </columnGrammar>
+        <make table="param_gal_acep_\class">
+          <rowmaker idmaps="*">
+            <LOOP listItems="mean_I mean_V ampl_I period period_err period_short period_short_err">
+              <events>
+                <map dest="\item">parseWithNull(@\item, float, "-")</map>
+              </events>
+            </LOOP>
+            <map dest="epoch" nullExcs="TypeError">parseWithNull(@epoch, float, "-")-JD_MJD</map>
+          </rowmaker>
+        </make>
+      </data>
+    </events>
+  </LOOP>
+
 </resource>
