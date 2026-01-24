@@ -1,6 +1,7 @@
 <resource schema="ogle" resdir=".">
   <meta name="schema-rank">50</meta>
   <macDef name="referenceM54">2016AcA....66..197H</macDef>
+  <macDef name="referenceCV">TBD2016AcA....66..197H</macDef>
   <meta name="creationDate">2025-12-21T20:06:30Z</meta>
 
   <meta name="title">Original OGLE ident tables outside the main fields</meta>
@@ -10,7 +11,7 @@
 
 <!-- ==================== M54 stars  =========================================== -->
 
-  <table id="m54" onDisk="True" adql="True" namePath="ogle/aux#object">
+  <table id="m54" onDisk="True" adql="True">
     <meta name="description">The (almost) original table M54variables.dat with identification and parameters of stars
                    from Sagittarius Dwarf Spheroidal Galaxy and its M54 Globular Cluster</meta>
 
@@ -19,16 +20,16 @@
         <PRUNE name="subtype"/>
         <PRUNE name="ogle3_id"/>
         <PRUNE name="ogle2_id"/>
-    </FEED>  
+    </FEED>
     <FEED source="ogle/aux#object_param_columns">
-        <PRUNE id="object_id"/>"
+        <PRUNE name="object_id"/>"
     </FEED>
   </table>
 
   <!-- JK: there is an error in column format description in the README file; corrected -->
   <data id="import_m54">
     <sources>data/misc/m54/M54variables_cleaned.dat</sources>
-    <columnGrammar topIgnoredLines="3">
+    <columnGrammar>
       <colDefs>
         object_id:      1-4
         alphaHMS:      13-23
@@ -84,4 +85,184 @@
       </rowmaker>
     </make>
   </data>
+
+<!-- ==================== CV stars (Dwarf Nova candidates DN)  =========================================== -->
+
+  <table id="cv_basic" onDisk="True" adql="hidden">
+    <meta name="description">The original table CV/tab1.dat with basic parameters of dwarf nova candidates
+            detected in the OGLE fields toward the Galactic bulge and the Magellanic System</meta>
+
+    <!-- Pull whole set of columns directly from prototypes -->
+    <FEED source="ogle/aux#object_ident_columns">
+        <PRUNE name="subtype"/>
+        <PRUNE name="ogle4_id"/>
+        <PRUNE name="ogle3_id"/>
+        <PRUNE name="ogle2_id"/>
+        <PRUNE name="vsx"/>
+    </FEED>  
+    <FEED source="ogle/aux#object_param_columns">
+        <PRUNE name="object_id"/>"
+        <PRUNE name="mean_V"/>"
+        <PRUNE name="mean_I"/>"
+        <PRUNE name="period"/>"
+        <PRUNE name="period_err"/>"
+        <PRUNE name="epoch"/>"
+    </FEED>
+
+    <column name="peak_I" type="double precision"
+        ucd="phot.mag"
+        unit="mag"
+        tablehead="Peack I"
+        description="I-band peak magnitude"
+        required="False"/>
+
+    <column name="duration" type="real"
+        ucd="src.var;time.duration"
+        unit="d"
+        tablehead="Outburst Duration"
+        description="Mean outburst duration"
+        required="False"/>
+
+    <column name="frequency" type="double precision"
+        ucd="src.var;time.period"
+        unit="count/yr"
+        tablehead="Outburst frequency"
+        description="Number of outbursts per year"
+        required="False"/>    
+
+  </table>
+
+  <data id="import_cv">
+    <sources>data/misc/CV/tab1.dat</sources>
+    <!-- There is an error in the original README format decription -->
+    <columnGrammar>
+      <colDefs>
+        object_id:      1-16
+        alphaHMS:      18-28
+        deltaDMS:      30-40
+        peak_I:        91-96
+        ampl_I:        98-102
+        frequency:    104-109
+        duration:     111-115
+      </colDefs>
+    </columnGrammar>
+    <make table="cv_basic">
+      <rowmaker idmaps="*">
+        <var name="raj2000">hmsToDeg(@alphaHMS, ":")</var>
+        <var name="dej2000">dmsToDeg(@deltaDMS, ":")</var>
+
+        <LOOP listItems="peak_I ampl_I frequency duration">
+          <events>
+            <map dest="\item">parseWithNull(@\item, float, "-")</map>
+          </events>
+        </LOOP>
+        <var name="ogle_vartype">"CV"</var>  
+        <var name="ssa_targclass">"CV*"</var>
+        <var name="ssa_collection">"OGLE-CV"</var>
+        <var name="ssa_reference">"\referenceCV"</var>
+      </rowmaker>
+    </make>
+  </data>
+
+  <table id="cv_periods" onDisk="True" adql="hidden">
+    <meta name="description">The original table CV/orb_periods.dat with orbital periods 
+            of dwarf nova candidates detected in the OGLE fields toward the Galactic 
+            bulge and the Magellanic System</meta>
+
+    <column name="object_id" type="text" ucd="meta.id;meta.main"
+        tablehead="Star ID" verbLevel="1" 
+        description="Star identifier"
+        required="True">
+    </column>
+
+    <column name="period" type="double precision">
+        ucd="src.var;time.period"
+        unit="d"
+        tablehead="Orbital Period"
+        description="Orbital period"
+        required="False"
+    </column>
+
+    <column name="period_err" type="double precision">
+        ucd="src.var;time.period"
+        unit="d"
+        tablehead="Period err"
+        description="Uncertainty of period"
+        required="False"
+    </column>
+  </table>
+
+  <data id="import_cv_periods">
+    <sources>data/misc/CV/orb_periods.dat</sources>
+    <!-- There is an error in the original README format decription -->
+    <!-- Remove empty lines on prefilter -->
+    <columnGrammar commentIntroducer="#" preFilter="sed '/^$/d'">
+      <colDefs>
+        object_id:   1-16
+        period:     18-27
+        period_err: 29-38
+      </colDefs>
+    </columnGrammar>
+    <make table="cv_periods">
+      <rowmaker idmaps="*">
+        <LOOP listItems="period period_err">
+          <events>
+            <map dest="\item">parseWithNull(@\item, float, "-")</map>
+          </events>
+        </LOOP>
+      </rowmaker>
+    </make>
+  </data>
+
+  <table id="cv_sh_periods" onDisk="True" adql="hidden">
+    <meta name="description">The original table CV/sh_periods.dat with superhump periods 
+            of dwarf nova candidates detected in the OGLE fields toward the Galactic 
+            bulge and the Magellanic System</meta>
+
+    <column name="object_id" type="text" ucd="meta.id;meta.main"
+        tablehead="Star ID" verbLevel="1" 
+        description="Star identifier"
+        required="True">
+    </column>
+
+    <column name="sh_period" type="double precision">
+        ucd="src.var;time.period"
+        unit="d"
+        tablehead="Superhump Period"
+        description="Superhump period"
+        required="False"
+    </column>
+
+    <column name="sh_period_err" type="double precision">
+        ucd="src.var;time.period"
+        unit="d"
+        tablehead="SH Period err"
+        description="Uncertainty of period"
+        required="False"
+    </column>
+  </table>
+
+  <data id="import_cv_sh_periods">
+    <sources>data/misc/CV/sh_periods.dat</sources>
+    <!-- There is an error in the original README format decription -->
+    <columnGrammar commentIntroducer="#" preFilter="sed '/^$/d'">
+      <colDefs>
+        object_id:      1-16
+        sh_period:     18-25
+        sh_period_err: 27-34
+      </colDefs>
+    </columnGrammar>
+    <make table="cv_sh_periods">
+      <rowmaker idmaps="*">
+        <LOOP listItems="sh_period sh_period_err">
+          <events>
+            <map dest="\item">parseWithNull(@\item, float, "-")</map>
+          </events>
+        </LOOP>
+      </rowmaker>
+    </make>
+  </data>
+
+<!-- ==================================== -->
+
 </resource>

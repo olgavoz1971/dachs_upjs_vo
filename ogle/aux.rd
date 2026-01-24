@@ -70,14 +70,14 @@
         required="True">
       </column>
 
-      <column name="mean_I" type="real"
+      <column name="mean_I" type="double precision"
         ucd="phot.mag"
         unit="mag"
         tablehead="Mean I"
         description="Intensity mean I-band magnitude"
         required="False"/>
 
-      <column name="mean_V" type="real"
+      <column name="mean_V" type="double precision"
         ucd="phot.mag"
         unit="mag"
         tablehead="Mean V"
@@ -149,9 +149,7 @@
       Columns relevant for the Anomalous Cepheid parameters tables
     </doc>
     <events>
-      <FEED source="object_param_columns">
-        <PRUNE id="ampl_V"/>"
-      </FEED>
+      <FEED source="object_param_columns"/>
       <column name="period_short" type="double precision"
         ucd="src.var;time.period"
         unit="d"
@@ -191,9 +189,8 @@
         Columns relevant for the Classical Cepheid parameter tables
     </doc>
     <events>
-      <FEED source="object_param_columns">
-        <PRUNE id="ampl_V"/>"
-      </FEED>
+      <FEED source="object_param_columns"/>
+
       <column original="period" description="Period (longest)"/>
 
       <column name="period_short" type="double precision"
@@ -324,21 +321,21 @@
       <column original="period" description="Orbital period"/>
       <column original="epoch" description="Epoch of the periastron passage"/>
 
-      <column name="ecc" type="real"
+      <column name="ecc" type="double precision"
         ucd="src.orbital.eccentricity"
         unit="deg"
         tablehead="Eccentricity"
         description="Orbital eccentricity"
         required="False"/>
 
-      <column name="incl" type="real"
+      <column name="incl" type="double precision"
         ucd="src.orbital.inclination"
         unit="deg"
         tablehead="Inclination"
         description="Orbital inclination"
         required="False"/>
 
-      <column name="omega" type="real"
+      <column name="omega" type="double precision"
         ucd="src.orbital.periastron"
         unit="deg"
         tablehead="Omega"
@@ -367,9 +364,7 @@
   <mixinDef id="mira_p">													<!-- LPV param -->
     <doc>"description">Columns relevant for the Mira (LPV) object parameters tables</doc>
     <events>
-      <FEED source="object_param_columns">
-        <PRUNE id="epoch"/>
-      </FEED>
+      <FEED source="object_param_columns"/>
     </events>
   </mixinDef>
 
@@ -385,9 +380,7 @@
   <mixinDef id="rot_p">														<!-- ROT param-->
     <doc>"description">Columns relevant for the Rotating Variables parameters tables</doc>
     <events>
-      <FEED source="object_param_columns">
-        <PRUNE id="epoch"/>
-      </FEED>
+      <FEED source="object_param_columns"/>
       <column name="ampl_V" type="double precision"
         ucd="phot.mag"
         unit="mag"
@@ -460,7 +453,7 @@
       <column original="epoch" description="Time of inferior conjunction (transit)"/>
 
       <column name="duration"
-        type="real"
+        type="double precision"
         ucd="time.duration"
         unit="d"
         tablehead="Duration"
@@ -468,7 +461,7 @@
         required="False"/>
 
       <column name="depth"
-        type="real"
+        type="double precision"
         ucd="src.var.amplitude"
         tablehead="Depth"
         description="Transit depth"

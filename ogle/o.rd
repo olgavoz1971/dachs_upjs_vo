@@ -663,6 +663,46 @@
     <make table="transits"/>
   </data>
 
+
+<!-- ======================= CV special view ============================= -->
+  <table id="cv" adql="True" onDisk="True">
+    <meta name="table-rank">150</meta>
+    <meta name="description" format="rst">
+      Coordinates and variability parameters of of dwarf nova candidates
+      (Cataclysmic Variables) from the OGLE Variable Star Collection.
+    </meta>
+
+    <!-- just pull all columns from underlying tables -->
+    <LOOP>
+       <codeItems>
+         for col in context.resolveId("ogle/misc#cv_basic").columns:
+           yield {'item': f'ogle/misc#cv_basic.{col.name}'}
+         for col in context.resolveId("ogle/misc#cv_periods").columns:
+           yield {'item': f'ogle/misc#cv_periods.{col.name}'}
+         for col in context.resolveId("ogle/misc#cv_sh_periods").columns:
+           yield {'item': f'ogle/misc#cv_sh_periods.{col.name}'}
+       </codeItems>
+       <events>
+         <column original="\item"/>
+       </events>
+    </LOOP>
+
+    <index columns="object_id"/>
+
+    <viewStatement>
+      CREATE MATERIALIZED VIEW \curtable AS (
+        SELECT \colNames FROM \schema.cv_basic
+        LEFT JOIN \schema.cv_periods USING (object_id)
+        LEFT JOIN \schema.cv_sh_periods USING (object_id)
+      )
+    </viewStatement>
+  </table>
+
+  <data id="create-cv-view">
+    <make table="cv"/>
+  </data>
+
+
 <!-- ======================= United Objects View ============================= -->
 
   <macDef name="objects_description">
