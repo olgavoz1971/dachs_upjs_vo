@@ -1,7 +1,10 @@
 <resource schema="ogle" resdir=".">
   <meta name="schema-rank">50</meta>
+
   <macDef name="referenceM54">2016AcA....66..197H</macDef>
   <macDef name="referenceCV">2015AcA....65..313M</macDef>
+  <macDef name="referenceBLAP">2017NatAs...1E.166P</macDef>
+
   <meta name="creationDate">2025-12-21T20:06:30Z</meta>
 
   <meta name="title">Original OGLE ident tables outside the main fields</meta>
@@ -359,6 +362,87 @@
     <make table="cv_xray">
       <rowmaker idmaps="*">
         <map dest="chandra_id">parseWithNull(@chandra_id, str, "")</map>
+      </rowmaker>
+    </make>
+  </data>
+
+<!-- ==================== BLAP (Blue Large-Amplitude Pulsators)  =========================================== -->
+
+  <table id="blap" onDisk="True" adql="True">
+    <meta name="description">The original table blap.dat with observational parameters of
+                             Blue Large-Amplitude Pulsators (BLAPs) </meta>
+
+    <meta name="source">\referenceBLAP</meta>
+
+    <!-- Pull whole set of columns directly from prototypes -->
+    <FEED source="ogle/aux#object_ident_columns">
+        <PRUNE name="subtype"/>
+        <PRUNE name="ogle3_id"/>
+        <PRUNE name="ogle2_id"/>
+    </FEED>  
+    <FEED source="ogle/aux#object_param_columns">
+        <PRUNE name="object_id"/>"
+        <PRUNE name="epoch"/>"
+    </FEED>
+    <column name="gaia_id" type="text" ucd="meta.id"
+        tablehead="GAIA ID" verbLevel="1"
+        description="Gaia DR3 identifier"
+        required="False">
+      </column>
+
+   <column name="ampl_V" type="double precision"
+        ucd="phot.mag"
+        unit="mag"
+        tablehead="Ampl V"
+        description="V-band amplitude of the primary period"
+        required="False"/>
+  </table>
+
+  <data id="import_blap">
+    <sources>data/misc/BLAP/blap.dat</sources>
+    <columnGrammar topIgnoredLines="3">
+      <colDefs>
+        object_id:      1-13
+        ogle4_id:      16-32
+        gaia_id:       34-52
+        alphaHMS:      55-65
+        deltaDMS:      67-77
+        period_str:    80-96
+        mean_I:        98-103
+        mean_V:       106-111
+        ampl_I:       113-118
+        ampl_V:       120-125
+        vsx:          128-151
+      </colDefs>
+    </columnGrammar>
+    <make table="blap">
+<!--  you make me cry...
+      This time we extract the period and (I hope) its uncertainty 
+      from the representation like "0.0196215026(24)" --> 
+
+      <rowmaker idmaps="*">
+        <var name="period">@period_str.split("(")[0]</var>
+        <var name="period_err">
+           (
+            float(@period_str.split("(")[1].rstrip(")"))
+            * 10**(-len(@period.split(".")[1]))
+           ) if "(" in @period_str else None
+        </var>
+        <var name="raj2000">hmsToDeg(@alphaHMS, ":")</var>
+        <var name="dej2000">dmsToDeg(@deltaDMS, ":")</var>
+        <map dest="ogle4_id">parseWithNull(@ogle4_id, str, "")</map>
+
+        <LOOP listItems="mean_I mean_V ampl_I ampl_V">
+          <events>
+            <map dest="\item">parseWithNull(@\item, float, "-")</map>
+          </events>
+        </LOOP>
+        <map dest="gaia_id">parseWithNull(@gaia_id, str, "-")</map>
+        <map dest="vsx">parseWithNull(@vsx, str, "")</map>
+        <var name="ogle_vartype">"BLAP"</var>  
+        <var name="ssa_targclass">"Pu*"</var>
+        <var name="ssa_collection">"OGLE-BLAP"</var>
+        <var name="ssa_reference">"\referenceBLAP"</var>
       </rowmaker>
     </make>
   </data>

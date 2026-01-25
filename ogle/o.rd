@@ -806,9 +806,12 @@
           SELECT \common_cols, epoch, ampl_I, NULL AS subtype				-- m54 mingle-mangle
           FROM \schema.m54
         UNION ALL
+          SELECT \common_cols, NULL AS epoch, ampl_I, NULL AS subtype		-- BLAP
+          FROM \schema.blap
+        UNION ALL
           SELECT object_id, raj2000, dej2000, vsx, ssa_targclass,			-- CV
                  ogle_vartype, ssa_reference, ssa_collection,
-                 peak_I AS mean_I, NULL AS mean_V,
+                 peak_I+ampl_I AS mean_I, NULL AS mean_V,
                  COALESCE(period, sh_period), 
                  COALESCE(period_err, sh_period_err),
                  NULL AS epoch, ampl_I, NULL AS subtype

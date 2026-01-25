@@ -52,12 +52,48 @@ Unfortunately, it is not possible to include multiple publications in a single r
 Therefore, when several relevant papers exist, I selected the “paper1”.
 
 ## Issues
-gd/cep/phot/V/OGLE-GD-CEP-1198.dat;  gd/cep/phot/V/OGLE-GD-CEP-1160.dat
+### gd/cep/phot/V/OGLE-GD-CEP-1198.dat;  gd/cep/phot/V/OGLE-GD-CEP-1160.dat
 obstime is HJD-2450000.0, not HJD as for all other GD/cep/phot/[VI]/*.dat
+Use script correct_jd245.sh to see, what is wrong.
 
-M54/M54variables.dat
+### misc/BLAP/phot_ogle4/I; misc/BLAP/phot_ogle3/I
+A lot of files have HJD instead of expected (and
+declared) there HJD-2400000. Use script correct_from_jd245.sh to check and confirm.sh
+to confirm corrections.
+
+Perhaps, it makes sense to do so also:
+mv misc/BLAP/phot_Swope/V/* misc/BLAP/phot_ogle4/V/
+mv misc/BLAP/phot_Swope/I/* misc/BLAP/phot_ogle4/I/
+
+The authors mention that observation time there is BJD TDB, which differs 
+from the rest of the data (declared as HJD). I should think about how to 
+put this gracefully into the photDM.
+
+### M54/M54variables.dat
 This file should be cleaned of empty lines with only the first column filled.
-I could not write an appropriate grammar for ingesting this file and gave up
+I could not write an appropriate grammar for ingesting this file and gave
+up. Use clean_M54variables_file.py to fix thinhs.
+
+### gal/acep/acepF.dat; acep1O.dat
+Here some stars (at the moment, a single case: OGLE-GAL-ACEP-091) are present
+in both files:
+  - acepF.dat   : classified as a fundamental-mode anomalous Cepheid
+  - acep1O.dat  : classified as a first-overtone anomalous Cepheid
+As a result, the same object appears twice in the database with two
+independent sets of parameters and duplicated light curves. This leads to
+confusion in the database tables and to unpredictable behaviour of derived
+parameters.
+
+To resolve this issue, such stars are treated here as double-mode objects.
+Their parameters from both classifications are extracted and combined into
+a separate file (acepF1O_new.dat), while they are removed from the original
+single-mode catalogues.
+
+The exact format of acepF1O_new.dat is documented in the accompanying file
+README_F1O.
+
+Use correct_gal_acep_duplications.py to do this
+
 
 ## Importing order
 1. Photometric system: phot.rd
