@@ -364,7 +364,9 @@
   <mixinDef id="mira_p">													<!-- LPV param -->
     <doc>"description">Columns relevant for the Mira (LPV) object parameters tables</doc>
     <events>
-      <FEED source="object_param_columns"/>
+      <FEED source="object_param_columns">
+        <PRUNE name="epoch"/>
+      </FEED>
     </events>
   </mixinDef>
 
@@ -380,7 +382,9 @@
   <mixinDef id="rot_p">														<!-- ROT param-->
     <doc>"description">Columns relevant for the Rotating Variables parameters tables</doc>
     <events>
-      <FEED source="object_param_columns"/>
+      <FEED source="object_param_columns">
+        <PRUNE name="epoch"/>
+      </FEED>
       <column name="ampl_V" type="double precision"
         ucd="phot.mag"
         unit="mag"

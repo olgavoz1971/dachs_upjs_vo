@@ -40,9 +40,11 @@
   </table>
 
   <data id="import_lightcurves" updating="True">
-    <sources pattern="data/gal/*/phot*/[VI]/*.dat"/>
 
-    <sources pattern="data/misc/m54/phot*/[VI]/*.dat"/>
+    <sources pattern="data/misc/CV/phot*/[VI]/*.dat"/>
+
+    <!-- <sources pattern="data/gal/*/phot*/[VI]/*.dat"/> -->
+    <!-- <sources pattern="data/misc/m54/phot*/[VI]/*.dat"/> -->
 
     <!-- <sources pattern="data/gd/*/phot*/[VI]/*.dat"/> -->
     <!-- <sources pattern="data/smc/acep/phot*/[VI]/*.dat"/>

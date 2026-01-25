@@ -1,7 +1,7 @@
 <resource schema="ogle" resdir=".">
   <meta name="schema-rank">50</meta>
   <macDef name="referenceM54">2016AcA....66..197H</macDef>
-  <macDef name="referenceCV">TBD2016AcA....66..197H</macDef>
+  <macDef name="referenceCV">2015AcA....65..313M</macDef>
   <meta name="creationDate">2025-12-21T20:06:30Z</meta>
 
   <meta name="title">Original OGLE ident tables outside the main fields</meta>
@@ -14,6 +14,8 @@
   <table id="m54" onDisk="True" adql="True">
     <meta name="description">The (almost) original table M54variables.dat with identification and parameters of stars
                    from Sagittarius Dwarf Spheroidal Galaxy and its M54 Globular Cluster</meta>
+
+    <meta name="source">\referenceM54</meta>
 
     <!-- Pull whole set of columns directly from prototypes -->
     <FEED source="ogle/aux#object_ident_columns">
@@ -125,7 +127,7 @@
 
     <column name="frequency" type="double precision"
         ucd="src.var;time.period"
-        unit="count/yr"
+        unit="yr**-1"
         tablehead="Outburst frequency"
         description="Number of outbursts per year"
         required="False"/>    

@@ -81,10 +81,6 @@
 
 <!-- ======================= All Classical Cepheids ============================= -->
 
-  <macDef name="param_cepheid_common_cols">
-    object_id, epoch, period, period_err, ampl_I, mean_I, mean_V
-  </macDef>
-
   <table id="cepheids" adql="True" onDisk="True">
 
     <meta name="table-rank">150</meta>
@@ -672,7 +668,22 @@
       (Cataclysmic Variables) from the OGLE Variable Star Collection.
     </meta>
 
-    <!-- just pull all columns from underlying tables -->
+    <!-- Pull references -->
+    <LOOP>
+      <codeItems>
+        # Collect references from all involved tables
+        with base.getTableConn() as conn:
+          refs = [list(conn.query("SELECT ssa_reference FROM ogle.cv_basic LIMIT 1"))[0][0]]
+          # remove duplicates
+          uniq_refs = list(dict.fromkeys(refs))
+          yield {"db_source": "; ".join(uniq_refs)}
+       </codeItems>
+      <events>
+        <meta name="source">\db_source</meta>
+      </events>
+    </LOOP>
+
+    <!-- pull all columns directly from underlying tables -->
     <LOOP>
        <codeItems>
          for col in context.resolveId("ogle/misc#cv_basic").columns:
@@ -715,10 +726,17 @@
     or through the SSA service. Light curves can be extracted using the associated DataLink services.
   </macDef>
 
+
+<!-- While doing UNION ot important to preserve column's order -->
+
   <macDef name="common_cols">
     object_id, raj2000, dej2000,
     vsx, ssa_targclass, ogle_vartype, ssa_reference, ssa_collection,
-    mean_I, mean_V, period, period_err, epoch
+    mean_I, mean_V, period, period_err
+  </macDef>
+
+  <macDef name="all_cols">
+    \common_cols, epoch, ampl_I, subtype
   </macDef>
 
   <table id="objects_all" adql="True" onDisk="True" nrows="800000"
@@ -749,38 +767,46 @@
       
     <viewStatement>
       CREATE MATERIALIZED VIEW \curtable AS (
-        SELECT \common_cols, ampl_I, pulse_mode AS subtype					--acep
+        SELECT \common_cols, epoch, ampl_I, pulse_mode AS subtype			--acep
           FROM \schema.acepheids
         UNION ALL
-        SELECT \common_cols, ampl_I, pulse_mode AS subtype					-- cep
+        SELECT \common_cols, epoch, ampl_I, pulse_mode AS subtype			-- cep
           FROM \schema.cepheids
         UNION ALL
-          SELECT \common_cols, ampl_I, subtype								-- dsct
+          SELECT \all_cols													-- dsct
           FROM \schema.dsct
         UNION ALL
-          SELECT \common_cols, depth1 AS ampl_I, subtype					-- ecl
+          SELECT \common_cols, epoch, depth1 AS ampl_I, subtype				-- ecl
           FROM \schema.eclipsing
         UNION ALL
-          SELECT \common_cols, ampl_I, subtype								-- hb
+          SELECT \all_cols													-- hb
           FROM \schema.heartbeat
         UNION ALL
-          SELECT \common_cols, ampl_I, NULL AS subtype						-- lpv
+          SELECT \common_cols, NULL AS epoch, ampl_I, NULL AS subtype		-- lpv
           FROM \schema.miras
         UNION ALL
-          SELECT \common_cols, ampl_I, NULL AS subtype						-- rot 
+          SELECT \common_cols, NULL AS epoch, ampl_I, NULL AS subtype		-- rot 
           FROM \schema.rotating
         UNION ALL
-          SELECT \common_cols, ampl_I, subtype								-- rrlyr
+          SELECT \all_cols													-- rrlyr
           FROM \schema.rrlyr
         UNION ALL
-          SELECT \common_cols, ampl_I, subtype								-- t2cep
+          SELECT \all_cols													-- t2cep
           FROM \schema.t2cep
         UNION ALL
-          SELECT \common_cols, depth AS ampl_I, NULL AS subtype				-- blg transits
+          SELECT \common_cols, epoch, depth AS ampl_I, NULL AS subtype		-- blg transits
           FROM \schema.transits
         UNION ALL
-          SELECT \common_cols, ampl_I, NULL AS subtype						-- m54 mingle-mangle
+          SELECT \common_cols, epoch, ampl_I, NULL AS subtype				-- m54 mingle-mangle
           FROM \schema.m54
+        UNION ALL
+          SELECT object_id, raj2000, dej2000, NULL AS vsx, ssa_targclass,	-- CV
+                 ogle_vartype, ssa_reference, ssa_collection,
+                 peak_I AS mean_I, NULL AS mean_V,
+                 COALESCE(period, sh_period), 
+                 COALESCE(period_err, sh_period_err),
+                 NULL AS epoch, ampl_I, NULL AS subtype
+          FROM \schema.cv
         )
     </viewStatement>
   </table>
