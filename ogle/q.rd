@@ -99,7 +99,7 @@
 
     <!-- custom columns -->
 
-    <column name="p_mean_mag" type="real"
+    <column name="mean_mag" type="real"
         ucd="phot.mag;stat.mean"
         unit="mag"
         tablehead="Mean magnitude"
@@ -107,7 +107,8 @@
         verbLevel="1"
         required="False"/>   <!-- And this column is worth showing to users -->
 
-    <column original="ogle/o#objects_all.period" name="p_period"/>
+    <column original="ogle/o#objects_all.period" name="period"/>
+    <column original="ogle/o#objects_all.epoch" name="epoch"/>
 
     <!-- ssap#fill-plainlocation mixin converts rd,dec into ssa_location
       (spoint) and ssa_region, but do not forget add aperture 
@@ -130,7 +131,16 @@
           )::spoly AS ssa_region,
           '\getConfig{web}{serverURL}/\rdId/sdl/dlget?ID=' || '\pubDIDBase' || q.object_id || '-' || q.passband AS accref,
           '\pubDIDBase' || q.object_id || '-' || q.passband AS ssa_pubdid,
-          '\getConfig{web}{serverURL}/\rdId/preview-plot/qp/' || q.object_id || '-' || q.passband AS preview,
+
+          -- I prefer a folded lightcurve but we can put up with unfolded one sometimes
+          CASE
+            WHEN o.period IS NOT NULL THEN
+              '\getConfig{web}{serverURL}/\rdId/preview-plot/qp/' || q.object_id || '-' || q.passband
+          ELSE
+              '\getConfig{web}{serverURL}/\rdId/preview/qp/' || q.object_id || '-' || q.passband
+          END AS preview,
+
+          -- '\getConfig{web}{serverURL}/\rdId/preview-plot/qp/' || q.object_id || '-' || q.passband AS preview,
           'phot.mag;em.opt.' || q.passband AS ssa_fluxucd,
           q.passband AS ssa_bandpass,
           p.specmid AS ssa_specmid,
@@ -141,8 +151,9 @@
           t_min,
           t_max,
           q.ssa_length,
-          mean_mag AS p_mean_mag,
-          o.period AS p_period,
+          q.mean_mag AS mean_mag,
+          o.period AS period,
+          o.epoch AS epoch,
           50000 AS accsize,
           NULL AS embargo,
           NULL AS owner,
@@ -390,19 +401,18 @@
       <metaMaker semantics="#preview-plot">
         <code>
             # TODO raise something reasonable in case of absent information about the period
+            # Preview of folded lightcurve with period and epoch (if available)
             pubdid = descriptor.metadata['ssa_pubdid']
             target = descriptor.metadata['ssa_targname']
             band = descriptor.metadata['ssa_bandpass']
-            period = descriptor.metadata['p_period']
-            print(f'metaMaker semantics="#preview-plot" {period=}')
+            # Check if the period is present:
+            period = descriptor.metadata['period']
             if period is None:
               # yield None
               yield DatalinkFault.NotFoundFault(target, "No period for this star known here")
             else:
               path_ending = "/".join(pubdid.split("/")[-2:])
               url = makeAbsoluteURL(f"\rdId/preview-plot/qp/{path_ending}")
-              if period:
-                  print('Period!')
               yield descriptor.makeLink(
                 url,
                 description=f"Preview of folded lightcurve for {target} in {band}",
@@ -443,7 +453,7 @@
     <meta name="shortName">TS previews</meta>
     <meta name="description">
         A service returning PNG thumbnails for folded time series. It takes the obs_id for which to generate a preview. 
-        To calculate phases, period from objects_all view is used.
+        To calculate phases, period and epoch from objects_all view are used.
     </meta>
     <pythonCore>
         <inputTable>
@@ -469,22 +479,32 @@
                         {"obj_id": objId, "passband": passband}
                     ))
 
-                    period = list(conn.query(
-                      "SELECT period "
+                    period_epoch = list(conn.query(
+                      "SELECT period, epoch "
                         "FROM \schema.objects_all "
                         "WHERE object_id=%(obj_id)s LIMIT 1",
                         {"obj_id": objId}
                     ))
 
+                    # period = list(conn.query(
+                    #   "SELECT period "
+                    #     "FROM \schema.objects_all "
+                    #     "WHERE object_id=%(obj_id)s LIMIT 1",
+                    #     {"obj_id": objId}
+                    # ))
+
               if not res:
                 raise UnknownURI(f'No time series for {objId} {passband}')
 
-              print(f'--- qp renderer for previews {period=}')
-              period = period[0][0] if len(period) > 0 else None
-              print(f'--- qp renderer for previews {period=}')
+              # print(f'--- qp renderer for previews {period=}')
+              period, epoch = period_epoch[0] if len(period_epoch) > 0 else (None, None)
+              # period = period[0][0] if len(period) > 0 else None
+              # print(f'--- qp renderer for previews {period=}')
               if period is None:
                 raise UnknownURI(f'We have no period for {objId}')
-              jd0 = res[0][0]
+              # use epoch if present, otherwise take just the first observation
+              jd0 = epoch if epoch is not None else res[0][0]
+              # jd0 = res[0][0]
               folded = [
                      ((jd - jd0) / period % 1.0, mag)
                      for jd, mag in res

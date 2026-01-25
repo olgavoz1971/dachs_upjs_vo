@@ -692,6 +692,10 @@
            yield {'item': f'ogle/misc#cv_periods.{col.name}'}
          for col in context.resolveId("ogle/misc#cv_sh_periods").columns:
            yield {'item': f'ogle/misc#cv_sh_periods.{col.name}'}
+         for col in context.resolveId("ogle/misc#cv_vsx").columns:
+           yield {'item': f'ogle/misc#cv_vsx.{col.name}'}
+         for col in context.resolveId("ogle/misc#cv_xray").columns:
+           yield {'item': f'ogle/misc#cv_xray.{col.name}'}
        </codeItems>
        <events>
          <column original="\item"/>
@@ -705,6 +709,8 @@
         SELECT \colNames FROM \schema.cv_basic
         LEFT JOIN \schema.cv_periods USING (object_id)
         LEFT JOIN \schema.cv_sh_periods USING (object_id)
+        LEFT JOIN \schema.cv_vsx USING (object_id)
+        LEFT JOIN \schema.cv_xray USING (object_id)
       )
     </viewStatement>
   </table>
@@ -800,7 +806,7 @@
           SELECT \common_cols, epoch, ampl_I, NULL AS subtype				-- m54 mingle-mangle
           FROM \schema.m54
         UNION ALL
-          SELECT object_id, raj2000, dej2000, NULL AS vsx, ssa_targclass,	-- CV
+          SELECT object_id, raj2000, dej2000, vsx, ssa_targclass,			-- CV
                  ogle_vartype, ssa_reference, ssa_collection,
                  peak_I AS mean_I, NULL AS mean_V,
                  COALESCE(period, sh_period), 

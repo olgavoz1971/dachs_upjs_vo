@@ -166,6 +166,8 @@
     </make>
   </data>
 
+<!-- ====================== cv orb periods ================ -->
+
   <table id="cv_periods" onDisk="True" adql="hidden">
     <meta name="description">The original table CV/orb_periods.dat with orbital periods 
             of dwarf nova candidates detected in the OGLE fields toward the Galactic 
@@ -216,6 +218,8 @@
     </make>
   </data>
 
+<!-- ====================== cv sh periods ================ -->
+
   <table id="cv_sh_periods" onDisk="True" adql="hidden">
     <meta name="description">The original table CV/sh_periods.dat with superhump periods 
             of dwarf nova candidates detected in the OGLE fields toward the Galactic 
@@ -265,6 +269,98 @@
     </make>
   </data>
 
-<!-- ==================================== -->
+
+<!-- ====================== cv vsx cross-ident ================ -->
+
+  <table id="cv_vsx" onDisk="True" adql="hidden">
+    <meta name="description">The original table cv_vsx.dat with 
+          cross-identifications with the International Variable Star Index (VSX) database
+            of dwarf nova candidates detected in the OGLE fields toward the Galactic 
+            bulge and the Magellanic System</meta>
+
+    <column name="object_id" type="text" ucd="meta.id;meta.main"
+        tablehead="Star ID" verbLevel="1" 
+        description="Star identifier"
+        required="True">
+    </column>
+
+    <column name="vsx" type="text" ucd="meta.id"
+        tablehead="VSX" verbLevel="1"
+        description="VSX designation"
+        required="False">
+      </column>
+
+  </table>
+
+  <data id="import_cv_vsx">
+    <sources>data/misc/CV/cv_vsx.dat</sources>
+    <columnGrammar commentIntroducer="#" preFilter="sed '/^$/d'">
+      <colDefs>
+        object_id:      1-16
+        vsx:           18-41
+      </colDefs>
+    </columnGrammar>
+    <make table="cv_vsx">
+      <rowmaker idmaps="*">
+      </rowmaker>
+    </make>
+  </data>
+
+
+<!-- ====================== cv xrays cross-ident ================ -->
+
+  <table id="cv_xray" onDisk="True" adql="hidden">
+    <meta name="description">The original table CV/cv_xrays.dat with 
+          cross-identifications with X-ray Counterparts to Dwarf Novae
+            in the OGLE fields toward the Galactic bulge and the Magellanic System</meta>
+
+    <column name="object_id" type="text" ucd="meta.id;meta.main"
+        tablehead="Star ID" verbLevel="1" 
+        description="Star identifier"
+        required="True">
+    </column>
+
+    <column name="xray_id" type="text"
+        ucd="meta.id"
+        tablehead="Xray source ID"
+        verbLevel="1"
+        description="X-ray source name"
+        required="False">
+      </column>
+
+     <column name="dist" type="real" 
+        ucd="pos.angdistance"
+        unit="arcsec"
+        tablehead="Distance"
+        verbLevel="1"
+        description="Angular distance between the star and X-ray source"
+        required="False">
+      </column>
+
+    <column name="chandra_id" type="text"
+        ucd="meta.id"
+        tablehead="Chandra ID" verbLevel="1"
+        description="Identifier in the Chandra Galactic Bulge Survey \
+                     Full X-Ray Point Source Catalog (Jonker et al. 2011, 2014)"
+        required="False">
+      </column>
+  </table>
+
+  <data id="import_cv_xray">
+    <sources>data/misc/CV/cv_xrays.dat</sources>
+    <columnGrammar commentIntroducer="#" preFilter="sed '/^$/d'">
+      <colDefs>
+        object_id:       1-16
+        xray_id:        18-40
+        dist:           42-45
+        chandra_id:     47-50
+      </colDefs>
+    </columnGrammar>
+    <make table="cv_xray">
+      <rowmaker idmaps="*">
+        <map dest="chandra_id">parseWithNull(@chandra_id, str, "")</map>
+      </rowmaker>
+    </make>
+  </data>
 
 </resource>
