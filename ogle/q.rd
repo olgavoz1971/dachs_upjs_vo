@@ -6,7 +6,6 @@
 
   <meta name="title">OGLE Time series</meta>
 
-  <FEED source="ogle/meta#object_table_desc"/>
   <FEED source="ogle/meta#ogle_meta"/>
   <FEED source="ogle/meta#longdoc_ogle"/>
 

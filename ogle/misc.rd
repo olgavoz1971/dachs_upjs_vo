@@ -9,7 +9,6 @@
 
   <meta name="title">Original OGLE ident tables outside the main fields</meta>
 
-  <FEED source="ogle/meta#field_table_desc"/>
   <FEED source="ogle/meta#ogle_meta"/>
 
 <!-- ==================== M54 stars  =========================================== -->
@@ -28,6 +27,7 @@
     </FEED>
     <FEED source="ogle/aux#object_param_columns">
         <PRUNE name="object_id"/>"
+        <PRUNE name="epoch"/>"
     </FEED>
   </table>
 
@@ -59,6 +59,7 @@
           <events>
             <map dest="\item">parseWithNull(@\item, float, "-")</map>
           </events>
+
         </LOOP>
 
         <!-- Try to bring ogle vartypes to the Simbad object types -->        

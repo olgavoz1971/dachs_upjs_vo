@@ -4,7 +4,6 @@
 
   <meta name="title">OGLE Variable Star Parameters</meta>
 
-  <FEED source="ogle/meta#object_table_desc"/>
   <FEED source="ogle/meta#ogle_meta"/>
   <FEED source="ogle/meta#longdoc_ogle"/>
 
@@ -723,7 +722,7 @@
 <!-- ======================= United Objects View ============================= -->
 
   <macDef name="objects_description">
-    This table is a unified catalogue of objects from the OGLE Collection of Variable Star Light Curves.
+    This table is a unified catalogue of objects from the OCVS.
     It was constructed by merging variable-type–specific ident.dat tables with selected columns 
     from tables containing parameters: cep.dat, cepF.dat, cep1O.dat, cepF1O.dat, cep1O2O.dat, cep1O2O3O.dat, 
     cep2O3O.dat, Miras.dat, and others.
@@ -803,7 +802,7 @@
           SELECT \common_cols, epoch, depth AS ampl_I, NULL AS subtype		-- blg transits
           FROM \schema.transits
         UNION ALL
-          SELECT \common_cols, epoch, ampl_I, NULL AS subtype				-- m54 mingle-mangle
+          SELECT \common_cols, NULL AS epoch, ampl_I, NULL AS subtype		-- m54 mingle-mangle
           FROM \schema.m54
         UNION ALL
           SELECT \common_cols, NULL AS epoch, ampl_I, NULL AS subtype		-- BLAP

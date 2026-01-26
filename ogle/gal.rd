@@ -11,7 +11,6 @@
 
   <meta name="title">Original OGLE Variable Stars tables form the \field Collection.</meta>
 
-  <FEED source="ogle/meta#field_table_desc" field="\field"/>
   <FEED source="ogle/meta#ogle_meta"/>
 
 <!-- ================================= Anomalous Cepheids ============================== -->
