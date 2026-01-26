@@ -282,7 +282,7 @@
           refposition="HELIOCENTER"
           refframe="ICRS"
           time0="2400000.5"
-          timescale="TCB"
+          timescale="UTC"
         >//timeseries#phot-0</mixin>
 
         <param original="ts_ssa.t_min"/>
