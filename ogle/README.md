@@ -56,9 +56,11 @@ Therefore, when several relevant papers exist, I selected the “paper1”.
 obstime is HJD-2450000.0, not HJD as for all other GD/cep/phot/[VI]/*.dat
 Use script correct_jd245.sh to see, what is wrong.
 
-### misc/BLAP/phot_ogle4/I; misc/BLAP/phot_ogle3/I
-A lot of files have HJD instead of expected (and
-declared) there HJD-2400000. Use script correct_from_jd245.sh to check and confirm.sh
+### BLAP
+misc/BLAP/phot_ogle4/I; misc/BLAP/phot_ogle3/I:
+
+A lot of files have full JD instead of expected (and
+declared) there BJD_TDB-2450000. Use script correct_from_jd245.sh to check and confirm.sh
 to confirm corrections.
 
 Perhaps, it makes sense to do so also:
@@ -66,8 +68,9 @@ mv misc/BLAP/phot_Swope/V/* misc/BLAP/phot_ogle4/V/
 mv misc/BLAP/phot_Swope/I/* misc/BLAP/phot_ogle4/I/
 
 The authors mention that observation time there is BJD TDB, which differs 
-from the rest of the data (declared as HJD). I should think about how to 
-put this gracefully into the photDM.
+from the rest of the data (declared as HJD and, *I suppose*, UTC). I added a nested
+LOOP to produce separate lightcurve template for all filters and different
+time scales. This does not look graceful, but still works.
 
 ### M54/M54variables.dat
 This file should be cleaned of empty lines with only the first column filled.

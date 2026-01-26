@@ -228,6 +228,7 @@
       ssa_datasource="'survey'"
       mime="'application/x-votable+xml'"
       ssa_targetpos="NULL"
+      refposition="UNKNOWN"
     >//ssap#view</mixin>
     
     <!--  coverage param is an alias of s_region param --> 
@@ -264,10 +265,10 @@
 -->
 
   <STREAM id="instance-template">
-    <table id="instance_\band_short" onDisk="False">
+    <table id="instance_\band_short-\\timescale" onDisk="False">
       <!-- metadata modified by sdl's dataFunction -->
-      <meta name="description">The \metaString{source} lightcurve in the \band_human filter </meta>
-
+      <meta name="description">The OGLE lightcurve in the \band_human filter </meta>
+      <!-- <meta name="source">2025AcA....65....1U</meta> -->
       <!-- JK: define them _before_ mentioning them the mixin -->
       <param original="ts_ssa.ssa_bandpass"/>
       <param original="ts_ssa.ssa_specmid"/>
@@ -279,10 +280,10 @@
           phot_description="OGLE magnitude in \band_human"
           phot_ucd='phot.mag;\band_ucd'
           phot_unit="mag"
-          refposition="HELIOCENTER"
+          refposition="\\refposition"
           refframe="ICRS"
           time0="2400000.5"
-          timescale="UTC"
+          timescale="\\timescale"
         >//timeseries#phot-0</mixin>
 
         <param original="ts_ssa.t_min"/>
@@ -303,13 +304,23 @@
 
   <!-- instantiate for a few bands - take names from https://svo2.cab.inta-csic.es/theory/fps/ -->
   <!-- zero point are from https://svo2.cab.inta-csic.es/theory/fps -->
-  <!-- TODO How to read it from the database????  -->
-  <LOOP source="instance-template">
+  <!-- It would be interesting to have here a mixin like  //siap#getBandFromFilter but for ssap -->
+
+  <LOOP reexpand="True">
     <csvItems>
+      refposition, timescale
+      HELIOCENTER, UTC
+      BARYCENTER,  TDB   
+    </csvItems>
+    <events>
+      <LOOP source="instance-template">
+        <csvItems>
             band_short, band_human, band_ucd, effective_wavelength, zero_point_flux
             V,          Bessell/V, em.opt.V, 5.4e-7, 3630.22
             I,          Bessell/I, em.opt.I, 8.3e-7, 2415.65
-    </csvItems>
+        </csvItems>
+      </LOOP>
+    </events> 
   </LOOP>
 
   <data id="build-ts" auto="False">
@@ -334,7 +345,7 @@
       </pargetter>
     </embeddedGrammar>
 
-    <make table="instance_V">   <!-- just a placeholder, we don't have the bare "instance" table. But we need a name from the LOOP -->
+    <make table="instance_V-UTC">   <!-- just a placeholder, we don't have the bare "instance" table. But we need a name from the LOOP -->
       <rowmaker idmaps="*" id="make-ts"/>
 
       <!-- parmaker can get parameters, provided by pargetter and write them as a metadata in the instance table -->
@@ -345,6 +356,9 @@
              sourceId = vars["ssa_targname"]     # in apply the current input fields are available in the vars dictionary
              targetTable.setMeta("description", base.getMetaText(targetTable, "description") +
                  " for {}".format(sourceId))
+             # JK: does not work :-( How to specifify it for each ts instance from ssa_reference?
+             # targetTable.setMeta("source", "2035AcA....65....1U")
+             # targetTable.setMeta("publication_id", "2034AcA....65....1U")
              targetTable.setMeta("name", str(sourceId))
            </code>
          </apply>
@@ -426,9 +440,10 @@
         <setup imports="gavo.rsc"/>
         <code>
             _, bandid = rd.parseIdentifier(descriptor.metadata["ssa_pubdid"])
+            timescale = "TDB" if descriptor.metadata["ssa_collection"] == "OGLE-BLAP" else "UTC"
             dd = rd.getById("build-ts")
             descriptor.data = rsc.Data.createWithTable(dd,
-                rd.getById("instance_"+bandid))
+                rd.getById("instance_" + bandid + "-" + timescale))
             descriptor.data = rsc.makeData(
                 dd,
                 data=descriptor.data,
