@@ -74,6 +74,7 @@ Perhaps, it makes sense to do so also:
 ```
 cat phot_Swope/I/OGLE-BLAP-001.dat >> phot_ogle4/I/OGLE-BLAP-001.dat
 cat phot_Swope/V/OGLE-BLAP-001.dat >> phot_ogle4/V/OGLE-BLAP-001.dat
+rm -r phot_Swope/
 ```
 
 The authors mention that observation time there is BJD TDB, which differs 
