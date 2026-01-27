@@ -52,13 +52,19 @@ Unfortunately, it is not possible to include multiple publications in a single r
 Therefore, when several relevant papers exist, I selected “paper1”.
 
 ## Issues
-### gd/cep/phot/V/OGLE-GD-CEP-1198.dat;  gd/cep/phot/V/OGLE-GD-CEP-1160.dat
+### gd/cep
+```
+gd/cep/phot/V/OGLE-GD-CEP-1198.dat;  
+gd/cep/phot/V/OGLE-GD-CEP-1160.dat:
+```
 obstime is `HJD-2450000.0`, not `HJD` as for all other `GD/cep/phot/[VI]/*.dat`
 Use script `correct_jd245.sh` to see what is wrong.
 
 ### BLAP
-`misc/BLAP/phot_ogle4/I; misc/BLAP/phot_ogle3/I`:
-
+```
+misc/BLAP/phot_ogle4/I;
+misc/BLAP/phot_ogle3/I:
+```
 A lot of files have a `full JD` instead of expected (and
 declared) there `BJD_TDB-2450000`. Use script `correct_from_jd245.sh` to check and `confirm.sh`
 to confirm corrections.
@@ -80,7 +86,9 @@ This file should be cleaned of empty lines with only the first column filled.
 I could not write an appropriate grammar for ingesting this file, and gave
 up. Use `clean_M54variables_file.py` to fix things.
 
-### gal/acep/acepF.dat; acep1O.dat
+### gal/acep
+`gal/acep/acepF.dat; acep1O.dat`
+
 Here, some stars (at the moment, a single case: OGLE-GAL-ACEP-091) are present
 in both files:
   - `acepF.dat`   : classified as a fundamental-mode anomalous Cepheid
