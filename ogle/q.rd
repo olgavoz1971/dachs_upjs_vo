@@ -39,6 +39,7 @@
 
   <table id="raw_data" onDisk="True" adql="True" nrows="1500000"
       namePath="//ssap#instance">
+    <meta name="table-rank">500</meta>
     <meta name="description">A united view over original ident tables for SSA/ObsCore ingestion</meta>
 
     <!-- the table with your custom metadata; it is transformed
@@ -74,6 +75,7 @@
     <mixin>//ssap#plainlocation</mixin>
     <mixin>//ssap#simpleCoverage</mixin>
 
+    <index columns="ssa_targname"/>
     <FEED source="//scs#splitPosIndex"
       columns="ssa_location"
       long="degrees(long(ssa_location))"
@@ -192,7 +194,8 @@
 
 <!-- ================================== ts_ssa =========================== -->
 
-  <table id="ts_ssa" onDisk="True" adql="True" nrows="1500000">
+  <table id="ts_ssa" onDisk="True" adql="True">
+    <property name="forceStats">1</property>
     <meta name="table-rank">50</meta>
     <meta name="_associatedDatalinkService">
       <meta name="serviceId">sdl</meta>

@@ -10,6 +10,7 @@
 <!-- ======================= All Anomalous Cepheids ============================= -->
 
   <table id="acepheids" adql="True" onDisk="True">
+    <property name="forceStats">1</property>
 
     <meta name="table-rank">150</meta>
     <meta name="description" format="rst">
@@ -81,6 +82,7 @@
 <!-- ======================= All Classical Cepheids ============================= -->
 
   <table id="cepheids" adql="True" onDisk="True">
+    <property name="forceStats">1</property>
 
     <meta name="table-rank">150</meta>
     <meta name="description" format="rst">
@@ -201,6 +203,7 @@
 <!-- ======================= All DSct ============================= -->
 
   <table id="dsct" adql="True" onDisk="True">
+    <property name="forceStats">1</property>
 
     <meta name="table-rank">150</meta>
     <meta name="description" format="rst">
@@ -255,6 +258,7 @@
 <!-- ======================= All Ecl/Ell binaries ============================= -->
 
   <table id="eclipsing" adql="True" onDisk="True">
+    <property name="forceStats">1</property>
 
     <meta name="table-rank">150</meta>
     <meta name="description" format="rst">
@@ -324,6 +328,7 @@
 <!-- ======================= HB (Heartbeat stars) ============================= -->
 
   <table id="heartbeat" adql="True" onDisk="True">
+    <property name="forceStats">1</property>
     <meta name="table-rank">150</meta>
     <meta name="description" format="rst">
       Coordinates and variability parameters of all Heartbeat Variables \
@@ -376,6 +381,7 @@
 <!-- ======================= All LPV (Miras) ============================= -->
 
   <table id="miras" adql="True" onDisk="True">
+    <property name="forceStats">1</property>
     <meta name="table-rank">150</meta>
     <meta name="description" format="rst">
       Coordinates and variability parameters of all Long Period Variables \
@@ -424,6 +430,7 @@
 <!-- ======================= All Rot (rotating) ============================= -->
 
   <table id="rotating" adql="True" onDisk="True">
+    <property name="forceStats">1</property>
     <meta name="table-rank">150</meta>
     <meta name="description" format="rst">
       Coordinates and variability parameters of all Rotating Variables \
@@ -468,6 +475,7 @@
 <!-- ======================= All RR Lyr ============================= -->
 
   <table id="rrlyr" adql="True" onDisk="True">
+    <property name="forceStats">1</property>
     <meta name="table-rank">150</meta>
     <meta name="description" format="rst">
       Coordinates and variability parameters of all RR Lyr Variables \
@@ -561,6 +569,7 @@
 <!-- ======================= All t2cep ============================= -->
 
   <table id="t2cep" adql="True" onDisk="True">
+    <property name="forceStats">1</property>
     <meta name="table-rank">150</meta>
     <meta name="description" format="rst">
       Coordinates and variability parameters of all Type II Cepheids \
@@ -617,6 +626,7 @@
 <!-- ======================= All Transits ============================= -->
 
   <table id="transits" adql="True" onDisk="True">
+    <property name="forceStats">1</property>
     <meta name="table-rank">150</meta>
     <meta name="description" format="rst">
       Coordinates and variability parameters of candidates for transiting planets \
@@ -661,6 +671,7 @@
 
 <!-- ======================= CV special view ============================= -->
   <table id="cv" adql="True" onDisk="True">
+    <property name="forceStats">1</property>
     <meta name="table-rank">150</meta>
     <meta name="description" format="rst">
       Coordinates and variability parameters of of dwarf nova candidates
@@ -744,13 +755,14 @@
     \common_cols, epoch, ampl_I, subtype
   </macDef>
 
-  <table id="objects_all" adql="True" onDisk="True" nrows="800000"
+  <table id="objects_all" adql="True" onDisk="True"
          mixin="//scs#pgs-pos-index">
 
+    <property name="forceStats">1</property>
     <meta name="table-rank">100</meta>
 
-    <meta name="description">
-      \objects_description format="rst
+    <meta name="description" format="rst">
+      \objects_description
      </meta>
 
     <index columns="object_id"/>
@@ -834,8 +846,8 @@
 
     <meta name="shortName">All OGLE Objects</meta>
     <meta name="title">OGLE objects Cone Search</meta>
-    <meta name="description">
-      \objects_description format="rst
+    <meta name="description" format="rst">
+      \objects_description
     </meta>
     <meta name="_related" title="OGLE Varable Stars Time series"
             >\internallink{\rdId/ts-web/info}

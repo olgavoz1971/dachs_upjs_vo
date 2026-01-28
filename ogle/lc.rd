@@ -4,14 +4,6 @@
 
   <meta name="title">Combined lightcurve tables with all PP for all objects from OGLE
                      Variable Star Collection</meta>
-  <meta name="description">
-    The OGLE project consists of several sub-surveys that differ in sky coverage and in the types of variability targeted.
-    Here, we build the big table contained all photometry points for all objects from the OGLE Collection of Variable 
-    Star Light Curves.
-    The data can be accessed via ADQL, but the main purpose of this table is to serve as a basis for the
-    ssa_ts table and to provide input to the timeseries and preview instances in the DataLink service.
-  </meta>
-
   <FEED source="ogle/meta#longdoc_ogle"/>
   <FEED source="ogle/meta#ogle_meta"/>
 
@@ -24,6 +16,7 @@
 
   <table id="lightcurves" onDisk="True" adql="True"  nrows="1700000000" 
       namePath="ogle/aux#lc">
+    <meta name="table-rank">300</meta>
     <meta name="description">The united table with photometry points of all OGLE Lightcurves</meta>
     <index columns="object_id, passband"/>
 <!-- <index columns="object_id, passband" cluster=True>
