@@ -1,4 +1,4 @@
-publisher: Pavol Josef Šafárik University
+publisher: Pavol Jozef Šafárik University
 contact.name: UPJŠ Archive
 contact.address: Jesenná 5, 040 01 Košice, Slovakia
 contact.email: astro.upjs@gmail.com
@@ -19,7 +19,7 @@ widely distributed, and their relatively low operational cost allows \
 long-term high-cadence monitoring of individual variable stars. \
 This makes it possible to detect subtle features, transits, and even \
 evolutionary processes. \
-Our team is from Pavol Josef Šafárik University in Košice, Slovakia
+Our team is from Pavol Jozef Šafárik University in Košice, Slovakia
 
 authority.title: UPJŠ Authority
 authority.description: These records belong to UPJŠ dachs server
