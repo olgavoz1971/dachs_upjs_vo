@@ -89,7 +89,7 @@ Path("acep1O_corr.dat").write_text(
 map_1O = {f(l, IN["id"]): l for l in acep1O}
 
 # ------------------------------------------------------------
-# b) Create acepF1O_new.dat
+# b) Create acepF1O.dat
 # ------------------------------------------------------------
 out = []
 
@@ -116,13 +116,13 @@ for lF in acepF:
 
     out.append(row)
 
-Path("acepF1O_new.dat").write_text("\n".join(out) + "\n")
+Path("acepF1O.dat").write_text("\n".join(out) + "\n")
 
 # ------------------------------------------------------------
 # c) README_F1O (IDENTICAL FORMAT)
 # ------------------------------------------------------------
 Path("README_F1O").write_text("""\
-Format of acepF1O_new.dat
+Format of acepF1O.dat
 --------------------------------------------------------------------------
   1-17  A17      ---     Star's ID
 

@@ -14,10 +14,11 @@
      be careful not to double/triple data. Just play with the templates
 -->
 
-  <table id="lightcurves" onDisk="True" adql="True"  nrows="1700000000" 
+  <table id="lightcurves" onDisk="True" adql="True"  nrows="1660000000" 
       namePath="ogle/aux#lc">
-    <meta name="table-rank">300</meta>
     <meta name="description">The united table with photometry points of all OGLE Lightcurves</meta>
+    <meta name="table-rank">200</meta>
+
     <index columns="object_id, passband"/>
 <!-- <index columns="object_id, passband" cluster=True>
     <index columns="object_id"/>
@@ -34,14 +35,14 @@
 
   <data id="import_lightcurves" updating="True">
 
-    <sources pattern="data/misc/BLAP/phot*/[VI]/*.dat"/>
+    <!-- <sources pattern="data/misc/BLAP/phot*/[VI]/*.dat"/> -->
     <!-- <sources pattern="data/misc/CV/phot*/[VI]/*.dat"/> -->
 
+    <!-- <sources pattern="data/misc/M54/phot*/[VI]/*.dat"/> -->
     <!-- <sources pattern="data/gal/*/phot*/[VI]/*.dat"/> -->
-    <!-- <sources pattern="data/misc/m54/phot*/[VI]/*.dat"/> -->
-
     <!-- <sources pattern="data/gd/*/phot*/[VI]/*.dat"/> -->
-    <!-- <sources pattern="data/smc/acep/phot*/[VI]/*.dat"/>
+    <!--
+    <sources pattern="data/smc/acep/phot*/[VI]/*.dat"/>
     <sources pattern="data/smc/cep/phot*/[VI]/*.dat"/>
     <sources pattern="data/smc/dsct/phot*/[VI]/*.dat"/>
     <sources pattern="data/smc/ecl/phot*/[VI]/*.dat"/>

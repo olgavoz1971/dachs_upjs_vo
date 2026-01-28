@@ -34,7 +34,7 @@
 
   <!-- JK: there is an error in column format description in the README file; corrected -->
   <data id="import_m54">
-    <sources>data/misc/m54/M54variables_cleaned.dat</sources>
+    <sources>data/misc/M54/M54variables_cleaned.dat</sources>
     <columnGrammar>
       <colDefs>
         object_id:      1-4
