@@ -804,7 +804,7 @@
       <rowmaker idmaps="*">
         <FEED source="ogle/aux#makeCommonRowsIdent"/>
         <var name="subtype">None</var>
-        <var name="ssa_targclass">"V*,Pl"</var>
+        <var name="ssa_targclass">"V*,Pl?"</var>
         <var name="ogle_vartype">"Transit"</var>
         <var name="ssa_collection">"\prefix-TR"</var>
         <var name="ssa_reference">"\referenceTransits"</var>
