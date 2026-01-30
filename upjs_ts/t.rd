@@ -96,6 +96,7 @@
 
     <column name="mag_diff_err" type="double precision"
       ucd="stat.error;phot.mag"
+      unit="mag"
       tablehead="Mag diff error"
       description="Estimation of differential magnitude error"
       required="False"/>
