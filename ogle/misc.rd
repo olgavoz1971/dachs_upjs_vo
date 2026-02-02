@@ -387,7 +387,7 @@
         <PRUNE name="object_id"/>"
         <PRUNE name="epoch"/>"
     </FEED>
-    <column name="gaia_id" type="text" ucd="meta.id"
+    <column name="gaia_id" type="bigint" ucd="meta.id"
         tablehead="GAIA ID" verbLevel="1"
         description="Gaia DR3 identifier"
         required="False">
