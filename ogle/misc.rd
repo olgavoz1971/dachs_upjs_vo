@@ -391,6 +391,7 @@
         tablehead="GAIA ID" verbLevel="1"
         description="Gaia DR3 identifier"
         required="False">
+        <values nullLiteral="-1"/>       
       </column>
 
    <column name="ampl_V" type="double precision"
@@ -398,6 +399,7 @@
         unit="mag"
         tablehead="Ampl V"
         description="V-band amplitude of the primary period"
+        displayHint="sf=4"
         required="False"/>
   </table>
 
@@ -440,7 +442,8 @@
             <map dest="\item">parseWithNull(@\item, float, "-")</map>
           </events>
         </LOOP>
-        <map dest="gaia_id">parseWithNull(@gaia_id, str, "-")</map>
+        <!-- <map dest="gaia_id">parseWithNull(@gaia_id, str, "-")</map> -->
+        <map dest="gaia_id">parseWithNull(@gaia_id, int, nullLiteral="-")</map>
         <map dest="vsx">parseWithNull(@vsx, str, "")</map>
         <var name="ogle_vartype">"BLAP"</var>  
         <var name="ssa_targclass">"Pu*"</var>

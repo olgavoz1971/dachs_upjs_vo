@@ -13,7 +13,7 @@
     <property name="forceStats">1</property>
 
     <meta name="table-rank">150</meta>
-    <meta name="description" format="rst">
+    <meta name="description">
       Coordinates and variability parameters of all Anomalous Cepheids from the OGLE Variable Star Collection.
       The table was constructed by merging all A.Cepheid-related data from all OGLE fields, such as GD, LMC, and SMC.
     </meta>
@@ -85,7 +85,7 @@
     <property name="forceStats">1</property>
 
     <meta name="table-rank">150</meta>
-    <meta name="description" format="rst">
+    <meta name="description">
       Coordinates and variability parameters of all Classical Cepheids from the OGLE Variable Star Collection.
       The table was constructed by merging all Cepheid-related data from all OGLE fields, such as BLG, GD, LMC, and SMC.
     </meta>
@@ -206,8 +206,8 @@
     <property name="forceStats">1</property>
 
     <meta name="table-rank">150</meta>
-    <meta name="description" format="rst">
-      Coordinates and variability parameters of all Delta Sct from the OGLE Variable Star Collection.\
+    <meta name="description">
+      Coordinates and variability parameters of all Delta Sct from the OGLE Variable Star Collection.
       The table was constructed by merging all d Sct-related data from all OGLE fields, such as BLG, GD, LMC, and SMC.
     </meta>
 
@@ -261,10 +261,10 @@
     <property name="forceStats">1</property>
 
     <meta name="table-rank">150</meta>
-    <meta name="description" format="rst">
-      Coordinates and variability parameters of all Eclipsing and Ellipsoidal Binary Systems \
-      from the OGLE Variable Star Collection. \
-      The table was constructed by merging all EB-related data from all OGLE fields, \
+    <meta name="description">
+      Coordinates and variability parameters of all Eclipsing and Ellipsoidal Binary Systems
+      from the OGLE Variable Star Collection.
+      The table was constructed by merging all EB-related data from all OGLE fields,
       such as BLG, GD, LMC, and SMC.
     </meta>
 
@@ -330,10 +330,10 @@
   <table id="heartbeat" adql="True" onDisk="True">
     <property name="forceStats">1</property>
     <meta name="table-rank">150</meta>
-    <meta name="description" format="rst">
-      Coordinates and variability parameters of all Heartbeat Variables \
-      from the OGLE Variable Star Collection.\
-      The table was constructed by merging all Hb-related data from all OGLE fields, \
+    <meta name="description">
+      Coordinates and variability parameters of all Heartbeat Variables
+      from the OGLE Variable Star Collection.
+      The table was constructed by merging all Hb-related data from all OGLE fields,
       such as BLG, GD, LMC, and SMC.
     </meta>
 
@@ -383,10 +383,10 @@
   <table id="miras" adql="True" onDisk="True">
     <property name="forceStats">1</property>
     <meta name="table-rank">150</meta>
-    <meta name="description" format="rst">
-      Coordinates and variability parameters of all Long Period Variables \
-      (LPV, Miras) from the OGLE Variable Star Collection.\
-      The table was constructed by merging all LPV-related data from all OGLE fields, \
+    <meta name="description">
+      Coordinates and variability parameters of all Long Period Variables
+      (LPV, Miras) from the OGLE Variable Star Collection.
+      The table was constructed by merging all LPV-related data from all OGLE fields,
       such as BLG, GD, LMC, and SMC.
     </meta>
 
@@ -432,10 +432,10 @@
   <table id="rotating" adql="True" onDisk="True">
     <property name="forceStats">1</property>
     <meta name="table-rank">150</meta>
-    <meta name="description" format="rst">
-      Coordinates and variability parameters of all Rotating Variables \
-      from the OGLE Variable Star Collection.\
-      The table was constructed by merging all rotating variable-related data from all OGLE fields, \
+    <meta name="description">
+      Coordinates and variability parameters of all Rotating Variables
+      from the OGLE Variable Star Collection.
+      The table was constructed by merging all rotating variable-related data from all OGLE fields,
       such as BLG, GD, LMC, and SMC.
     </meta>
 
@@ -477,10 +477,10 @@
   <table id="rrlyr" adql="True" onDisk="True">
     <property name="forceStats">1</property>
     <meta name="table-rank">150</meta>
-    <meta name="description" format="rst">
-      Coordinates and variability parameters of all RR Lyr Variables \
-      from the OGLE Variable Star Collection.\
-      The table was constructed by merging all RR Lyr-related data from all OGLE fields, \
+    <meta name="description">
+      Coordinates and variability parameters of all RR Lyr Variables
+      from the OGLE Variable Star Collection.
+      The table was constructed by merging all RR Lyr-related data from all OGLE fields,
       such as BLG, GD, LMC, and SMC.
     </meta>
 
@@ -571,10 +571,10 @@
   <table id="t2cep" adql="True" onDisk="True">
     <property name="forceStats">1</property>
     <meta name="table-rank">150</meta>
-    <meta name="description" format="rst">
-      Coordinates and variability parameters of all Type II Cepheids \
-      from the OGLE Variable Star Collection.\
-      The table was constructed by merging all Type II Cepheids-related data from all OGLE fields, \
+    <meta name="description">
+      Coordinates and variability parameters of all Type II Cepheids
+      from the OGLE Variable Star Collection.
+      The table was constructed by merging all Type II Cepheids-related data from all OGLE fields,
       such as BLG, GD, LMC, and SMC.
     </meta>
 
@@ -628,9 +628,9 @@
   <table id="transits" adql="True" onDisk="True">
     <property name="forceStats">1</property>
     <meta name="table-rank">150</meta>
-    <meta name="description" format="rst">
-      Coordinates and variability parameters of candidates for transiting planets \
-      from the OGLE Variable Star Collection.\
+    <meta name="description">
+      Coordinates and variability parameters of candidates for transiting planets
+      from the OGLE Variable Star Collection.
       The table was constructed by merging all transits-related data
     </meta>
 
@@ -673,7 +673,7 @@
   <table id="cv" adql="True" onDisk="True">
     <property name="forceStats">1</property>
     <meta name="table-rank">150</meta>
-    <meta name="description" format="rst">
+    <meta name="description">
       Coordinates and variability parameters of of dwarf nova candidates
       (Cataclysmic Variables) from the OGLE Variable Star Collection.
     </meta>
@@ -733,12 +733,13 @@
 <!-- ======================= United Objects View ============================= -->
 
   <macDef name="objects_description">
-    This table is a unified catalogue of objects from the OCVS.
-    It was constructed by merging variable-type–specific ident.dat tables with selected columns 
-    from tables containing parameters: cep.dat, cepF.dat, cep1O.dat, cepF1O.dat, cep1O2O.dat, cep1O2O3O.dat, 
+    This table is a unified catalogue of objects from the OCVS.\
+    It was constructed by merging variable-type–specific ident.dat tables\
+    with selected columns from tables containing parameters:\
+    cep.dat, cepF.dat, cep1O.dat, cepF1O.dat, cep1O2O.dat, cep1O2O3O.dat,\
     cep2O3O.dat, Miras.dat, and others.
 
-    The corresponding light curves can be discovered via TAP through the ts_ssa or obscore tables, 
+    The corresponding light curves can be discovered via TAP through the ts_ssa or obscore tables,\
     or through the SSA service. Light curves can be extracted using the associated DataLink services.
   </macDef>
 
@@ -761,7 +762,7 @@
     <property name="forceStats">1</property>
     <meta name="table-rank">100</meta>
 
-    <meta name="description" format="rst">
+    <meta name="description">
       \objects_description
      </meta>
 
@@ -846,7 +847,7 @@
 
     <meta name="shortName">All OGLE Objects</meta>
     <meta name="title">OGLE objects Cone Search</meta>
-    <meta name="description" format="rst">
+    <meta name="description">
       \objects_description
     </meta>
     <meta name="_related" title="OGLE Varable Stars Time series"
