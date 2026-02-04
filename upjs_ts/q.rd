@@ -1,6 +1,6 @@
 <resource schema="upjs_ts" resdir=".">
-    <meta name="schema-rank">100</meta>
-    <macDef name="pubDIDBase">ivo://\getConfig{ivoa}{authority}/~?\rdId/</macDef>	<!-- from bgds l2 -->
+	<meta name="schema-rank">100</meta>
+	<macDef name="pubDIDBase">ivo://\getConfig{ivoa}{authority}/~?\rdId/</macDef> <!-- from bgds l2 -->
 
 	<meta name="creationDate">2025-09-03T09:40:33Z</meta>
 
@@ -26,7 +26,7 @@
 		This approach, we believe, may help researchers follow the behaviour of other interesting objects over time.
 
 		For each photometric point, we provide the list of comparison stars used in its calculation
-		(which may vary for each star and each image) via a DataLink service with #auxiliary semantics.
+		(which may vary for each star and each image).
 
 		The corresponding calibrated images are published separately in the upjs_img image collection.
         </meta>
@@ -134,6 +134,23 @@
 			description="stellar magnitude"
 			verbLevel="1"
 			required="True"/>	<!-- And this column is worth showing to users -->
+
+ 		<column name="p_ra" type="double precision"
+			ucd="pos.eq.ra;meta.main"
+			tablehead="RA"
+			verbLevel="1"
+			unit="deg"
+			description="Right ascension"
+			required="False"/>
+
+		<column name="p_dec"
+			type="double precision"
+			ucd="pos.eq.dec;meta.main"
+			tablehead="Dec"
+			verbLevel="1"
+			unit="deg"
+			description="Declination"
+			required="False"/>
 
 		<!-- note 1: accref = ...upjs_ts/q/object_id path for (future) product (lightcurve) this is carmenes-style
 					'upjs_ts/q/' || o.id || '/' || p.band AS accref,
@@ -292,52 +309,55 @@
 			\band_human filter </meta>
 
     	<!-- JK: define them _before_ mentioning them the mixin -->
-		<param original="ts_ssa.ssa_bandpass"/>
-		<param original="ts_ssa.ssa_specmid"/>
-			<mixin
-				effectiveWavelength="\effective_wavelength"
-				filterIdentifier='"\band_human"'
-				magnitudeSystem="Vega"
-				zeroPointFlux="\zero_point_flux"
-				phot_description="Kolonica magnitude in \band_human"
-				phot_ucd='phot.mag;\band_ucd'
-				phot_unit="mag"
-				refposition="BARYCENTER"
-				refframe="ICRS"
-				time0="2400000.5"
-				timescale="TCB"
-			>//timeseries#phot-0</mixin>
+			<param original="ts_ssa.ssa_bandpass"/>
+			<param original="ts_ssa.ssa_specmid"/>
+				<mixin
+					effectiveWavelength="\effective_wavelength"
+					filterIdentifier='"\band_human"'
+					magnitudeSystem="Vega"
+					zeroPointFlux="\zero_point_flux"
+					phot_description="Kolonica magnitude in \band_human"
+					phot_ucd='phot.mag;\band_ucd'
+					phot_unit="mag"
+					refposition="BARYCENTER"
+					refframe="ICRS"
+					time0="2400000.5"
+					timescale="TCB"
+				>//timeseries#phot-0</mixin>
 
-		<param original="ts_ssa.t_min"/>
-		<param original="ts_ssa.t_max"/>
-		<param original="ts_ssa.ssa_location"/>
+			<param original="ts_ssa.t_min"/>
+			<param original="ts_ssa.t_max"/>
+			<param original="ts_ssa.ssa_location"/>
 
-		<!-- Add my columns -->
-		<column name="mag_err" type="double precision"
-			ucd="stat.error;phot.mag"
-			unit="mag"
-			tablehead="magnitude"
-			description="stellar magnitude error"
-			verbLevel="1"
-			required="False"/>
+			<!-- Add my columns -->
+			<column name="mag_err" type="double precision"
+				ucd="stat.error;phot.mag"
+				unit="mag"
+				tablehead="magnitude"
+				description="stellar magnitude error"
+				verbLevel="1"
+				required="False"/>
 
-		<column name="origin_image" type="text"
-			ucd="meta.ref.url"
-			tablehead="access_url"
-			description="Path to access fits image"
-			verbLevel="1"
-			required="False"
-			displayHint="type=product"/>
+			<column name="origin_image" type="text"
+				ucd="meta.ref.url"
+				tablehead="access_url"
+				description="Path to access fits image"
+				verbLevel="1"
+				required="False"
+				displayHint="type=product"/>
 
-		<column name="airmass"
-			ucd="obs.airMass"
-			description="Airmass of the target"
-			verbLevel="18"/>
+			<column name="airmass"
+				ucd="obs.airMass"
+				type="real"
+				description="Airmass of the target"
+				verbLevel="18"/>
 
-		<!-- JK: Add also something kind of:
-			<column original="lightcurves.process_info"/>   my jsonb from lc_metadata
-		-->
-
+			<column name="comp_stars" 
+				type="text"
+				tablehead="Comparison stars"
+				ucd="meta.ref.url"
+				verbLevel="10"
+				description="Link to comparison stars for this photometry point"/>
 		</table>
 	</STREAM>
 
@@ -372,7 +392,7 @@
 
 					with base.getTableConn() as conn:
 						for row in conn.queryToDicts(
-							"SELECT l.dateobs as dateobs, l.magnitude AS phot, l.mag_err, "
+							"SELECT l.id as pp_id, l.dateobs as dateobs, l.magnitude AS phot, l.mag_err, "
 							" 99.99 AS airmass, l.image_filename AS origin_image"
 							" FROM \schema.lightcurves AS l"
 							" JOIN \schema.photosys AS p ON p.id = l.photosys_id"
@@ -383,6 +403,7 @@
 							dt = row["dateobs"]
 							dt_utc = dt.astimezone(datetime.timezone.utc) # I should have thrown out this trash
 							row['obs_time'] = dateTimeToMJD(dt_utc)	# This doesn't take timezone into account (like "extract(julian from dateobs at time zone 'UTC+12'")
+							row["comp_stars"] = makeAbsoluteURL("\rdId/comp_stars/qp/{}".format(row["pp_id"]))
 							yield row
 				</code>
 			</iterator>
@@ -423,6 +444,48 @@
 		dataFunction: builds ts
 		pubDID is the only input parameter there
 	-->
+
+	<service id="comp_stars" allowed="qp">
+		<property key="queryField">pp_id</property>
+		<pythonCore>
+			<inputTable>
+				<inputKey name="pp_id" type="bigint" required="True"
+					description="Identifier of a photometry point"/>
+			</inputTable>
+
+			<outputTable namePath="upjs_ts/t#objects" autoCols="gaia_name,ra,dec"/>
+
+			<coreProc>
+				<setup imports="gavo.api"/>
+				<code>
+					pp_id = inputTable.getParam("pp_id")
+					with base.getTableConn() as conn:
+						row = list(conn.query(
+							"select comp_stars from upjs_vo.lightcurves"
+							" where id=%(pp_id)s", {"pp_id": pp_id}))
+						try:
+							gdr3_ids = tuple(row[0][0])
+						except Exception as e:
+							print(f"something is wrong with comp_stars list: {e}")
+							t = api.TableForDef(self.outputTable, rows=[])
+							return("application/x-votable+xml", api.getAsVOTable(t))
+						if not gdr3_ids:
+							print("Empty list of comp_stars")
+							t = api.TableForDef(self.outputTable, rows=[])
+							return("application/x-votable+xml", api.getAsVOTable(t))
+
+						t = api.TableForDef(
+							self.outputTable,
+							rows = conn.queryToDicts(
+									"select gaia_name, ra, dec from upjs_vo.objects where gaia_name in %(gdr3_ids)s",
+									{"gdr3_ids": gdr3_ids}
+							)
+						)
+						return("application/x-votable+xml", api.getAsVOTable(t))
+				</code>
+			</coreProc>
+		</pythonCore>
+	</service>
 
 	<service id="sdl" allowed="dlget,dlmeta,static">
 		<!-- <property name="staticData">data/periodograms</property> -->

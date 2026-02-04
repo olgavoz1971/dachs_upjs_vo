@@ -171,11 +171,11 @@
       description="Equatorial coordiantes, ICRS"
       required="False"/>
 
-    <column name="gaia_name" type="text"
+    <column name="gaia_name" type="bigint"
       ucd="meta.id"
       tablehead="Gaia DR3 ID"
       description="Gaia DR3 identifier"
-      required="False"/>
+      required="True"/>
 
     <column name="simbad_name" type="text"
       ucd="meta.id"
