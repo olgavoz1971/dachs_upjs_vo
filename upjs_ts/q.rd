@@ -461,7 +461,7 @@
 					pp_id = inputTable.getParam("pp_id")
 					with base.getTableConn() as conn:
 						row = list(conn.query(
-							"select comp_stars from upjs_vo.lightcurves"
+							"select comp_stars from upjs_ts.lightcurves"
 							" where id=%(pp_id)s", {"pp_id": pp_id}))
 						try:
 							gdr3_ids = tuple(row[0][0])
@@ -477,7 +477,7 @@
 						t = api.TableForDef(
 							self.outputTable,
 							rows = conn.queryToDicts(
-									"select gaia_name, ra, dec from upjs_vo.objects where gaia_name in %(gdr3_ids)s",
+									"select gaia_name, ra, dec from upjs_ts.objects where gaia_name in %(gdr3_ids)s",
 									{"gdr3_ids": gdr3_ids}
 							)
 						)
