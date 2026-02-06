@@ -876,22 +876,41 @@
   </service>
 
   <regSuite title="ogle objects regression">
+    <regTest title="ogle objects TAP serves some data">
+      <url parSet="TAP" QUERY="SELECT count(*) n from ogle.objects_all where ssa_collection='OGLE-GAL-ACEP'"
+      >/tap/sync</url>
+      <code>
+        row = self.getFirstVOTableRow()
+        self.assertEqual(row["n"], 119)
+      </code>
+    </regTest>
+
     <regTest title="ogle SCS serves some data">
-      <url RA="%ra that returns exactly one row%"
-          DEC="%dec that returns exactly one row%" SR="0.001"
-        >cone/scs.xml</url>
+      <url RA="80.8983"
+           DEC="-69.7616" SR="0.0001"
+      >ogle-objects/scs.xml</url>
+      <code>
+        # rows = self.getVOTableRows()
+        row = self.getFirstVOTableRow()
+        self.assertEqual(row["object_id"], 'OGLE-LMC-RRLYR-13820')
+        # self.assertAlmostEqual(row["raj2000"], 80.89829166666667)
+      </code>
+    </regTest>
+
+    <regTest title="The ogle objects_all has unique object_names">
+      <url parSet="TAP"
+        QUERY="SELECT object_id, count(*) AS n FROM ogle.objects_all group by object_id having count(*) > 1"
+      >/tap/sync</url>
       <code>
         # The actual assertions are pyUnit-like.  Obviously, you want to
         # remove the print statement once you've worked out what to test
         # against.
-        row = self.getFirstVOTableRow()
-        print(row)
-        self.assertAlmostEqual(row["ra"], 22.22222)
+        rows = self.getVOTableRows()
+        # print(len(rows))
+        # This is bad; this is caused by duplication in the original cv_xrays.dat.I wash my hands of it
+        self.assertEqual(len(rows), 3)	
       </code>
     </regTest>
-
-    <!-- add more tests: extra tests for the web side, custom widgets,
-      rendered outputFields... -->
   </regSuite>
 
 </resource>

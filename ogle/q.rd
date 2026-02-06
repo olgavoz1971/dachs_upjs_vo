@@ -643,4 +643,38 @@
     </ssapCore>
   </service>
 
+  <regSuite title="ogle ts regression">
+    <regTest title="ogle SSAP serves some data">
+      <url REQUEST="queryData" PUBDID="ivo://astro.upjs/~?ogle/q/OGLE-SMC-CEP-1759-I"
+      >ssa/ssap.xml</url>
+      <code>
+        # print(self.data)
+        # self.assertHasStrings("OGLE I lightcurve for OGLE-SMC-CEP-1759", "12.972499999999977 -72.95352777777752")
+        self.assertHasStrings("OGLE I lightcurve for OGLE-SMC-CEP-1759")
+      </code>
+    </regTest>
+
+    <regTest title="ogle Datalink metadata looks about right.">
+      <url ID="ivo://astro.upjs/~?ogle/q/OGLE-SMC-CEP-1733-I">
+           sdl/dlmeta</url>
+      <code>
+        # dachs test -k datalink  q
+        by_sem = self.datalinkBySemantics()
+        # print(by_sem)
+        # self.fail("Fill this in")
+        self.assertHasStrings("Preview for OGLE-SMC-CEP-1733 in I", "OGLE time series for OGLE-SMC-CEP-1733 in I")
+      </code>
+    </regTest>
+
+    <regTest title="ogle ts_ssa TAP serves some data">
+      <url parSet="TAP" QUERY="SELECT count(*) n from ogle.ts_ssa where ssa_collection='OGLE-GAL-ACEP'"
+      >/tap/sync</url>
+      <code>
+        row = self.getFirstVOTableRow()
+        # print(f'n = {row["n"]}')
+        self.assertEqual(row["n"], 184)
+      </code>
+    </regTest>
+  </regSuite>
+
 </resource>

@@ -152,21 +152,18 @@
        group by object_id
        having count(*) > 1;
 -->
-  <regSuite title="ogle regression">
-    <regTest title="ogle table serves some data">
+  <regSuite title="ogle lightcurves regression">
+    <regTest title="ogle lightcurves serves some data">
       <url parSet="TAP"
-        QUERY="SELECT object_id, count(*) AS n FROM ogle.objects_all group by object_id having count(*) > 1"
+        QUERY="SELECT count(*) AS n FROM ogle.lightcurves where object_id='OGLE-BLG-ECL-116512'and passband='I'"
       >/tap/sync</url>
       <code>
         # The actual assertions are pyUnit-like.  Obviously, you want to
         # remove the print statement once you've worked out what to test
         # against.
-        print('???????????????????????????')
-        print()
         row = self.getFirstVOTableRow()
-        print(row)
-        # self.assertAlmostEqual(row["n"], 0)
-        
+        # print(f'{row["n"]=}')
+        self.assertAlmostEqual(row["n"], 1250)        
       </code>
     </regTest>
 
