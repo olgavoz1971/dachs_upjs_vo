@@ -1,3 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+
 <resource schema="upjs_img" resdir=".">
   <meta name="schema-rank">150</meta>
   <meta name="creationDate">2025-11-24T08:21:08Z</meta>
@@ -34,6 +36,11 @@
   <meta name="coverage.waveband">Optical</meta>
 
   <table id="main" onDisk="True" adql="True">
+    <meta name="_associatedDatalinkService">
+      <meta name="serviceId">dl</meta>
+      <meta name="idColumn">obs_publisher_did</meta>
+    </meta>
+
     <mixin have_bandpass_id="True">//siap2#pgs</mixin>
     <mixin preview="NULL">//obscore#publishObscoreLike</mixin>
   </table>
@@ -123,6 +130,83 @@
       </rowmaker>
     </make>
   </data>
+
+  <service id="dl" allowed="dlget,dlmeta">
+    <meta name="title">Kolonica Images Datalink</meta>
+    <meta name="description">In addition to common image cut-out operations, 
+          #coderived returns decompressed FITS image</meta>
+    <datalinkCore>
+      <descriptorGenerator procDef="//soda#fits_genDesc"  name="genFITSDesc">
+        <bind key="qnd">0</bind>	<!-- deals with fit.fz -->
+        <bind key="accrefPrefix">'upjs_img/data'</bind>
+      </descriptorGenerator>
+      <FEED source="//soda#fits_standardDLFuncs"/>
+      <metaMaker semantics="#coderived">
+        <code>
+          # print(f'\n\n metaMaker descriptor {descriptor} {descriptor.accref=} {descriptor.accessPath=} {descriptor.hdr}\n\n')
+          descriptor.contentQualifier="#image"
+          # give a hint that we will deal with an unpacked fits 
+          # How to do this whthout the headaches of restoring filenames?
+          accref_unpacked = descriptor.accref.replace('.fit.fz', '.fits')
+          yield descriptor.makeLink(
+            makeAbsoluteURL("\rdId/unpack/qp/{}".format(accref_unpacked)),
+            contentType="image/fits",
+            description="funpacked FITS",
+            contentLength=descriptor.estimateSize()*2.0,
+            contentQualifier="#image"
+          )
+        </code>
+      </metaMaker>
+    </datalinkCore>
+  </service>
+
+  <service id="unpack" allowed="qp">
+    <meta name="title">Experimenting with fz unpacking on the fly</meta>
+    <property key="queryField">accref</property>
+    <pythonCore>
+      <inputTable>
+        <inputKey name="accref" type="text" required="True"
+          description="filename and path to the unpacked fits file file"/>
+      </inputTable>
+      <coreProc>
+        <setup imports="gavo.utils.pyfits, io"/>
+        <code>
+          # JK: How to find original file? Let's pretend we do not know if unpacked one exists
+
+          accref_unpacked = inputTable.getParam("accref")
+          fullpath = os.path.join(base.getConfig("inputsDir"), accref_unpacked)
+
+          if not os.path.isfile(fullpath):
+            fullpath = fullpath.replace('.fits', '.fit')
+            if not os.path.isfile(fullpath):
+              fullpath = fullpath.replace('.fit', '.fit.fz')
+
+          # This code is just for fun - it will not work with two-page headers
+          with pyfits.open(fullpath) as hdulist:
+            hdu = None
+
+            for h in hdulist:
+              if isinstance(h, pyfits.CompImageHDU):
+                hdu = h
+                break
+            is_compressed = hdu is not None
+            if is_compressed:
+              # take uncompressed data
+              data = hdu.data
+              header = hdu.header
+            else:
+              # just copy non-compressed data
+              data = hdulist[0].data
+              header = hdulist[0].header
+
+            out_buffer = io.BytesIO()
+            pyfits.writeto(out_buffer, data, header)
+            return ("application/fits", out_buffer.getvalue())
+
+        </code>
+      </coreProc>
+    </pythonCore>
+  </service>
 
   <!-- if you want to build an attractive form-based service from
     SIAP, you probably want to tinker here quite a bit; if you
