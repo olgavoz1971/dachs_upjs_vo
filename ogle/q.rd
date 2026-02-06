@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resource schema="ogle" resdir=".">
   <meta name="schema-rank">50</meta>
   <macDef name="pubDIDBase">ivo://\getConfig{ivoa}{authority}/~?\rdId/</macDef>

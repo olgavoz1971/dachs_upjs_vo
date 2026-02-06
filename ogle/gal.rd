@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resource schema="ogle" resdir=".">
   <meta name="schema-rank">50</meta>
   <meta name="creationDate">2026-01-21T20:06:30Z</meta>

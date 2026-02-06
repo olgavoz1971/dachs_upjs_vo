@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resource schema="ogle" resdir=".">
   <meta name="creationDate">2026-01-01T07:00:00Z</meta>
   <meta name="subject">light-curves</meta>

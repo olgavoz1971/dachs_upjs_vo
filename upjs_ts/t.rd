@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resource schema="upjs_ts" resdir=".">
   <meta name="schema-rank">100</meta>
   <meta name="creationDate">2025-11-25T12:38:44Z</meta>

@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resource schema="ogle" resdir=".">
   <macDef name="referenceM54">2016AcA....66..197H</macDef>
   <meta name="schema-rank">500</meta>

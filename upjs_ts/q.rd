@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resource schema="upjs_ts" resdir=".">
 	<meta name="schema-rank">100</meta>
 	<macDef name="pubDIDBase">ivo://\getConfig{ivoa}{authority}/~?\rdId/</macDef> <!-- from bgds l2 -->
