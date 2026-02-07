@@ -265,8 +265,7 @@
     <meta name="description">
       Coordinates and variability parameters of all Eclipsing and Ellipsoidal Binary Systems
       from the OGLE Variable Star Collection.
-      The table was constructed by merging all EB-related data from all OGLE fields,
-      such as BLG, GD, LMC, and SMC.
+      The table was constructed by merging all EB-related data from all OGLE fields, such as BLG, GD, LMC, and SMC.
     </meta>
 
     <LOOP>
@@ -334,8 +333,7 @@
     <meta name="description">
       Coordinates and variability parameters of all Heartbeat Variables
       from the OGLE Variable Star Collection.
-      The table was constructed by merging all Hb-related data from all OGLE fields,
-      such as BLG, GD, LMC, and SMC.
+      The table was constructed by merging all Hb-related data from all OGLE fields, such as BLG, GD, LMC, and SMC.
     </meta>
 
     <LOOP>
@@ -387,8 +385,7 @@
     <meta name="description">
       Coordinates and variability parameters of all Long Period Variables
       (LPV, Miras) from the OGLE Variable Star Collection.
-      The table was constructed by merging all LPV-related data from all OGLE fields,
-      such as BLG, GD, LMC, and SMC.
+      The table was constructed by merging all LPV-related data from all OGLE fields, such as BLG, GD, LMC, and SMC.
     </meta>
 
     <LOOP>
@@ -436,8 +433,7 @@
     <meta name="description">
       Coordinates and variability parameters of all Rotating Variables
       from the OGLE Variable Star Collection.
-      The table was constructed by merging all rotating variable-related data from all OGLE fields,
-      such as BLG, GD, LMC, and SMC.
+      The table was constructed by merging all rotating variable-related data from all OGLE fields, such as BLG, GD, LMC, and SMC.
     </meta>
 
     <LOOP>
@@ -481,8 +477,7 @@
     <meta name="description">
       Coordinates and variability parameters of all RR Lyr Variables
       from the OGLE Variable Star Collection.
-      The table was constructed by merging all RR Lyr-related data from all OGLE fields,
-      such as BLG, GD, LMC, and SMC.
+      The table was constructed by merging all RR Lyr-related data from all OGLE fields, such as BLG, GD, LMC, and SMC.
     </meta>
 
     <!-- Pull references -->
@@ -575,8 +570,7 @@
     <meta name="description">
       Coordinates and variability parameters of all Type II Cepheids
       from the OGLE Variable Star Collection.
-      The table was constructed by merging all Type II Cepheids-related data from all OGLE fields,
-      such as BLG, GD, LMC, and SMC.
+      The table was constructed by merging all Type II Cepheids-related data from all OGLE fields, such as BLG, GD, LMC, and SMC.
     </meta>
 
     <!-- Pull references -->
@@ -675,8 +669,7 @@
     <property name="forceStats">1</property>
     <meta name="table-rank">150</meta>
     <meta name="description">
-      Coordinates and variability parameters of of dwarf nova candidates
-      (Cataclysmic Variables) from the OGLE Variable Star Collection.
+      Coordinates and variability parameters of of dwarf nova candidates (Cataclysmic Variables) from the OGLE Variable Star Collection.
     </meta>
 
     <!-- Pull references -->
@@ -734,14 +727,15 @@
 <!-- ======================= United Objects View ============================= -->
 
   <macDef name="objects_description">
-    This table is a unified catalogue of objects from the OCVS.\
-    It was constructed by merging variable-type–specific ident.dat tables\
-    with selected columns from tables containing parameters:\
-    cep.dat, cepF.dat, cep1O.dat, cepF1O.dat, cep1O2O.dat, cep1O2O3O.dat,\
-    cep2O3O.dat, Miras.dat, and others.
+This table is a unified catalogue of objects from\
+the OGLE Collection of Variable Stars (OCVS) (https://www.astrouw.edu.pl/ogle/ogle4/OCVS).
+It was constructed by merging variable-type–specific ident.dat tables\
+with selected columns from tables containing parameters:\
+cep.dat, cepF.dat, cep1O.dat, cepF1O.dat, cep1O2O.dat, cep1O2O3O.dat,\
+cep2O3O.dat, Miras.dat, and others.
 
-    The corresponding light curves can be discovered via TAP through the ts_ssa or obscore tables,\
-    or through the SSA service. Light curves can be extracted using the associated DataLink services.
+The corresponding light curves can be discovered via TAP through the ts_ssa or obscore tables,\
+or through the SSA service. Light curves can be extracted using the associated DataLink services.
   </macDef>
 
 

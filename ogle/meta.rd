@@ -7,40 +7,38 @@
   <STREAM id="ogle_meta">
 
     <meta name="description" format="rst">
-      The Optical Gravitational Lensing Experiment (OGLE) is a long-term photometric 
+      The **Optical Gravitational Lensing Experiment (OGLE)** is a long-term photometric 
       survey operated by the University of Warsaw at Las Campanas Observatory.
-      Most of the observations are carried out in the Cousins I filter, with
-      auxiliary measurements in the V filter.
+      Most of the observations are carried out in the Cousins *I* filter, with
+      auxiliary measurements in the *V* filter.
 
       High-cadence, long-term observations of crowded fields have led to the
       systematic discovery and classification of variable stars.
       The OGLE Collection of Variable Stars (OCVS) contains over one million objects.
       OCVS light curves span three survey phases: OGLE-II (1996-2000), OGLE-III
-      (2001-2009),
-      and OGLE-IV (2010-present).
+      (2001-2009), and OGLE-IV (2010-present).
 
-      The VO-compliant re-publication of the OCVS light curve collection allows 
-      bulk download for objects with a specific variability class and parameters, 
+      The VO-compliant re-publication of the OCVS light curve collection allows
+      bulk download for objects with a specific variability class and parameters,
       which can be very handy for ML-based light curve analysis and related applications.
 
-      The original data of the republished collection can be found at:
-      https://www.astrouw.edu.pl/ogle/ogle4/OCVS/.
+      The original data of the republished collection can be found at: 
+      https://www.astrouw.edu.pl/ogle/ogle4/OCVS/
 
       While republishing, we almost preserve the original data structure. That is, there are tables
       with variable star parameters split by variability type (Cepheids, Eclipsing and Ellipsoidal
       Binaries, RR Lyrae stars, etc.) and by sky field: Galactic Bulge (BLG), Magellanic Clouds
-      (LMC, SMC), Galactic Disc (GD). A few tables are related only to a variability class (e.g., 
-      Cataclysmic Variables - CV, BLAPs, Anomalous Cepheids in the Milky Way
-      - ACEP/GAL) or a specific 
-      field (M54 variables, which comprise diverse classes).
+      (LMC, SMC), Galactic Disc (GD). A few tables are related only to a variability class 
+      (e.g., Cataclysmic Variables - CV, BLAPs, Anomalous Cepheids in the Milky Way - ACEP/GAL)
+      or a specific field (M54 variables, which comprise diverse classes).
 
-      All observed objects with their main parameters are aggregated in the object_all table, 
+      All observed objects with their main parameters are aggregated in the object_all table,
       which facilitates generic queries across all classes. This table is served by Cone Search.
 
-      The ts_ssa table is the main table for light-curve queries. It is served by TAP and SSA services. 
-      The time series themselves, as well as previews of folded and unfolded light curves, can be accessed 
-      via DataLink from the ts_ssa and ObsCore tables. Direct links to previews of folded curves are placed 
-      in the preview column of both the ts_ssa and ObsCore tables.
+      The ts_ssa table is the main table for light-curve queries. It is served by TAP and SSA services.
+      The time series themselves, as well as previews of folded and unfolded light curves, can be accessed
+      via DataLink from the ts_ssa and ObsCore tables. Direct links to previews of folded curves are placed
+      in the *preview* column of both the *ts_ssa* and *ObsCore* tables.
     </meta>
 
     <meta name="subject">light-curves</meta>
@@ -51,8 +49,9 @@
     <meta name="facility">Las Campanas</meta>
     <meta name="source">2015AcA....65....1U</meta>
 
-    <meta name="creator">Soszyński, I.; Udalski, A.; Szymański, M.K.; Szymański, G.;  
-      Poleski, R.; Pawlak, M.; Pietrukowicz, P.; Wrona, M.; Iwanek, P.; Mróz, M.
+    <meta name="creator">Soszyński, I.; Udalski, A.; Szymański, M.K.; Pietrukowicz, P.; Borowicz, J.; 
+                         Glowacki, M.; Hamanowicz, A.; Iwanek, P.; Kołaczek-Szymański, P.A.; Mróz, M.; 
+                         Pawlak, M.; Ratajczak, M.; Skowron J.; Wrona, M.; 
     </meta>
     <meta name="copyright" format="rst">
       If you use or refer to the data obtained from this catalog in your scientific work, please cite the appropriate papers:
