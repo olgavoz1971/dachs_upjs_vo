@@ -219,9 +219,17 @@
       copiedcolumns="[!p]*"
 -->
 
+<!-- Add the column to map ssa_targname to for a natural join with objects* tables -->
+    <column name="object_id" type="text" ucd="meta.id;meta.main"
+        tablehead="Star ID" verbLevel="1" 
+        description="Star identifier"
+        required="True">
+    </column>
+
     <mixin
       sourcetable="raw_data"
       copiedcolumns="*"
+      customcode=", ssa_targname AS object_id"
       ssa_aperture="1/3600."
       ssa_dstype="'timeseries'"
       ssa_fluxcalib="'CALIBRATED'"
