@@ -155,7 +155,7 @@ ADQL Query Examples
 Download all RR Lyrae light curves with period in [0.5–0.7 days] range in the I band::
 
 
-  SELECT ssa_targname, accref, o.period FROM ogle.ts_ssa AS t NATURAL JOIN ogle.rrlyr AS o
+  SELECT ssa_targname, accref, o.period FROM ogle.ts_ssa AS t JOIN ogle.rrlyr AS o USING (object_id)
   WHERE o.period BETWEEN 0.5 AND 0.7 AND t.ssa_bandpass = 'I'
 
 
@@ -168,14 +168,14 @@ Download all previews of the light curves with epochs (time of maximum brightnes
 Find all stars with periods longer than the duration of observations in I filter::
 
 
-  SELECT o.* FROM ogle.objects_all o NATURAL JOIN ogle.ts_ssa t
-  AND t.ssa_bandpass='I' WHERE o.period > ssa_timeext
+  SELECT o.* FROM ogle.objects_all o JOIN ogle.ts_ssa t USING(object_id)
+  WHERE t.ssa_bandpass='I' AND o.period > ssa_timeext
 
 
 Select ten eclipsing binary systems, classified as "Contact" with the longest periods::
 
 
-  SELECT TOP 10 accref, preview, o.* FROM ogle.eclipsing o NATURAL JOIN ogle.ts_ssa t
+  SELECT TOP 10 accref, preview, o.* FROM ogle.eclipsing o JOIN ogle.ts_ssa t USING(object_id)
   WHERE subtype='C' and ssa_length>100 ORDER BY o.period DESC
 
 
