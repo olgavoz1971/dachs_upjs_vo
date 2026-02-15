@@ -115,17 +115,17 @@
   </STREAM>
 
   <STREAM id="makeCommonRowsIdent">
-    <DEFAULTS sep=":"/>
+    <DEFAULTS sep=":" empty=""/>
 
     <!-- Input HMS/DMS fields are quite diverse: separators may be spaces or
          colons; leading  zeros may be replaced by extra spaces -->
     <var name="raj2000">hmsToDeg(@alphaHMS.replace(" \sep", "\sep"), "\sep")</var>
     <var name="dej2000">dmsToDeg(@deltaDMS.replace(" \sep", "\sep"), "\sep")</var>
 
-    <map dest="ogle4_id">parseWithNull(@ogle4_id, str, "")</map>
-    <map dest="ogle3_id">parseWithNull(@ogle3_id, str, "")</map>
-    <map dest="ogle2_id">parseWithNull(@ogle2_id, str, "")</map>
-    <map dest="vsx">parseWithNull(@vsx, str, "")</map>
+    <map dest="ogle4_id">parseWithNull(@ogle4_id, str, "\empty")</map>
+    <map dest="ogle3_id">parseWithNull(@ogle3_id, str, "\empty")</map>
+    <map dest="ogle2_id">parseWithNull(@ogle2_id, str, "\empty")</map>
+    <map dest="vsx">parseWithNull(@vsx, str, "\empty")</map>
   </STREAM>
 
   <mixinDef id="acepheid_id">

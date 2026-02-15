@@ -92,8 +92,9 @@
     <column name="datalink" type="text"
       ucd="meta.ref.url"
       tablehead="Datalink"
-      description="A link to a datalink document for this spectrum."
-      verbLevel="15" displayHint="type=url">
+      description="A link to a datalink document for this timeseries"
+      verbLevel="15"
+      displayHint="type=url">
 
       <property name="targetType">application/x-votable+xml;content=datalink</property>
       <property name="targetTitle">Datalink</property>
@@ -160,7 +161,7 @@
           NULL AS embargo,
           NULL AS owner,
           'application/x-votable+xml' AS mime,
-          NULL AS datalink,
+          '\getConfig{web}{serverURL}/\rdId/sdl/dlmeta?ID=' || '\pubDIDBase' || q.object_id || '-' || q.passband AS datalink,
           o.ssa_collection,
           o.ssa_reference
         FROM (

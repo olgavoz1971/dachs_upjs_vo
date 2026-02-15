@@ -23,7 +23,6 @@
 
     <!-- Pull whole set of columns directly from prototypes -->
     <FEED source="ogle/aux#object_ident_columns">
-        <PRUNE name="subtype"/>
         <PRUNE name="ogle3_id"/>
         <PRUNE name="ogle2_id"/>
     </FEED>
@@ -52,6 +51,7 @@
     </columnGrammar>
     <make table="m54">
       <rowmaker idmaps="*">
+
         <map dest="object_id">f'OGLE-M54-{@object_id}'</map>
         <map dest="ogle4_id">parseWithNull(@ogle4_id, str, "-")</map>
         <var name="raj2000">hmsToDeg(@alphaHMS, ":")</var>
@@ -61,13 +61,18 @@
           <events>
             <map dest="\item">parseWithNull(@\item, float, "-")</map>
           </events>
-
         </LOOP>
 
-        <!-- Try to bring ogle vartypes to the Simbad object types -->        
-        <var name="ssa_targclass">@ogle_vartype</var>
+       <!-- Parse OGLE vartype, we will correct them later -->
+       <var name="raw_vartype">
+         parseWithNull(@ogle_vartype, str, "-")
+       </var>
+
+        <!-- fill up ssa_targclass: map ogle vartypes to the Simbad object types -->        
+        <!-- <bind key="default">base.NotGiven</bind> -->
+        <var name="ssa_targclass">@raw_vartype</var>
         <apply name="m54_to_simbad_otype" procDef="//procs#dictMap">
-          <bind key="default">base.NotGiven</bind>
+          <bind key="default">"V*"</bind>
           <bind key="key">"ssa_targclass"</bind>
           <bind key="mapping"> {
             "-" : "V*",
@@ -87,9 +92,49 @@
             "spotted": "Ro*"
           } </bind>
         </apply>
-        <map dest="ogle_vartype">parseWithNull(@ogle_vartype, str, "-")</map>
+
+        <!-- Preserve original subtype first, then add several exceptions: -->
+        <var name="subtype">@raw_vartype</var>
+
+       <!-- Try unifying vartype/subtype pairs with other sky fields -->
+        <var name="subtype">@raw_vartype</var>
+        <apply name="m54_fill_subtype" procDef="//procs#dictMap">
+          <bind key="default">base.NotGiven</bind>
+          <bind key="key">"subtype"</bind>
+          <bind key="mapping"> {
+            "RRab": "RRab",
+            "RRc": "RRc",
+            "RRd": "RRd",
+            "EA": "EA",
+            "EB": "EB",
+            "EW": "EW",
+            "BLHer": "BLHer",
+            "WVir": "WVir",
+            "Ell": "Ell",
+          } </bind>
+        </apply>
+
+        <!-- Now let's normalise ogle_vartypes to make them similar to those in other sky fields -->
+        <var name="ogle_vartype">@raw_vartype</var>
+        <apply name="m54_correct_vartype" procDef="//procs#dictMap">
+          <bind key="default">base.NotGiven</bind>
+          <bind key="key">"ogle_vartype"</bind>
+          <bind key="mapping"> {
+            "RRab": "RR Lyr",
+            "RRc": "RR Lyr",
+            "RRd": "RR Lyr",
+            "aRRd": "RR Lyr",
+            "EA": "Ecl",
+            "EB": "Ecl",
+            "EW": "Ecl",
+            "WVir": "T2Cep",
+            "BLHer": "T2Cep",
+          } </bind>
+        </apply>
+
         <var name="ssa_collection">"OGLE-M54"</var>
         <var name="ssa_reference">"\referenceM54"</var>
+
       </rowmaker>
     </make>
   </data>

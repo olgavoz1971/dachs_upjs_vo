@@ -51,7 +51,7 @@
 
     <meta name="creator">Soszyński, I.; Udalski, A.; Szymański, M.K.; Pietrukowicz, P.; Borowicz, J.; 
                          Glowacki, M.; Hamanowicz, A.; Iwanek, P.; Kołaczek-Szymański, P.A.; Mróz, M.; 
-                         Pawlak, M.; Ratajczak, M.; Skowron J.; Wrona, M.
+                         Pawlak, M.; Ratajczak, M.; Skowron, J.; Wrona, M.
     </meta>
     <meta name="copyright" format="rst">
       If you use or refer to the data obtained from this catalog in your scientific work, please cite the appropriate papers:
