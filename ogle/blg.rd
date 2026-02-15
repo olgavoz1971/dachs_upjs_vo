@@ -618,6 +618,7 @@
             "RRab": "RR*",
             "RRc": "RR*",
             "RRd": "RR*",
+            "aRRd": "RR*",
           } </bind>
         </apply>
         <var name="ogle_vartype">"RR Lyr"</var>
@@ -803,7 +804,7 @@
     </columnGrammar>
     <make table="ident_blg_transit">
       <rowmaker idmaps="*">
-        <FEED source="ogle/aux#makeCommonRowsIdent"/>
+        <FEED source="ogle/aux#makeCommonRowsIdent" empty="-"/>
         <var name="subtype">None</var>
         <var name="ssa_targclass">"V*,Pl?"</var>
         <var name="ogle_vartype">"Transit"</var>

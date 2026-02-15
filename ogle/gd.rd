@@ -377,6 +377,7 @@
             "RRab": "RR*",
             "RRc": "RR*",
             "RRd": "RR*",
+            "aRRd": "RR*",
           } </bind>
         </apply>
         <var name="ogle_vartype">"RR Lyr"</var>
