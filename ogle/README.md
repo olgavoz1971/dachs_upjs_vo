@@ -1,12 +1,13 @@
-# OGLE light curve re-publication
+# OCVS light curve re-publication
 
 This sub-repository contains resource descriptors for the re-publication of
-OGLE-II, OGLE-III, and OGLE-IV light curves.
+OGLE Collection of Variable Stars (OCVS) light curves from 
+OGLE-II, OGLE-III, and OGLE-IV.
 
 The original data are provided by the Optical Gravitational Lensing Experiment
-(OGLE) and are available at https://ogle.astrouw.edu.pl/.
+(OGLE) and are available at https://www.astrouw.edu.pl/ogle/ogle4/OCVS/.
 
-The re-publication is carried out with the permission of the OGLE team
+The re-publication is carried out with the permission of the OCVS team
 (see correspondence).
 
 ## Structure
@@ -17,27 +18,27 @@ There are the time series themselves and separate tables containing star
 coordinates, names and variable-star parameters. A couple of these tables are subsets of others, 
 which, as I understand it, reflects the hierarchy of variability subtypes.
 
-All this results in a rather complex system of RD files.
+All this results in a rather complex system of resource descriptor (RD) files.
 I try to follow the approach described below.
 
-1. I ingest the original data _as is_ wherever possible, reflecting the original OGLE directory 
-structure in the “field” RDs (such as blg, gd, lmc, smc, etc.),
+1. I ingest the original data _as is_ wherever possible, reflecting the original OCVS directory 
+structure in the “sky-field” RDs (such as blg, gd, lmc, smc, etc.),
 These RD's corresponds to the top level of the OGLE directory tree.
 I hope this approach may help with future data updates.
 
 2. Client-visible tables are organised as views over the original data in the o.rd (“objects”). 
-Here, I try to aggregate objects of the same variability type (and therefore having a homogeneous set 
-of parameters) into separate variable-star-type tables, such as Cepheids, RR Lyrae stars, 
+Here, I try to aggregate objects of the same variability class (and therefore having a homogeneous set 
+of parameters) into separate variable-star-class tables, such as Cepheids, RR Lyrae stars, 
 eclipsing binaries, etc.
 In this way, clients can construct ADQL queries for light curves by selecting variable stars 
-with specified parameters.
+with specific parameters.
 
 3. The light curves themselves, together with previews of folded and unfolded curves, 
-are accessible via DataLink services from the ts_ssa or ObsCore tables. ts_ssa
+are accessible via DataLink services from the ts_ssa or ObsCore tables. The ts_ssa
 is intended to be the main access point for time series data.
 
-4. I implement SSAP and Cone Search; honestly, I am not sure how useful these services will be 
-for the OGLE collection.
+4. I implement SSAP and Cone Search services; honestly, I am not sure how useful these services will be 
+for OCVS.
 
 ## References
 
@@ -58,14 +59,14 @@ gd/cep/phot/V/OGLE-GD-CEP-1198.dat;
 gd/cep/phot/V/OGLE-GD-CEP-1160.dat:
 ```
 obstime is `HJD-2450000.0`, not `HJD` as for all other `GD/cep/phot/[VI]/*.dat`
-Use script `correct_jd245.sh` to see what is wrong.
+Use the script `correct_jd245.sh` to see what is wrong.
 
 ### BLAP
 ```
 misc/BLAP/phot_ogle4/I;
 misc/BLAP/phot_ogle3/I:
 ```
-A lot of files have a `full JD` instead of expected (and
+A lot of files have a `full JD` instead of the expected (and
 declared) there `BJD_TDB-2450000`. Use script `correct_from_jd245.sh` to check and `confirm.sh`
 to confirm corrections.
 
@@ -80,12 +81,12 @@ rm -r phot_Swope/
 The authors mention that observation time there is BJD TDB, which differs 
 from the rest of the data (declared as HJD and, *I suppose*, UTC). I added a nested
 LOOP to produce a separate lightcurve template for all filters and different
-time scales. This does not look graceful, but still works.
+time scales. This does not look graceful, but it still works.
 
 ### M54/M54variables.dat
 This file should be cleaned of empty lines with only the first column filled.
-I could not write an appropriate grammar for ingesting this file, and gave
-up. Use `clean_M54variables_file.py` to fix things.
+I could not write an appropriate grammar for ingesting this file, and gave up. 
+Use `clean_M54variables_file.py` to fix things.
 
 ### gal/acep
 `gal/acep/acepF.dat; acep1O.dat`
