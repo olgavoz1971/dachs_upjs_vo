@@ -12,7 +12,7 @@
   <macDef name="referenceCep">2015AcA....65..297S</macDef>
   <macDef name="referenceRRLyr">2016AcA....66..131S</macDef>
   <macDef name="referenceDSct">2022AcA....72..245S</macDef>
-  <macDef name="referenceEcl">2024AcA....74..241G</macDef>
+  <macDef name="referenceEcl">2016AcA....66..421P</macDef>
   <macDef name="referenceHB">2022ApJS..259...16W</macDef>
   <macDef name="referenceT2Cep">2018AcA....68...89S</macDef>
 

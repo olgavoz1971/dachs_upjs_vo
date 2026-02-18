@@ -56,8 +56,28 @@
     </meta>
     <meta name="copyright" format="rst">
       If you use or refer to the data obtained from this catalog in your scientific work, please cite the appropriate papers:
-        :bibcode: `2015AcA....65....1U`  (OGLE-IV photometry)
-        :bibcode: `2008AcA....58...69U`  (OGLE-III photometry)
+
+        :bibcode: `2014AcA....64..177S`  (RR Lyr stars in the Galactic bulge)
+        :bibcode: `2015AcA....65..297S`  (Classical Cepheids in the LMC and SMC) 
+        :bibcode: `2015AcA....65..233S`  (Anomalous Cepheids in the LMC and SMC) 
+        :bibcode: `2016AcA....66..131S`  (RR Lyr stars in the LMC and SMC)
+        :bibcode: `2016AcA....66..405S`  (Eclipsing stars in the Galactic bulge)
+        :bibcode: `2016AcA....66..421P`  (Eclipsing stars in the LMC and SMC)
+        :bibcode: `2017AcA....67..103S`   (Classical and anomalous Cepheids in the LMC and SMC)
+        :bibcode: `2017AcA....67..297S`  (Classical, type II, and anomalous Cepheids toward the Galactic Center)
+        :bibcode: `2018AcA....68...89S`  (Type II Cepheids in the LMC and SMC)
+        :bibcode: `2018AcA....68..315U`  (Clasical and type II cepheids in Galactic disk and bulge)
+        :bibcode: `2019AcA....69..321S`  (RR Lyr stars in the Galactic Disk and Bulge)
+        :bibcode: `2020AcA....70..241P`  (delta Scuti stars towards Galactic bulge)
+        :bibcode: `2021AcA....71..189S`  (delta Scuti stars in the Milky Way)
+        :bibcode: `2022ApJS..259...16W`  (One Thousand Heartbeat Stars) 
+        :bibcode: `2022ApJS..928..135W`  (Photometric Analysis of the OGLE Heartbeat Stars) 
+        :bibcode: `2022ApJS..260...46I`  (Miras in the Milky Way)
+        :bibcode: `2022AcA....72..245S`  (delta Sct Stars in the Small Magellanic Clouds)        
+        :bibcode: `2023AcA....73..105S`  (delta Scuti Stars in the Large Magellanic Cloud)
+        :bibcode: `2023AcA....73..127M`  (Transiting Planets in Galactic Bulge)
+
+
     </meta>
 
     <meta name="contentLevel">Research</meta>
