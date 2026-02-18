@@ -49,9 +49,10 @@
     <meta name="facility">Las Campanas</meta>
     <meta name="source">2015AcA....65....1U</meta>
 
-    <meta name="creator">Soszyński, I.; Udalski, A.; Szymański, M.K.; Pietrukowicz, P.; Borowicz, J.; 
-                         Glowacki, M.; Hamanowicz, A.; Iwanek, P.; Kołaczek-Szymański, P.A.; Mróz, M.; 
-                         Pawlak, M.; Ratajczak, M.; Skowron, J.; Wrona, M.
+    <meta name="creator">Soszyński, I.; Udalski, A.; Szymański, M.K.; Pietrukowicz, P.; Skowron, D.M.;
+                         Skowron, J.; Poleski, R.; Mróz, P.; Kozłowski, S.; Ulaczyk, K.;
+                         Iwanek, P.; Gromadzki, M.; Rybicki, K.; Wrona, M.; Ratajczak, M.; Mróz, M.;
+                         Borowicz, J.; Głowacki, M.; Urbanowicz, M.    
     </meta>
     <meta name="copyright" format="rst">
       If you use or refer to the data obtained from this catalog in your scientific work, please cite the appropriate papers:
