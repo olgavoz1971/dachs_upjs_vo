@@ -11,11 +11,11 @@
   <macDef name="referenceCep">2017AcA....67..297S</macDef>
   <macDef name="referenceLPV">2022ApJS..260...46I</macDef>
   <macDef name="referenceRRLyr">2014AcA....64..177S</macDef>
-  <macDef name="referenceDPV">\referenceDefault</macDef>
+  <macDef name="referenceDPV">2021ApJ...922...30R</macDef>
   <macDef name="referenceDSct">2020AcA....70..241P</macDef>
   <macDef name="referenceEcl">2016AcA....66..405S</macDef>
   <macDef name="referenceHB">2022ApJS..259...16W</macDef>
-  <macDef name="referenceRot">\referenceDefault</macDef>
+  <macDef name="referenceRot">2024AcA....74....1I</macDef>
   <macDef name="referenceShortEcl">2015AcA....65...39S</macDef>
   <macDef name="referenceT2Cep">2017AcA....67..297S</macDef>
   <macDef name="referenceTransits">2023AcA....73..127M</macDef>
