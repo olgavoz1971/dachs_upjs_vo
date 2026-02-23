@@ -731,7 +731,7 @@
     <meta name="table-rank">500</meta>
     <meta name="description">Gaia DR3 timeseries of eclipsing binaries for SSA/ObsCore ingestion</meta>
 
-    <LOOP listItems="ssa_dstitle ssa_targname
+    <LOOP listItems="ssa_dstitle
       ssa_pubDID ssa_bandpass ssa_specmid ssa_specstart ssa_specend ssa_specext ssa_fluxucd
       ssa_timeExt ssa_length">
       <events>
@@ -747,7 +747,8 @@
     <mixin>//ssap#plainlocation</mixin>
     <mixin>//ssap#simpleCoverage</mixin>
 
-    <index columns="ssa_targname"/>
+    <!-- <index columns="ssa_targname"/> -->
+    <index columns="source_id"/>
 
     <FEED source="//scs#splitPosIndex"
       columns="ssa_location"
@@ -768,12 +769,19 @@
       <property name="targetTitle">Datalink</property>
     </column>
 
+    <column name="source_id" 
+      type="bigint"
+      ucd="meta.id;meta.main"
+      tablehead="GaiaDR3 identifier"
+      description="Unique source identifier within Gaia DR3"
+      required="True"/>
+
    <viewStatement>
 
       CREATE MATERIALIZED VIEW \curtable AS (
         SELECT
           'Gaia DR3 ' || q.band || ' lightcurve for ' || q.source_id AS ssa_dstitle,
-           q.source_id AS ssa_targname,
+           q.source_id,
           -- 'Gaia DR3 ' || q.source_id AS ssa_targname,
           spoint(o.raj_rad, o.dej_rad) as ssa_location,
           spoly(  -- I'm not crazy enough to draw hexagons there, put up with squares
@@ -860,6 +868,7 @@
     </stc>
 
 <!-- Add the column to map ssa_targname to for a natural join with other Gaia tables -->
+<!--      customcode=", ssa_targname AS source_id" -->
     <column name="source_id" 
       type="bigint"
       ucd="meta.id;meta.main"
@@ -870,7 +879,7 @@
     <mixin
       sourcetable="raw_data"
       copiedcolumns="*"
-      customcode=", ssa_targname AS source_id"
+      ssa_targname="'Gaia DR3 ' || source_id"
       ssa_aperture="1/3600."
       ssa_dstype="'timeseries'"
       ssa_fluxcalib="'CALIBRATED'"
@@ -919,7 +928,7 @@
       <!-- metadata modified by sdl's dataFunction -->
       <!--	TODO: correct zeroPointFlux -->
 
-      <meta name="description">Gaia DR3 lightcurve in the \band_human filter </meta>
+      <meta name="description">Lightcurve in the \band_human filter </meta>
       <param original="ts_ssa.ssa_bandpass"/>
       <param original="ts_ssa.ssa_specmid"/>
         <mixin
@@ -960,9 +969,9 @@
   <LOOP source="instance-template">
     <csvItems>
             band_short, band_human, band_ucd, effective_wavelength, zero_point_flux
-            G,          Gaia DR3 G,  em.opt, 5.82e-7, 3228.75
-            BP,         Gaia DR3 Bp, em.opt, 5.04e-7, 3552.01
-            RP,         Gaia DR3 Rp, em.opt, 7.62e-7, 2554.95
+            G,          Gaia G,  em.opt, 5.82e-7, 3228.75
+            BP,         Gaia Bp, em.opt, 5.04e-7, 3552.01
+            RP,         Gaia Rp, em.opt, 7.62e-7, 2554.95
     </csvItems>
   </LOOP>
 
@@ -1067,8 +1076,8 @@
             # Try to pull period and epoch from the objects table:
             with base.getTableConn() as conn:
               res = next(conn.query(
-                "SELECT frequency, reference_time from \schema.vari_eclipsing_binary_lite where source_id=%(object)s",
-                {"object": descriptor.metadata['ssa_targname']})
+                "SELECT frequency, reference_time from \schema.vari_eclipsing_binary_lite where source_id=%(source_id)s",
+                {"source_id": descriptor.metadata['source_id']})
               )
 
             freq, epoch = res
