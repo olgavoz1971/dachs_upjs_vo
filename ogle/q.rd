@@ -252,7 +252,7 @@
       em_xel="1"
       t_xel="ssa_length"
       s_region="ssa_region"
-      oUCD="'phot.mag'"
+      oUCD="ssa_fluxucd"
       createDIDIndex="True"
       preview="preview"
     >//obscore#publishSSAPMIXC</mixin>
