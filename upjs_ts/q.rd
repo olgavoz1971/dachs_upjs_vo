@@ -86,7 +86,7 @@
 
 		<!-- list of metadata varying across datasets -->
 		<LOOP listItems="ssa_dstitle ssa_targname ssa_pubDID ssa_length ssa_timeExt ssa_bandpass
-					ssa_specmid ssa_specstart ssa_specend ssa_specext ssa_csysName">
+					ssa_specmid ssa_specstart ssa_specend ssa_specext ssa_fluxucd ssa_csysName">
  			<events>
 				<column original="\item"/>
 			</events>
@@ -185,6 +185,7 @@
 				NULL AS owner,
 				NULL AS datalink,
 				q.ssa_timeExt,
+				'phot.mag;em.opt.' || p.band AS ssa_fluxucd,
 				p.band AS ssa_bandpass,
 				p.specmid AS ssa_specmid,
 				p.specstart AS ssa_specstart,
@@ -248,7 +249,6 @@
 			ssa_collection="'Kolonica live timeseries'"
 			ssa_dstype="'timeseries'"
 			ssa_fluxcalib="'CALIBRATED'"
-			ssa_fluxucd="'phot.mag'"
 			ssa_spectralucd="NULL"
 			ssa_spectralunit="NULL"
 			ssa_targclass="'star'"
@@ -270,7 +270,7 @@
 			em_xel="1"
 			t_xel="ssa_length"
 			coverage="ssa_region"
-			oUCD="'phot.mag'"
+			oUCD="ssa_fluxucd"
 			createDIDIndex="True"
 			preview="preview"
 		>//obscore#publishSSAPMIXC</mixin>	<!-- JK: Note: We need to pass t_min/t_max parameters explicitly
