@@ -273,6 +273,7 @@
 			oUCD="ssa_fluxucd"
 			createDIDIndex="True"
 			preview="preview"
+			dataproduct_subtype="'lightcurve'"
 		>//obscore#publishSSAPMIXC</mixin>	<!-- JK: Note: We need to pass t_min/t_max parameters explicitly
 			in the case of timeseries: defaults are appropriate for spectra only -->
 

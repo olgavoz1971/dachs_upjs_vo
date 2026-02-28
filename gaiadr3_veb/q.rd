@@ -412,7 +412,7 @@
         ucd="time.epoch"
         unit="d"
         tablehead="reference_time"
-        description="Reference time used for the geometric model fit"
+        description="Reference time used for the geometric model fit; JD-2455197.5"
         verbLevel="1"/>
 
     <column name="frequency"
@@ -864,7 +864,7 @@
     </meta>
 
     <stc>
-      TimeInterval UTC HELIOCENTER "t_min" "t_max"
+      TimeInterval TCB BARYCENTER "t_min" "t_max"
     </stc>
 
 <!-- Add the column to map ssa_targname to for a natural join with other Gaia tables -->
@@ -906,9 +906,10 @@
       em_xel="1"
       t_xel="ssa_length"
       s_region="ssa_region"
-      oUCD="'phot.mag'"
+      oUCD="ssa_fluxucd"
       createDIDIndex="True"
       preview="preview"
+      dataproduct_subtype="'lightcurve'"
     >//obscore#publishSSAPMIXC</mixin>
 
     <column original="ssa_publisher" type="unicode"/>    <!-- unicode allows diacrtric symbols -->

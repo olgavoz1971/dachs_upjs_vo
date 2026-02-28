@@ -255,6 +255,7 @@
       oUCD="ssa_fluxucd"
       createDIDIndex="True"
       preview="preview"
+      dataproduct_subtype="'lightcurve'"
     >//obscore#publishSSAPMIXC</mixin>
 
     <column original="ssa_publisher" type="unicode"/>    <!-- unicode allows diacrtric symbols -->
