@@ -1,14 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resource schema="shugarov_ts" resdir=".">
+<resource schema="personal_shug" resdir=".">
   <meta name="creationDate">2026-02-19T08:41:36Z</meta>
   <macDef name="pubDIDBase">ivo://\getConfig{ivoa}{authority}/~?\rdId/</macDef>
 
-  <meta name="title">Personal observations of S. Shugarov</meta>
+  <meta name="title">Personal archive of S.Yu.Shugarov</meta>
   <meta name="description">
-    This is a part of our project dedicated to publish variable stars
-    observations, hidden on presonal and institutional arcives. All publications
-    are made with permissions of owners
-    TBD
+    This project is dedicated to publishing observations of variable stars, 
+    in particular light curves, from personal archives. 
+    All data has been published with the permission of the respective owners.
+
+    The archive presented here comprises the results of observations obtained 
+    with various small telescopes by S. Yu. Shugarov and colleagues. 
+    The majority of the data result from monitoring programmes of cataclysmic 
+    variable stars in the UBVRI photometric bands
   </meta>
   <!-- Take keywords from
     http://www.ivoa.net/rdf/uat
@@ -18,8 +22,8 @@
   <meta name="subject">time-domain-astronomy</meta>
 
   <meta name="creator">Shugarov, S. Yu.</meta>
-  <meta name="instrument">TBD</meta>
-  <meta name="facility">TBD</meta>
+  <meta name="instrument">Various</meta>
+  <meta name="facility">Various</meta>
 
   <meta name="source">2021Ap.....64..458S</meta>
   <meta name="contentLevel">Research</meta>
@@ -56,8 +60,6 @@
       ]]></code>
   </job></execute>
 
-
-
   <table id="raw_data" onDisk="True" adql="hidden"
       namePath="//ssap#instance">
     <meta name="table-rank">500</meta>
@@ -72,9 +74,6 @@
     </LOOP>
     <column original="//obscore#ObsCore.t_min"/>
     <column original="//obscore#ObsCore.t_max"/>
-
-    <column original="//products#products.preview"/>
-
     <column original="//products#products.preview"/>
 
 
@@ -131,14 +130,14 @@
           '\pubDIDBase' || q.object_id || '-' || q.passband AS ssa_pubdid,
 
           -- I prefer a folded lightcurve but we can put up with unfolded one sometimes
-          -- CASE
-          --  WHEN o.period IS NOT NULL THEN
-          --    '\getConfig{web}{serverURL}/\rdId/preview-plot/qp/' || q.object_id || '-' || q.passband
-          -- ELSE
-          --    '\getConfig{web}{serverURL}/\rdId/preview/qp/' || q.object_id || '-' || q.passband
-          -- END AS preview,
+          CASE
+            WHEN o.period IS NOT NULL THEN
+              '\getConfig{web}{serverURL}/\rdId/preview-plot/qp/' || q.object_id || '-' || q.passband
+            ELSE
+              '\getConfig{web}{serverURL}/\rdId/preview/qp/' || q.object_id || '-' || q.passband
+          END AS preview,
 
-          '\getConfig{web}{serverURL}/\rdId/preview/qp/' || q.object_id || '-' || q.passband AS preview,
+          -- '\getConfig{web}{serverURL}/\rdId/preview/qp/' || q.object_id || '-' || q.passband AS preview,
 
           'phot.mag;em.opt.' || q.passband AS ssa_fluxucd,
           q.passband AS ssa_bandpass,
@@ -244,9 +243,9 @@
       t_min="t_min"
       t_max="t_max"
       em_xel="1"
+      oUCD="ssa_fluxucd"
       t_xel="ssa_length"
       s_region="ssa_region"
-      oUCD="'phot.mag'"
       createDIDIndex="True"
       preview="preview"
     >//obscore#publishSSAPMIXC</mixin>
@@ -295,8 +294,8 @@
           description="stellar magnitude error"
           verbLevel="1"
           required="False"/>
-        <column original="shugarov_ts/t#lightcurves.facility"/>
-        <column original="shugarov_ts/t#lightcurves.note"/>
+        <column original="personal_shug/t#lightcurves.facility"/>
+        <column original="personal_shug/t#lightcurves.note"/>
     </table>
   </STREAM>
 
@@ -415,11 +414,10 @@
             # Try to pull period and epoch from the objects table:
             with base.getTableConn() as conn:
               res = next(conn.query(
-                "SELECT period, epoch from shugarov_ts.objects where object_id=%(object)s",
+                "SELECT period, epoch from personal_shug.objects where object_id=%(object)s",
                 {"object": descriptor.metadata['ssa_targname']})
               )
 
-            print(f"!!!!!!!!!!!!!!!!! {res=}")
             period, epoch = res
             # Check if the period is present:
             # period = descriptor.metadata['period']	# I eliminated period from ts_ssa as unnecessary duplication
@@ -567,5 +565,92 @@
     </pythonCore>
   </service>
 
+  <service id="ts-web" defaultRenderer="form">
+    <meta name="shortName">\schema Web</meta>
+    <meta name="title">Time Series Browser Service</meta>
+
+    <dbCore queriedTable="ts_ssa">
+      <condDesc buildFrom="ssa_location"/>
+      <condDesc buildFrom="t_min"/>
+      <condDesc buildFrom="t_max"/>
+      <condDesc buildFrom="ssa_bandpass"/>
+      <!-- <condDesc>
+        <inputKey original="ssa_bandpass" tablehead="Filter">
+          <values fromdb="DISTINCT ssa_bandpass from \schema.ts_ssa order by ssa_bandpass"/>
+        </inputKey>
+      </condDesc> -->
+
+      <condDesc>
+        <inputKey original="ssa_targname" tablehead="Target Object">
+          <values fromdb="ssa_targname from \schema.ts_ssa order by ssa_targname limit 10"/>
+        </inputKey>
+      </condDesc>
+
+    </dbCore>
+
+    <outputTable>
+      <autoCols>accref, ssa_targname, t_min, t_max, ssa_bandpass,
+        datalink</autoCols>
+      <FEED source="//ssap#atomicCoords"/>
+    </outputTable>
+  </service>
+
+  <service id="ssa" allowed="form,ssap.xml">
+    <meta name="shortName">\schema TS SSAP</meta>
+    <meta name="ssap.complianceLevel">full</meta>
+
+    <publish render="ssap.xml" sets="ivo_managed"/>
+    <publish render="form" sets="ivo_managed,local" service="ts-web"/>
+
+    <meta name="title">Shugarov's Light curves Form</meta>
+    <meta name="description">This service exposes photometric light curves.
+          The light curves are published per-band and are also discoverable
+          through ObsCore.
+    </meta>
+
+    <ssapCore queriedTable="ts_ssa">
+      <!-- <property key="previews">auto</property> 
+      auto produces wrong URLs in my case. Would it work properly if I populate products table? 
+      And does this really make sense?
+      -->
+      <FEED source="//ssap#hcd_condDescs"/>
+    </ssapCore>
+  </service>
+
+  <regSuite title="shug ts regression">
+    <regTest title="personal_shug SSAP serves some data">
+      <url REQUEST="queryData" PUBDID="ivo://upjs.jk/~?personal_shug/q/MO_Psc-R"
+      >ssa/ssap.xml</url>
+      <code>
+        # print(self.data)
+        # self.assertHasStrings("OGLE I lightcurve for OGLE-SMC-CEP-1759", "12.972499999999977 -72.95352777777752")
+        # self.assertHasStrings("OGLE I lightcurve for OGLE-SMC-CEP-1759")
+        self.assertHasStrings("R lightcurve for MO_Psc")
+      </code>
+    </regTest>
+
+    <regTest title="ogle Datalink metadata looks about right.">
+      <url ID="ivo://upjs.jk/~?personal_shug/q/AY_Lac-B">
+           sdl/dlmeta</url>
+      <code>
+        # dachs test -k datalink  q
+        by_sem = self.datalinkBySemantics()
+        # print(by_sem)
+        # self.fail("Fill this in")
+        # self.assertHasStrings("Preview for OGLE-SMC-CEP-1733 in I", "OGLE time series for OGLE-SMC-CEP-1733 in I")
+        self.assertHasStrings("S.Shugarov archive time series for AY_Lac in B", "Preview for AY_Lac in B")
+      </code>
+    </regTest>
+
+    <regTest title="ogle ts_ssa TAP serves some data">
+      <url parSet="TAP" QUERY="SELECT count(*) n from personal_shug.ts_ssa where ssa_collection='PERSONAL shug'"
+      >/tap/sync</url>
+      <code>
+        row = self.getFirstVOTableRow()
+        # print(f'n = {row["n"]}')
+        self.assertEqual(row["n"], 10)
+      </code>
+    </regTest>
+  </regSuite>
 
 </resource>

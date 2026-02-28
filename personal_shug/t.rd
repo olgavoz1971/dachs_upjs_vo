@@ -1,22 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resource schema="shugarov_ts" resdir=".">
+<resource schema="personal_shug" resdir=".">
   <meta name="schema-rank">100</meta>
   <meta name="creationDate">2026-02-19T12:38:44Z</meta>
 
-  <meta name="title">External Tables with Lightcurves From S.Shugarov personal archive</meta>
-  <meta name="description" format="rst" >
-    Time series in this collection were derived from CCD images obtained by S.Yu. Shugarov and collegues and processed by himself.
-    The observations were carried out to monitor mostly Cathaclysmic Varibles, which are the focus of researcher's scientific interest
-    TBD
-  </meta>
+  <meta name="title">Personal archive of S.Yu.Shugarov</meta>
 
   <meta name="subject">light-curves</meta>
   <meta name="subject">variable-stars</meta>
   <meta name="subject">time-domain-astronomy</meta>
 
   <meta name="creator">Shugarov, S.,Yu.; Vozyakova O.</meta>
-  <meta name="instrument">Different small telescopes</meta>
-  <meta name="facility">Tatranská Lomnica and other facilities</meta>
+  <meta name="instrument">Various</meta>
+  <meta name="facility">Various</meta>
 
   <meta name="source">2021Ap.....64..458S</meta>
   <meta name="contentLevel">Research</meta>
@@ -66,7 +61,7 @@
     <column name="facility" type="integer"
       ucd="meta.id;meta.dataset"
       tablehead="Facility"
-      description="Facility and telescope code: 1 = AISAS, Z-600, 2 = Nauchny, Z-600, 0 = not specified"
+      description="Facility and telescope code: 1 = AISAS, Z-600, 2 = Nauchny, Z-600, 3 = Nauchny, Maksutov-50, 0 = not specified"
       required="True"/>
 
     <column name="note" type="text"
@@ -78,7 +73,8 @@
   </table>
 
   <data id="import_lightcurves">
-    <sources pattern="data/??_???/*.dat"/>
+    <!-- <sources pattern="data/??_???/*.dat"/> -->
+    <sources pattern="data/*/*.dat"/>
     <csvGrammar delimiter=" " strip="True" preFilter="grep -v '^#'" names="dateobs_jd, magnitude, facility, note"/>
     <make table="lightcurves">
       <rowmaker idmaps="*">
@@ -93,7 +89,7 @@
 
   <table id="objects" onDisk="True" adql="True">
     <meta name="table-rank">100</meta>
-    <meta name="description">Observed objects</meta>
+    <meta name="description">Basic parameters of variable star targets included in the time-series archive</meta>
 
     <index columns="object_id"/>
 
@@ -139,13 +135,14 @@
         required="False">
     </column>
     
-    <column name="gaia_name" type="bigint" ucd="meta.id"
+    <column name="gaia_id" type="bigint" ucd="meta.id"
         tablehead="Gaia DR3 ID" verbLevel="1"
         description="Gaia DR3 identifier"
         required="False">
+        <values nullLiteral="-1"/>
     </column>
     
-    <column name="var_class" type="text"
+    <column name="varclass" type="text"
       ucd="src.class"
       tablehead="Target class"
       description="Target class (variable star class"
@@ -189,6 +186,33 @@
     </scsCore>
   </service>
 -->
+
+<!--   Cone Search  -->
+  <service id="shug-objects" allowed="form,scs.xml">
+    <publish render="scs.xml" sets="ivo_managed"/>
+    <publish render="form" sets="local,ivo_managed"/>
+
+    <meta name="shortName">All shug Objects</meta>
+    <meta name="title">personal_shug objects Cone Search</meta>
+    <meta name="description">
+      The table with basic parameters of the observed objects
+    </meta>
+    <meta name="_related" title="shug Varable Stars Time series"
+            >\internallink{\rdId/ts-web/info}
+    </meta>
+
+    <meta>
+      testQuery.ra: 263.562625
+      testQuery.dec: -27.398250
+      testQuery.sr:   0.0001
+    </meta>
+
+    <scsCore queriedTable="objects">
+      <FEED source="//scs#coreDescs"/>
+        <condDesc buildFrom="varclass"/>
+        <condDesc buildFrom="object_id"/>
+    </scsCore>
+  </service>
 
 <!-- ==============  photometric system ===================== -->
 
@@ -258,10 +282,10 @@
     </make>
   </data>
 
-  <regSuite title="shugarov_ts regression">
-    <regTest title="shugarov_ts objects table serves some data">
+  <regSuite title="personal_shug regression">
+    <regTest title="personal_shug objects table serves some data">
       <url parSet="TAP"
-        QUERY="SELECT * FROM shugarov_ts.objects WHERE gaia_name='1656754192432536832'"
+        QUERY="SELECT * FROM personal_shug.objects WHERE gaia_id='1656754192432536832'"
       >/tap/sync</url>
       <code>
         # The actual assertions are pyUnit-like.  Obviously, you want to
@@ -274,9 +298,9 @@
       </code>
     </regTest>
 
-    <regTest title="shugarov_ts objects table seems to contain the correct number of rows">
+    <regTest title="personal_shug objects table seems to contain the correct number of rows">
       <url parSet="TAP"
-        QUERY="SELECT COUNT(*) AS nrows FROM shugarov_ts.objects"
+        QUERY="SELECT COUNT(*) AS nrows FROM personal_shug.objects"
       >/tap/sync</url>
       <code>
         # The actual assertions are pyUnit-like.  Obviously, you want to
@@ -288,9 +312,9 @@
       </code>
     </regTest>
 
-    <regTest title="shugarov_ts lightcurves table serves some data">
+    <regTest title="personal_shug lightcurves table serves some data">
       <url parSet="TAP"
-        QUERY="select l.dateobs, l.image_filename FROM shugarov_ts.lightcurves l join shugarov_ts.objects o on l.object_id = o.id  WHERE o.gaia_name='1656754192432536832' and l.dateobs='2021-10-22 22:37:08.832'"
+        QUERY="select l.dateobs, l.image_filename FROM personal_shug.lightcurves l join personal_shug.objects o on l.object_id = o.id  WHERE o.gaia_id='1656754192432536832' and l.dateobs='2021-10-22 22:37:08.832'"
       >/tap/sync</url>
       <code>
         # The actual assertions are pyUnit-like.  Obviously, you want to
@@ -302,9 +326,9 @@
       </code>
     </regTest>
 
-    <regTest title="shugarov_ts photosys table serves some data">
+    <regTest title="personal_shug photosys table serves some data">
       <url parSet="TAP"
-        QUERY="SELECT * FROM shugarov_ts.photosys WHERE band='I'"
+        QUERY="SELECT * FROM personal_shug.photosys WHERE band='I'"
       >/tap/sync</url>
       <code>
         # The actual assertions are pyUnit-like.  Obviously, you want to
