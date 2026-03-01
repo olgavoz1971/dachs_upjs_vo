@@ -9,34 +9,6 @@ EB_FILE = "gaiadr3_vari_eclipsing_binary.csv"
 GS_FILE = "gaiadr3_gaia_source_veb.csv"
 
 
-def retrieve_gaia_source_tap_upload(local_file=EB_FILE, output_file=GS_FILE):
-    service = pyvo.dal.TAPService(TAP_URL)
-
-    # todo first 10 rows (debug)
-    upload_table = Table.read(local_file, format="csv")     # [:10]
-
-    query = """
-        SELECT gs.*
-        FROM gaiadr3.gaia_source AS gs
-        JOIN TAP_UPLOAD.my_upload AS up
-        USING (source_id)
-    """
-
-    print("Submitting async job with table upload...")
-
-    job = service.run_async(
-        query,
-        uploads={"my_upload": upload_table}
-    )
-
-    result = job.to_table()
-
-    print(f"Retrieved {len(result)} rows")
-
-    result.write(output_file, format="csv", delimiter="\t", overwrite=True)
-    print(f"Saved to {output_file}")
-
-
 def retrieve_veb_with_upload(upload_file, output_file='vari_eclipsing_binary.dat'):
     # todo:first 10 rows for debugging
     upload_table = Table.read(upload_file, format="csv")        # [:10]
@@ -78,6 +50,7 @@ def retrieve_veb_with_upload(upload_file, output_file='vari_eclipsing_binary.dat
 
     job = service.run_sync(
         query,
+        maxrec=2200000,
         uploads={"my_upload": upload_table}
     )
 
@@ -126,6 +99,7 @@ def retrieve_veb(output_file='vari_eclipsing_binary.dat'):
 
     job = service.run_sync(
         query,
+        maxrec=2200000
     )
 
     result = job.to_table()
@@ -160,6 +134,7 @@ def retrieve_gaia_source_with_upload(upload_file, output_file=GS_FILE):
     print("Submitting async job with table upload...")
     job = service.run_sync(
         query,
+        maxrec=2200000,
         uploads={"my_upload": upload_table}
     )
     result = job.to_table()
