@@ -25,7 +25,7 @@
 
   <meta name="creationDate">2026-02-22T15:53:36Z</meta>
 
-  <meta name="title">Selections from Gaia DR3 related to eclipsing binaries </meta>
+  <meta name="title">Gaia DR3 eclipsing binaries</meta>
   <meta name="description" format="rst">
         This schema contains data re-published from the official
         Gaia DR3 TAP services (e.g., ivo://uni-heidelberg.de/gaia/tap).
@@ -43,7 +43,7 @@
         <meta name="type">Catalog</meta>
   </meta>
   <meta name="coverage.waveband">Optical</meta>
-  <meta name="schema-rank">20</meta>
+  <meta name="schema-rank">70</meta>
 
   <meta name="subject">surveys</meta>
   <meta name="subject">astrometry</meta>
@@ -52,6 +52,7 @@
   <meta name="subject">time-domain-astronomy</meta>
 
   <meta name="facility">Gaia</meta>
+  <meta name="instrument">Gaia</meta>
 
   <meta name="copyright" format="rst">
         If you use public Gaia DR3 data in a paper, please take note of
@@ -238,6 +239,7 @@
         tablehead="Parallax_error"
         description="Standard error of parallax" />
 
+<!--
     <column name="phot_g_mean_mag"
         ucd="phot.mag;em.opt;stat.mean" unit="mag"
         tablehead="m_G"
@@ -248,37 +250,58 @@
         <property name="statisticsTarget">5000</property>
     </column>
 
+    <column name="phot_g_mean_flux"
+        ucd="phot.flux;em.opt;stat.mean"
+        unit="s**-1"
+        tablehead="flux_G"
+        description="Integrated mean G flux">
+    </column>
+
     <column name="phot_g_mean_flux_over_error"
-        ucd="stat.snr;phot.flux;em.opt;stat.mean" unit=""
+        ucd="phot.flux" unit=""
         tablehead="SNR G"
         description="Integrated mean G flux divided by its
             error. Errors are computed from the dispersion about the weighted
-            mean of the input calibrated photometry."
-        note="e"/>
+            mean of the input calibrated photometry.">
+    </column>
+-->
     <LOOP>
         <csvItems>
             band, ucd
-            rp,   R
-            bp,   B
+             g,   em.opt
+            rp,   em.opt.R
+            bp,   em.opt.B
         </csvItems>
         <events>
-            <column name="phot_\band\+_mean_flux_over_error"
-                ucd="stat.snr;phot.flux;em.opt.\ucd"
-                tablehead="SNR \upper{\band}"
-                description="Integrated mean \upper{\band} flux divided by its
-                    error. Errors are computed from the dispersion about the weighted
-                    mean of the input calibrated photometry."
-                note="e"/>
             <column name="phot_\band\+_mean_mag"
-                unit="mag" ucd="phot.mag;em.opt.\ucd"
+                unit="mag" ucd="phot.mag;\ucd"
                 tablehead="Mag \upper{\band}"
                 description="Mean magnitude in the integrated \upper{\band} band.
                     This is computed from the \upper{\band}-band mean flux
                     applying the magnitude zero-point in the Vega scale.
                     To obtain error estimates, see
                     phot_\band\+_mean_flux_over_error."
-                verbLevel="1" note="phot">
+                verbLevel="1">
                 <property name="statisticsTarget">5000</property>
+            </column>
+            <column name="phot_\band\+_mean_flux"
+              ucd="phot.flux;\ucd;stat.mean"
+              unit="s**-1"
+              tablehead="flux \upper{\band}"
+              description="Integrated mean \upper{\band} flux">
+            </column>
+            <column name="phot_\band\+_mean_flux_error"
+                unit="s**-1"
+                ucd="stat.error;phot.flux;\ucd"
+                tablehead="SNR \upper{\band}"
+                description="Integrated mean \upper{\band} flux divided by its
+                    error. Errors are computed from the dispersion about the weighted
+                    mean of the input calibrated photometry.">
+            </column>
+            <column name="phot_\band\+_mean_flux_over_error"
+                ucd="stat.snr;phot.flux;\ucd"
+                tablehead="Error \upper{\band}"
+                description="Error on the integrated mean \upper{\band} flux">
             </column>
         </events>
     </LOOP>
@@ -402,8 +425,8 @@
   <table id="vari_eclipsing_binary_lite" onDisk="True" primary="source_id" adql="True">
     <meta name="title">gaiadr3.vari_eclipsing_binary</meta>
     <meta name="description">
-      This table describes the properties of eclipsing binaries resulting from the variability analysis.
-      It includes most columns columns from the gaiadr3.vari_eclipsing_binary table.
+      This table describes the properties of eclipsing binaries resulting from the variability analysis in Gaia DR3.
+      It includes most columns from the gaiadr3.vari_eclipsing_binary table.
     </meta>
 
     <column name="source_id" type="bigint"
@@ -815,7 +838,7 @@
           -- '\getConfig{web}{serverURL}/\rdId/preview/qp/' || q.source_id || '-' || q.band AS preview,
 
           'Gaia ' || q.band AS ssa_bandpass,
-          'phot.mag;em.opt' AS ssa_fluxucd,
+          'phot.flux;em.opt' AS ssa_fluxucd,
           p.specmid AS ssa_specmid,
           p.specstart AS ssa_specstart,
           p.specend AS ssa_specend,
@@ -869,9 +892,8 @@
     </meta>
 
     <meta name="description">
-		This table contains photometric timeseries for eclipsing binaries from 
-		Gaia DR3 epoch photometry in IVOA SSA format. 
-		The actual data is available through a datalink service.
+		This table contains metadata of photometric timeseries for eclipsing binaries from 
+		Gaia DR3 epoch photometry in IVOA SSA format. The actual data is available through a datalink service.
     </meta>
 
     <stc>
@@ -921,6 +943,7 @@
       createDIDIndex="True"
       preview="preview"
       dataproduct_subtype="'lightcurve'"
+      instrument_name="'Gaia'"
     >//obscore#publishSSAPMIXC</mixin>
 
     <column original="ssa_publisher" type="unicode"/>    <!-- unicode allows diacrtric symbols -->
@@ -949,7 +972,7 @@
           magnitudeSystem='"Vega"'
           zeroPointFlux="\zero_point_flux"
           phot_description="Gaia DR3 magnitude in \band_human"
-          phot_ucd='phot.mag;\band_ucd'
+          phot_ucd='phot.flux;\band_ucd'
           phot_unit="s**-1"
           refposition="BARYCENTER"
           refframe="ICRS"
@@ -982,8 +1005,8 @@
     <csvItems>
             band_short, band_human, band_ucd, effective_wavelength, zero_point_flux
             G,          Gaia G,  em.opt, 5.82e-7, 3228.75
-            BP,         Gaia Bp, em.opt, 5.04e-7, 3552.01
-            RP,         Gaia Rp, em.opt, 7.62e-7, 2554.95
+            BP,         Gaia Bp, em.opt.B, 5.04e-7, 3552.01
+            RP,         Gaia Rp, em.opt.R, 7.62e-7, 2554.95
     </csvItems>
   </LOOP>
 
@@ -1310,8 +1333,8 @@
     <publish render="form" sets="local,ivo_managed"/>
     <meta name="title">Gaia DR3 EB Cone Search</meta>
     <meta>
-            testQuery.ra:  312.76222908
-            testQuery.dec:  6.690190
+            testQuery.ra:  39.78593
+            testQuery.dec:  4.83580
             testQuery.sr:  0.0001
     </meta>
     <scsCore queriedTable="gaia_source_lite_eb">

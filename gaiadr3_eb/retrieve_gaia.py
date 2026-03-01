@@ -13,7 +13,7 @@ def retrieve_gaia_source_tap_upload(local_file=EB_FILE, output_file=GS_FILE):
     service = pyvo.dal.TAPService(TAP_URL)
 
     # todo first 10 rows (debug)
-    upload_table = Table.read(local_file, format="csv")[:10]
+    upload_table = Table.read(local_file, format="csv")     # [:10]
 
     query = """
         SELECT gs.*
@@ -39,7 +39,7 @@ def retrieve_gaia_source_tap_upload(local_file=EB_FILE, output_file=GS_FILE):
 
 def retrieve_veb_with_upload(upload_file, output_file='vari_eclipsing_binary.dat'):
     # todo:first 10 rows for debugging
-    upload_table = Table.read(upload_file, format="csv")[:10]
+    upload_table = Table.read(upload_file, format="csv")        # [:10]
 
     service = pyvo.dal.TAPService(TAP_URL)
 
@@ -90,11 +90,10 @@ def retrieve_veb_with_upload(upload_file, output_file='vari_eclipsing_binary.dat
 
 
 def retrieve_veb(output_file='vari_eclipsing_binary.dat'):
-
     service = pyvo.dal.TAPService(TAP_URL)
 
     query = """
-        SELECT TOP 100 
+        SELECT TOP 1000 
         source_id,
         reference_time, frequency, frequency_error, 
         geom_model_reference_level, geom_model_reference_level_error, 
@@ -138,16 +137,16 @@ def retrieve_veb(output_file='vari_eclipsing_binary.dat'):
 
 
 def retrieve_gaia_source_with_upload(upload_file, output_file=GS_FILE):
-    upload_table = Table.read(upload_file, format="csv")[:10]
+    upload_table = Table.read(upload_file, format="csv")        # [:10]
     service = pyvo.dal.TAPService(TAP_URL)
     query = """
         SELECT TOP 1000
         source_id, ra, dec, ra_error, dec_error,
         pmra, pmdec, pmra_error, pmdec_error,
         parallax, parallax_error,
-        phot_g_mean_mag, phot_g_mean_flux_over_error,
-        phot_rp_mean_flux_over_error, phot_rp_mean_mag,
-        phot_bp_mean_flux_over_error, phot_bp_mean_mag,
+        phot_g_mean_mag, phot_g_mean_flux, phot_g_mean_flux_error, phot_g_mean_flux_over_error,
+        phot_rp_mean_mag, phot_rp_mean_flux, phot_rp_mean_flux_error, phot_rp_mean_flux_over_error,
+        phot_bp_mean_mag, phot_bp_mean_flux, phot_bp_mean_flux_error, phot_bp_mean_flux_over_error,
         radial_velocity, radial_velocity_error,
         ruwe, pm,
         teff_gspphot, teff_gspphot_lower, teff_gspphot_upper,
@@ -176,9 +175,9 @@ def retrieve_gaia_source(output_file=GS_FILE):
         source_id, ra, dec, ra_error, dec_error,
         pmra, pmdec, pmra_error, pmdec_error,
         parallax, parallax_error,
-        phot_g_mean_mag, phot_g_mean_flux_over_error,
-        phot_rp_mean_flux_over_error, phot_rp_mean_mag,
-        phot_bp_mean_flux_over_error, phot_bp_mean_mag,
+        phot_g_mean_mag, phot_g_mean_flux, phot_g_mean_flux_error, phot_g_mean_flux_over_error,
+        phot_rp_mean_mag, phot_rp_mean_flux, phot_rp_mean_flux_error, phot_rp_mean_flux_over_error,
+        phot_bp_mean_mag, phot_bp_mean_flux, phot_bp_mean_flux_error, phot_bp_mean_flux_over_error,
         radial_velocity, radial_velocity_error,
         ruwe, pm,
         teff_gspphot, teff_gspphot_lower, teff_gspphot_upper,
@@ -197,7 +196,7 @@ def retrieve_gaia_source(output_file=GS_FILE):
 def main():
     retrieve_veb(output_file='vari_eclipsing_binary.csv')
     retrieve_gaia_source_with_upload(upload_file="vari_eclipsing_binary.csv",
-                                     output_file= "gaia_source_lite_veb.csv")
+                                     output_file="gaia_source_lite_veb.csv")
     return
 
 
