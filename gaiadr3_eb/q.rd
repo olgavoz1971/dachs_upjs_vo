@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resource schema="gaiadr3_veb" resdir=".">
+<resource schema="gaiadr3_eb" resdir=".">
   <macDef name="pubDIDBase">ivo://\getConfig{ivoa}{authority}/~?\rdId/</macDef>
 
   <execute on="loaded" title="define id parse functions"><job>
@@ -27,10 +27,11 @@
 
   <meta name="title">Selections from Gaia DR3 related to eclipsing binaries </meta>
   <meta name="description" format="rst">
-        This schema contains data re-published from the official 
-        Gaia DR3 TAP services (e.g. ivo://uni-heidelberg.de/gaia/tap). 
-        It provides simplified access to eclipsing-binary parameters, 
-        and epoch photometry via SSAP.
+        This schema contains data re-published from the official
+        Gaia DR3 TAP services (e.g., ivo://uni-heidelberg.de/gaia/tap).
+        It provides simplified access to data related to eclipsing binary stars,
+        including epoch photometry and basic parameters from the gaiadr3.gaia_source
+        and gaiadr3.vari_eclipsing_binary tables. Timeseries are available via SSAP and DataLink.
   </meta>
   <meta name="creator">
         <meta name="name">GAIA Collaboration</meta>
@@ -68,7 +69,7 @@
 <!-- ==============  photometric system ===================== -->
 
   <table id="photosys" onDisk="True" adql="Hidden">
-    <meta name="description">The table with hotometric system parameters</meta>
+    <meta name="description">The table with photometric system parameters</meta>
 
     <column name="band_short" type="text"
       ucd="meta.id;instr.filter;meta.main"
@@ -135,7 +136,15 @@
 
 <!-- ============================= sources ====================== -->
 
-  <table id="gaia_source_lite_veb" onDisk="True" primary="source_id" adql="True">
+  <table id="gaia_source_lite_eb" onDisk="True" primary="source_id" adql="True">
+    <meta name="description" format="rst">
+            This is a light version of the full gaiadr3.gaia_source table,
+            containing astrometric and photometric columns and most columns
+            with astrophysical parameters for eclipsing binaries.
+            The full DR3 is available via the TAP services ivo://uni-heidelberg.de/gaia/tap
+            and ivo://esavo/gaia/tap
+    </meta>
+
     <index columns="pmra"/>
     <index columns="pmdec"/>
     <index columns="parallax"/>
@@ -144,7 +153,6 @@
     <index columns="phot_rp_mean_mag"/>
     <mixin>//scs#pgs-pos-index</mixin>
     <publish sets="ivo_managed,local"/>
-
     <stc>
             Position ICRS BARYCENTER SPHER3 Epoch J2016.0 "ra" "dec" "parallax"
                     Error "ra_error" "dec_error" "parallax_error"
@@ -380,9 +388,9 @@
   </table>
 
   <data id="import_gaia_source">
-    <sources item="data/gaia_source_lite_veb.csv"/>
+    <sources item="data/gaia_source_lite_eb.csv"/>
     <csvGrammar delimiter="," strip="True"/>
-      <make table="gaia_source_lite_veb">
+      <make table="gaia_source_lite_eb">
         <rowmaker idmaps="*">
      </rowmaker>
     </make>
@@ -394,7 +402,8 @@
   <table id="vari_eclipsing_binary_lite" onDisk="True" primary="source_id" adql="True">
     <meta name="title">gaiadr3.vari_eclipsing_binary</meta>
     <meta name="description">
-      This table describes the properties of the eclipsing binaries resulting from the variability analysis
+      This table describes the properties of eclipsing binaries resulting from the variability analysis.
+      It includes most columns columns from the gaiadr3.vari_eclipsing_binary table.
     </meta>
 
     <column name="source_id" type="bigint"
@@ -643,7 +652,9 @@
 <!-- ============================= lightcurves ====================== -->
   <table id="lightcurves" onDisk="True" adql="True">
     <meta name="table-rank">150</meta>
-    <meta name="description">This table contains all rows from Gaia DR3 epoch photometry for eclipsing binaties. Originally this data is accesible via DataLink</meta>
+    <meta name="description">This table contains all rows of Gaia DR3 epoch photometry
+       for eclipsing binaries. The data were retrieved via the original Gaia DR3 DataLink service.
+    </meta>
     <index columns="source_id"/>
 <!--    <index columns="band"/>
     <index columns="time"/>  -->
@@ -719,7 +730,7 @@
   </data>
 
 
-<!-- ================= SSAP stuff ======================== -->
+<!-- ================= SSA stuff ======================== -->
 
   <meta name="ssap.dataSource">survey</meta> 
   <meta name="ssap.creationType">archival</meta>
@@ -833,7 +844,7 @@
             radians(ra) AS raj_rad,
             radians(dec) AS dej_rad,
             radians(0.5/3600) AS aperture_rad
-          FROM \schema.gaia_source_lite_veb
+          FROM \schema.gaia_source_lite_eb
         ) AS o USING (source_id)
         JOIN \schema.vari_eclipsing_binary_lite b USING (source_id)
         JOIN \schema.photosys AS p ON p.band_short = q.band
@@ -1020,10 +1031,12 @@
   </data>
 
   <service id="sdl" allowed="dlget,dlmeta,static">
-    <meta name="title">Gaia DR3 light curves Datalink Service</meta>
-    <meta name="shortName">GDR3 TS Datalink</meta>
-    <meta name="description">
-      This service produces time series datasets for Gaia DR3 epoch photometry (lightcurves) of eclipsing binaries
+    <meta name="title">Gaia DR3 EB light curves Datalink</meta>
+    <meta name="shortName">GDR3 EB TS Datalink</meta>
+    <meta name="description">This service provides photometric time series
+         for eclipsing binaries from Gaia DR3 epoch photometry.
+         It generates per-band photometric time series along with previews
+         of folded and unfolded light curves.
     </meta>
 
     <!-- The datalink#fromtable descriptor generator simply pulling a row from a database table.
@@ -1129,8 +1142,8 @@
     <meta name="title">Folded lightcurve previews</meta>
     <meta name="shortName">Folded TS previews</meta>
     <meta name="description">
-        A service returning PNG thumbnails for folded time series. It takes the obs_id for which to generate a preview. 
-        To calculate phases, period and epoch from objects view are used.
+        A service returning PNG thumbnails of folded light curves for eclipsing binaries from Gaia DR3 epoch photometry.
+        Phases were calculated using the period and epoch values from the gaiadr3.vari_eclipsing_binary table
     </meta>
     <pythonCore>
         <inputTable>
@@ -1192,7 +1205,7 @@
     <meta name="title">Timeseries previews</meta>
     <meta name="shortName">TS previews</meta>
     <meta name="description">
-        A service returning PNG thumbnails for time series. It takes the obs id for which to generate a preview.
+        A service returning PNG thumbnails of time series for eclipsing binaries from Gaia DR3 epoch photometry.
     </meta>
     <pythonCore>
         <inputTable>
@@ -1230,6 +1243,122 @@
         </coreProc>
     </pythonCore>
   </service>
+
+  <service id="ts-web" defaultRenderer="form">
+    <meta name="shortName">\schema Web</meta>
+    <meta name="title">Gaia DR3 EB Time Series Browser Service</meta>
+
+    <dbCore queriedTable="ts_ssa">
+      <condDesc buildFrom="ssa_location"/>
+      <condDesc buildFrom="t_min"/>
+      <condDesc buildFrom="t_max"/>
+      <!-- <condDesc buildFrom="ssa_bandpass"/> -->
+
+      <condDesc>
+        <inputKey original="ssa_bandpass" tablehead="Filter" multiplicity="single">
+          <values>
+            <option title="Gaia G">Gaia G</option>
+            <option title="Gaia Bp">Gaia Bp</option>
+            <option title="Gaia Rp">Gaia Rp</option>
+          </values>
+        </inputKey>
+      </condDesc>
+
+      <condDesc>
+        <inputKey original="ssa_targname" tablehead="Target Object">
+          <values fromdb="ssa_targname from \schema.ts_ssa order by ssa_targname limit 10"/>
+        </inputKey>
+      </condDesc>
+    </dbCore>
+
+    <outputTable>
+      <autoCols>accref, ssa_targname, t_min, t_max, ssa_bandpass,
+        datalink</autoCols>
+      <FEED source="//ssap#atomicCoords"/>
+    </outputTable>
+  </service>
+
+  <service id="ssa" allowed="form,ssap.xml">
+    <meta name="shortName">GDR3 EB TS SSAP</meta>
+    <meta name="ssap.dataSource">survey</meta>
+    <meta name="ssap.creationType">archival</meta>
+    <meta name="ssap.testQuery">MAXREC=1</meta>
+    <meta name="ssap.complianceLevel">query</meta>
+    <meta name="productTypesServed">timeseries</meta>	<!-- TODO: add this to other ssa-service descriptions -->
+
+    <publish render="ssap.xml" sets="ivo_managed"/>
+    <publish render="form" sets="ivo_managed,local" service="ts-web"/>
+
+    <meta name="title">Gaia DR3 eclipsing binaries light curves SSA</meta>
+    <meta name="description">This service exposes photometric light curves
+          of eclipsing binaries from Gaia DR3 epoch photometry via the VO SSA protocol.
+          The light curves are published per-band and are also discoverable through ObsCore.
+    </meta>
+
+    <ssapCore queriedTable="ts_ssa">
+      <!-- <property key="previews">auto</property> 
+      auto produces wrong URLs in my case. Would it work properly if I populate products table? 
+      And does this really make sense?
+      -->
+      <FEED source="//ssap#hcd_condDescs"/>
+    </ssapCore>
+  </service>
+
+  <service id="dr3cone" allowed="form,scs.xml">
+    <meta name="shortName">GDR3light SCS</meta>
+    <publish render="scs.xml" sets="ivo_managed"/>
+    <publish render="form" sets="local,ivo_managed"/>
+    <meta name="title">Gaia DR3 EB Cone Search</meta>
+    <meta>
+            testQuery.ra:  312.76222908
+            testQuery.dec:  6.690190
+            testQuery.sr:  0.0001
+    </meta>
+    <scsCore queriedTable="gaia_source_lite_eb">
+      <FEED source="//scs#coreDescs"/>
+      <LOOP listItems="source_id phot_g_mean_mag phot_bp_mean_mag phot_rp_mean_mag">
+        <events>
+          <condDesc buildFrom="\item"/>
+        </events>
+      </LOOP>
+    </scsCore>
+  </service>
+
+  <regSuite title="gaiadr3_eb ts regression">
+    <regTest title="gaiadr3_eb SSAP serves some data">
+      <url REQUEST="queryData" PUBDID="ivo://upjs.jk/~?personal_shug/q/MO_Psc-R"
+      >ssa/ssap.xml</url>
+      <code>
+        # print(self.data)
+        # self.assertHasStrings("OGLE I lightcurve for OGLE-SMC-CEP-1759", "12.972499999999977 -72.95352777777752")
+        # self.assertHasStrings("OGLE I lightcurve for OGLE-SMC-CEP-1759")
+        self.assertHasStrings("R lightcurve for MO_Psc")
+      </code>
+    </regTest>
+
+    <regTest title="gaiadr3_eb Datalink metadata looks about right.">
+      <url ID="ivo://upjs.jk/~?personal_shug/q/AY_Lac-B">
+           sdl/dlmeta</url>
+      <code>
+        # dachs test -k datalink  q
+        by_sem = self.datalinkBySemantics()
+        # print(by_sem)
+        # self.fail("Fill this in")
+        # self.assertHasStrings("Preview for OGLE-SMC-CEP-1733 in I", "OGLE time series for OGLE-SMC-CEP-1733 in I")
+        self.assertHasStrings("S.Shugarov archive time series for AY_Lac in B", "Preview for AY_Lac in B")
+      </code>
+    </regTest>
+
+    <regTest title="gaiadr3_eb ts_ssa TAP serves some data">
+      <url parSet="TAP" QUERY="SELECT count(*) n from personal_shug.ts_ssa where ssa_collection='PERSONAL shug'"
+      >/tap/sync</url>
+      <code>
+        row = self.getFirstVOTableRow()
+        # print(f'n = {row["n"]}')
+        self.assertEqual(row["n"], 10)
+      </code>
+    </regTest>
+  </regSuite>
 
 
 </resource>

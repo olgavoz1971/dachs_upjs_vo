@@ -574,16 +574,17 @@
       <condDesc buildFrom="ssa_location"/>
       <condDesc buildFrom="t_min"/>
       <condDesc buildFrom="t_max"/>
-      <condDesc buildFrom="ssa_bandpass"/>
-      <!-- <condDesc>
+      <!-- <condDesc buildFrom="ssa_bandpass"/> -->
+
+      <condDesc>
         <inputKey original="ssa_bandpass" tablehead="Filter">
-          <values fromdb="DISTINCT ssa_bandpass from \schema.ts_ssa order by ssa_bandpass"/>
+          <values fromdb="ssa_bandpass from \schema.ts_ssa"/>
         </inputKey>
-      </condDesc> -->
+      </condDesc>
 
       <condDesc>
         <inputKey original="ssa_targname" tablehead="Target Object">
-          <values fromdb="ssa_targname from \schema.ts_ssa order by ssa_targname limit 10"/>
+          <values fromdb="ssa_targname from \schema.ts_ssa order by ssa_targname"/>
         </inputKey>
       </condDesc>
 
