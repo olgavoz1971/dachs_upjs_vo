@@ -173,20 +173,6 @@
     </make>
   </data>
 
-<!--
-  <service id="calibrators" allowed="scs.xml">
-    <meta name="shortName">upjs calibrators</meta>
-    <meta name="testQuery">
-      <meta name="ra">9.4076</meta>
-      <meta name="dec">9.6414</meta>
-      <meta name="sr">1.0</meta>
-    </meta>
-    <scsCore queriedTable="objects">
-      <FEED source="//scs#coreDescs"/>
-    </scsCore>
-  </service>
--->
-
 <!--   Cone Search  -->
   <service id="shug-objects" allowed="form,scs.xml">
     <publish render="scs.xml" sets="ivo_managed"/>
@@ -202,8 +188,8 @@
     </meta>
 
     <meta>
-      testQuery.ra: 263.562625
-      testQuery.dec: -27.398250
+      testQuery.ra: 335.592083
+      testQuery.dec: 50.39444
       testQuery.sr:   0.0001
     </meta>
 

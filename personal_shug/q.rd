@@ -26,7 +26,7 @@
   <meta name="instrument">Various</meta>
   <meta name="facility">Various</meta>
 
-  <meta name="source">2021Ap.....64..458S</meta>
+  <!-- <meta name="source">2021Ap.....64..458S</meta> -->	<!-- we put specific reference to every lightcurve -->
   <meta name="contentLevel">Research</meta>
   <meta name="type">Archive</meta>
 
@@ -266,11 +266,30 @@
     <table id="instance_\band_short" onDisk="False">
       <!-- metadata modified by sdl's dataFunction -->
       <meta name="description">The lightcurve in the \band_human filter </meta>
+      <meta name="my_weird_meta">Ahhhhaaaa</meta>
       <!-- <meta name="source">2025AcA....65....1U</meta> -->
       <!-- JK: define them _before_ mentioning them the mixin -->
+<!--
       <param original="ts_ssa.ssa_bandpass"/>
       <param original="ts_ssa.ssa_specmid"/>
-        <mixin
+-->
+      <param name="ra" type="double precision"
+           ucd="pos.eq.ra"
+           description="RA of source object"/>
+      <param name="dec" type="double precision"
+           ucd="pos.eq.dec"
+           description="Dec of source object"/>
+      <param name="filter" type="text"
+           ucd="meta.id;instr.filter"
+           description="Filter used."/>
+
+      <param name="comment"
+           type="text"
+           ucd="meta.note"/>
+      
+      <param original="//ssap#instance.ssa_reference" name="bibcode"/>	<!-- I'm afraid people may not recognise ssa_reference -->
+
+      <mixin
           effectiveWavelength="\effective_wavelength"
           filterIdentifier='"\band_human"'
           magnitudeSystem="Vega"
@@ -282,22 +301,26 @@
           refframe="ICRS"
           time0="2400000.5"
           timescale="UTC"
-        >//timeseries#phot-0</mixin>
+      >//timeseries#phot-0</mixin>
 
-        <param original="ts_ssa.t_min"/>
-        <param original="ts_ssa.t_max"/>
-        <param original="ts_ssa.ssa_location"/>
+<!--
+      <param original="ts_ssa.t_min"/>
+      <param original="ts_ssa.t_max"/>
+      <param original="ts_ssa.ssa_location"/>
+      <param original="ts_ssa.ssa_reference"/>
+-->
+
 
         <!-- Add my column -->
-        <column name="mag_err" type="double precision"
-          ucd="stat.error;phot.mag"
-          unit="mag"
-          tablehead="magnitude"
-          description="stellar magnitude error"
-          verbLevel="1"
-          required="False"/>
-        <column original="personal_shug/t#lightcurves.facility"/>
-        <column original="personal_shug/t#lightcurves.note"/>
+      <column name="mag_err" type="double precision"
+        ucd="stat.error;phot.mag"
+        unit="mag"
+        tablehead="magnitude"
+        description="stellar magnitude error"
+        verbLevel="1"
+        required="False"/>
+      <column original="personal_shug/t#lightcurves.facility" description="\facility_note"/>
+      <column original="personal_shug/t#lightcurves.note"/>
     </table>
   </STREAM>
 
@@ -305,14 +328,17 @@
   <!-- zero point are from https://svo2.cab.inta-csic.es/theory/fps -->
   <!-- It would be interesting to have here a mixin like  //siap#getBandFromFilter but for ssap -->
 
+  <macDef name="CCD_facility_note">Facility and telescope code: 1 = AISAS Z-600; 2 = Nauchny Z-600; 3 = Nauchny Maksutov-50; 0 = not specified</macDef>
+
   <LOOP source="instance-template">
     <csvItems>
-            band_short, band_human, band_ucd, effective_wavelength, zero_point_flux
-            U,          Bessell/U, em.opt.U, 3.6e-7, 1699.71
-            B,          Bessell/B, em.opt.B, 4.4e-7, 3908.46
-            V,          Bessell/V, em.opt.V, 5.4e-7, 3630.22
-            R,          Bessell/R, em.opt.R, 6.2e-7, 3056.93
-            I,          Bessell/I, em.opt.I, 8.3e-7, 2415.65
+            band_short, band_human, band_ucd, effective_wavelength, zero_point_flux, facility_note
+            U,          Bessell/U, em.opt.U, 3.6e-7, 1699.71, \CCD_facility_note
+            B,          Bessell/B, em.opt.B, 4.4e-7, 3908.46, \CCD_facility_note
+            V,          Bessell/V, em.opt.V, 5.4e-7, 3630.22, \CCD_facility_note
+            R,          Bessell/R, em.opt.R, 6.2e-7, 3056.93, \CCD_facility_note
+            I,          Bessell/I, em.opt.I, 8.3e-7, 2415.65, \CCD_facility_note
+            pg,         pg.plate, em.opt.B, 5.0e-7, 3900, Photo Archive code: 1 = SAI; 2 = Sonneberg; 3 = Odessa; 4 = Skalnaté Pleso
     </csvItems>
   </LOOP>
 
@@ -339,20 +365,24 @@
     </embeddedGrammar>
 
     <make table="instance_V">   <!-- just a placeholder, we don't have the bare "instance" table. But we need a name from the LOOP -->
-      <rowmaker idmaps="*" id="make-ts"/>
 
+      <rowmaker idmaps="*" id="make-ts"/>
       <!-- parmaker can get parameters, provided by pargetter and write them as a metadata in the instance table -->
-      <parmaker id="make-ts-par" idmaps="ssa_bandpass, ssa_specmid, t_min, t_max, ssa_location">
+      <!-- <parmaker id="make-ts-par" idmaps="ssa_bandpass, ssa_specmid, t_min, t_max, ssa_location, mynote"> -->
+      <parmaker id="make-ts-par">
          <!--tut: touch manually the instance table metadata -->
+         <map dest="filter">@ssa_bandpass</map>
+         <map dest="bibcode">@ssa_reference</map>
+         <map dest="ra">@ssa_location.asDALI()[0]</map>
+         <map dest="dec">@ssa_location.asDALI()[1]</map>
          <apply name="update_metadata">
            <code>
              sourceId = vars["ssa_targname"]     # in apply the current input fields are available in the vars dictionary
              targetTable.setMeta("description", base.getMetaText(targetTable, "description") +
                  " for {}".format(sourceId))
-             # JK: does not work :-( How to specifify it for each ts instance from ssa_reference?
-             # targetTable.setMeta("source", "2035AcA....65....1U")
-             # targetTable.setMeta("publication_id", "2034AcA....65....1U")
+             targetTable.setParam("comment", "This is my best comment")             
              targetTable.setMeta("name", str(sourceId))
+             # print(f'\n \n \n {vars=} \n \n \n')
            </code>
          </apply>
       </parmaker>
@@ -466,7 +496,7 @@
   <service id="preview-plot" allowed="qp">
     <property name="queryField">obs_id</property>
     <meta name="title">Folded lightcurve previews</meta>
-    <meta name="shortName">TS previews</meta>
+    <meta name="shortName">TS previews-plot</meta>
     <meta name="description">
         A service returning PNG thumbnails for folded time series. It takes the obs_id for which to generate a preview. 
         To calculate phases, period and epoch from objects view are used.
@@ -568,7 +598,7 @@
   </service>
 
   <service id="ts-web" defaultRenderer="form">
-    <meta name="shortName">\schema Web</meta>
+    <meta name="shortName">Shug Web</meta>
     <meta name="title">Time Series Browser Service</meta>
 
     <dbCore queriedTable="ts_ssa">
@@ -599,7 +629,7 @@
   </service>
 
   <service id="ssa" allowed="form,ssap.xml">
-    <meta name="shortName">\schema TS SSAP</meta>
+    <meta name="shortName">Shug TS SSAP</meta>
     <meta name="ssap.complianceLevel">full</meta>
 
     <publish render="ssap.xml" sets="ivo_managed"/>
