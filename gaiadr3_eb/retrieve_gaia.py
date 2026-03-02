@@ -2,7 +2,8 @@ import pyvo
 from astropy.table import Table
 
 # TAP service URL
-TAP_URL = "https://gaia.ari.uni-heidelberg.de/tap/"
+# TAP_URL = "https://gaia.ari.uni-heidelberg.de/tap/"
+TAP_URL = "https://gaia.aip.de/tap"
 
 # Output files
 EB_FILE = "gaiadr3_vari_eclipsing_binary.csv"
@@ -66,7 +67,7 @@ def retrieve_veb(output_file='vari_eclipsing_binary.dat'):
     service = pyvo.dal.TAPService(TAP_URL)
 
     query = """
-        SELECT TOP 1000 
+        SELECT 
         source_id,
         reference_time, frequency, frequency_error, 
         geom_model_reference_level, geom_model_reference_level_error, 
@@ -99,7 +100,7 @@ def retrieve_veb(output_file='vari_eclipsing_binary.dat'):
 
     job = service.run_sync(
         query,
-        maxrec=2200000
+        maxrec=2200000        
     )
 
     result = job.to_table()
@@ -114,7 +115,7 @@ def retrieve_gaia_source_with_upload(upload_file, output_file=GS_FILE):
     upload_table = Table.read(upload_file, format="csv")        # [:10]
     service = pyvo.dal.TAPService(TAP_URL)
     query = """
-        SELECT TOP 1000
+        SELECT
         source_id, ra, dec, ra_error, dec_error,
         pmra, pmdec, pmra_error, pmdec_error,
         parallax, parallax_error,
@@ -145,8 +146,36 @@ def retrieve_gaia_source_with_upload(upload_file, output_file=GS_FILE):
 
 def retrieve_gaia_source(output_file=GS_FILE):
     service = pyvo.dal.TAPService(TAP_URL)
+
     query_gs = """
-        SELECT TOP 1000
+        SELECT
+        s.source_id, ra, dec, ra_error, dec_error,
+        pmra, pmdec, pmra_error, pmdec_error,
+        parallax, parallax_error,
+        phot_g_mean_mag, phot_g_mean_flux, phot_g_mean_flux_error, phot_g_mean_flux_over_error,
+        phot_rp_mean_mag, phot_rp_mean_flux, phot_rp_mean_flux_error, phot_rp_mean_flux_over_error,
+        phot_bp_mean_mag, phot_bp_mean_flux, phot_bp_mean_flux_error, phot_bp_mean_flux_over_error,
+        radial_velocity, radial_velocity_error,
+        ruwe, pm,
+        teff_gspphot, teff_gspphot_lower, teff_gspphot_upper,
+        logg_gspphot, logg_gspphot_lower, logg_gspphot_upper,
+        mh_gspphot, mh_gspphot_lower, mh_gspphot_upper
+        FROM gaiadr3.gaia_source AS s JOIN gaiadr3.vari_eclipsing_binary AS b ON s.source_id = b.source_id
+    """
+    print("Submitting async job with table gaia_source...")
+    job_gs = service.run_async(query_gs, maxrec=2200000)
+    result_gs = job_gs.to_table()
+    print(f"Downloaded {len(result_gs)} rows")
+    result_gs.write(output_file, format="csv", delimiter=",", overwrite=True)
+    print(f"Saved to {output_file}")
+
+
+def retrieve_gaia_source_for_veb(output_file=GS_FILE):
+    print('Inside retrieve_gaia_source_for_veb')
+    service = pyvo.dal.TAPService(TAP_URL)
+    print('Got service')
+    query = """
+        SELECT
         source_id, ra, dec, ra_error, dec_error,
         pmra, pmdec, pmra_error, pmdec_error,
         parallax, parallax_error,
@@ -159,19 +188,28 @@ def retrieve_gaia_source(output_file=GS_FILE):
         logg_gspphot, logg_gspphot_lower, logg_gspphot_upper,
         mh_gspphot, mh_gspphot_lower, mh_gspphot_upper
         FROM gaiadr3.gaia_source
+        JOIN gaiadr3.vari_eclipsing_binary USING (source_id)
+        
     """
-    print("Submitting async job with table gaia_source...")
-    job_gs = service.run_async(query_gs)
-    result_gs = job_gs.to_table()
-    print(f"Downloaded {len(result_gs)} rows")
-    result_gs.write(output_file, format="csv", delimiter=",", overwrite=True)
+    print("Submitting async job retrieve_gaia_source_for_veb ...")
+    job = service.run_async(
+        query,
+        maxrec=2200000,
+    )
+    result = job.to_table()
+    print(f"Downloaded {len(result)} rows")
+    result.write(output_file, format="csv", delimiter=",", overwrite=True)
     print(f"Saved to {output_file}")
 
 
 def main():
-    retrieve_veb(output_file='vari_eclipsing_binary.csv')
-    retrieve_gaia_source_with_upload(upload_file="vari_eclipsing_binary.csv",
-                                     output_file="gaia_source_lite_veb.csv")
+    # retrieve_veb(output_file='vari_eclipsing_binary.csv')
+    # retrieve_gaia_source_with_upload(upload_file="vari_eclipsing_binary.csv",
+    #                                 output_file="gaia_source_lite_veb.csv")
+    # retrieve_gaia_source(output_file="gaia_source_lite_veb.csv")
+    print('start')
+    retrieve_gaia_source_for_veb(output_file="gaia_source_lite_eb.csv")
+    print('finish')
     return
 
 
