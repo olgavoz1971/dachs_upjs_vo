@@ -138,6 +138,7 @@
 <!-- ============================= sources ====================== -->
 
   <table id="gaia_source_lite_eb" onDisk="True" primary="source_id" adql="True">
+    <meta name="table-rank">150</meta>
     <meta name="description" format="rst">
             This is a light version of the full gaiadr3.gaia_source table,
             containing astrometric and photometric columns and most columns
@@ -423,6 +424,7 @@
 <!-- ===================== vari_eclipsing_binary ============== -->
 
   <table id="vari_eclipsing_binary_lite" onDisk="True" primary="source_id" adql="True">
+    <meta name="table-rank">150</meta>
     <meta name="title">gaiadr3.vari_eclipsing_binary</meta>
     <meta name="description">
       This table describes the properties of eclipsing binaries resulting from the variability analysis in Gaia DR3.
@@ -674,11 +676,14 @@
 
 <!-- ============================= lightcurves ====================== -->
   <table id="lightcurves" onDisk="True" adql="True">
-    <meta name="table-rank">150</meta>
+    <meta name="table-rank">200</meta>
     <meta name="description">This table contains all rows of Gaia DR3 epoch photometry
        for eclipsing binaries. The data were retrieved via the original Gaia DR3 DataLink service.
     </meta>
-    <index columns="source_id"/>
+    <!-- <index columns="source_id"/> -->
+    <index columns="source_id, band"/>
+    <index columns="obs_time"/>
+
 <!--    <index columns="band"/>
     <index columns="time"/>  -->
 
@@ -687,7 +692,9 @@
       ucd="meta.id;meta.main"
       tablehead="GaiaDR3 identifier"
       description="Unique source identifier within Gaia DR3"
-      required="True"/>
+      required="True">
+      <property name="statistics">no</property>
+    </column>
 
     <column name="obs_time"
       type="double precision"
@@ -708,7 +715,9 @@
           of the individual CCD observations is (much) below 1~ms (e.g. in BP and RP), 
           the G band observation time is averaged over typically 9 CCD observations taken in 
           a time range of about 44sec."
-      required="True"/>
+      required="True">
+      <property name="statistics">no</property>
+    </column>
 
     <column name="flux"
       type="double precision"
@@ -717,7 +726,9 @@
       tablehead="Flux"
       description="Band flux value for the transit. For G band, it is a combination of individual SM-AF CCD fluxes.
             For BP and RP bands, it is an integrated CCD flux."
-      required="False"/>
+      required="False">
+      <property name="statistics">no</property>
+    </column>
 
     <column name="flux_error" 
       type="double precision"
@@ -725,7 +736,9 @@
       unit="s**-1"
       tablehead="Flux error"
       description="Flux error. If the flux has been rejected or is unavailable, this error will be set to null."
-      required="False"/>
+      required="False">
+      <property name="statistics">no</property>
+    </column>
 
     <column name="band"
       type="text"
@@ -734,7 +747,9 @@
       tablehead="Photometric Band"
       description="Photometric band. Values: G (per-transit combined SM-AF flux), 
           BP (blue photometer integrated flux) and RP (red photometer integrated flux)"
-      required="True"/>
+      required="True">
+      <property name="statistics">no</property>
+    </column>
 
   </table>
 
@@ -783,6 +798,7 @@
 
     <!-- <index columns="ssa_targname"/> -->
     <index columns="source_id"/>
+    <index columns="ssa_bandpass"/>
 
     <FEED source="//scs#splitPosIndex"
       columns="ssa_location"
@@ -890,6 +906,7 @@
       <meta name="serviceId">sdl</meta>
       <meta name="idColumn">ssa_pubDID</meta>
     </meta>
+    <index columns="ssa_targname"/>
 
     <meta name="description">
 		This table contains metadata of photometric timeseries for eclipsing binaries from 

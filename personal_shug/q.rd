@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resource schema="personal_shug" resdir=".">
+  <meta name="schema-rank">100</meta>
   <meta name="creationDate">2026-02-19T08:41:36Z</meta>
   <macDef name="pubDIDBase">ivo://\getConfig{ivoa}{authority}/~?\rdId/</macDef>
 
@@ -50,7 +51,6 @@
         def parseIdentifier(id):
             """returns object and bandpass from an accref or a pubDID.
             """
-            # assert "ogle" in id
             tail = id.split("/")[-1]
             object, bandpass = tail.rsplit("-", 1)  # object may contain "-"
             return object, bandpass
@@ -82,6 +82,7 @@
     <mixin>//ssap#simpleCoverage</mixin>
 
     <index columns="ssa_targname"/>
+    <index columns="ssa_bandpass"/>
 
     <FEED source="//scs#splitPosIndex"
       columns="ssa_location"
@@ -604,7 +605,7 @@
     <publish render="ssap.xml" sets="ivo_managed"/>
     <publish render="form" sets="ivo_managed,local" service="ts-web"/>
 
-    <meta name="title">Shugarov's Light curves Form</meta>
+    <meta name="title">Personal archive light curves</meta>
     <meta name="description">This service exposes photometric light curves.
           The light curves are published per-band and are also discoverable
           through ObsCore.
@@ -619,19 +620,17 @@
     </ssapCore>
   </service>
 
-  <regSuite title="shug ts regression">
+  <regSuite title="shug regression">
     <regTest title="personal_shug SSAP serves some data">
       <url REQUEST="queryData" PUBDID="ivo://upjs.jk/~?personal_shug/q/MO_Psc-R"
       >ssa/ssap.xml</url>
       <code>
         # print(self.data)
-        # self.assertHasStrings("OGLE I lightcurve for OGLE-SMC-CEP-1759", "12.972499999999977 -72.95352777777752")
-        # self.assertHasStrings("OGLE I lightcurve for OGLE-SMC-CEP-1759")
         self.assertHasStrings("R lightcurve for MO_Psc")
       </code>
     </regTest>
 
-    <regTest title="ogle Datalink metadata looks about right.">
+    <regTest title="shug Datalink metadata looks about right.">
       <url ID="ivo://upjs.jk/~?personal_shug/q/AY_Lac-B">
            sdl/dlmeta</url>
       <code>
@@ -639,12 +638,11 @@
         by_sem = self.datalinkBySemantics()
         # print(by_sem)
         # self.fail("Fill this in")
-        # self.assertHasStrings("Preview for OGLE-SMC-CEP-1733 in I", "OGLE time series for OGLE-SMC-CEP-1733 in I")
         self.assertHasStrings("S.Shugarov archive time series for AY_Lac in B", "Preview for AY_Lac in B")
       </code>
     </regTest>
 
-    <regTest title="ogle ts_ssa TAP serves some data">
+    <regTest title="shug ts_ssa TAP serves some data">
       <url parSet="TAP" QUERY="SELECT count(*) n from personal_shug.ts_ssa where ssa_collection='PERSONAL shug'"
       >/tap/sync</url>
       <code>
