@@ -266,9 +266,6 @@
     <table id="instance_\band_short" onDisk="False">
       <!-- metadata modified by sdl's dataFunction -->
       <meta name="description">The lightcurve in the \band_human filter </meta>
-      <meta name="my_weird_meta">Ahhhhaaaa</meta>
-      <!-- <meta name="source">2025AcA....65....1U</meta> -->
-      <!-- JK: define them _before_ mentioning them the mixin -->
 <!--
       <param original="ts_ssa.ssa_bandpass"/>
       <param original="ts_ssa.ssa_specmid"/>
@@ -370,11 +367,12 @@
       <!-- parmaker can get parameters, provided by pargetter and write them as a metadata in the instance table -->
       <!-- <parmaker id="make-ts-par" idmaps="ssa_bandpass, ssa_specmid, t_min, t_max, ssa_location, mynote"> -->
       <parmaker id="make-ts-par">
-         <!--tut: touch manually the instance table metadata -->
+         <!-- Add additioanal stuff to the litghtcure VOTable metadata. TODO: It would be nice to have the period and epoch there --> 
          <map dest="filter">@ssa_bandpass</map>
          <map dest="bibcode">@ssa_reference</map>
          <map dest="ra">@ssa_location.asDALI()[0]</map>
          <map dest="dec">@ssa_location.asDALI()[1]</map>
+         <!--tut: touch manually the instance table metadata -->
          <apply name="update_metadata">
            <code>
              sourceId = vars["ssa_targname"]     # in apply the current input fields are available in the vars dictionary
