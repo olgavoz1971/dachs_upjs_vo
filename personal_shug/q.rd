@@ -285,6 +285,11 @@
            ucd="meta.note"/>
       
       <param original="//ssap#instance.ssa_reference" name="bibcode"/>	<!-- I'm afraid people may not recognise ssa_reference -->
+      <param original="\sc/t#objects.period"/>
+      <param original="\sc/t#objects.epoch"/>
+      <param original="ts_ssa.ssa_targclass"/>
+      <param original="ts_ssa.ssa_collection"/>
+      <param original="ts_ssa.mean_mag"/>
 
       <mixin
           effectiveWavelength="\effective_wavelength"
@@ -300,14 +305,6 @@
           timescale="UTC"
       >//timeseries#phot-0</mixin>
 
-<!--
-      <param original="ts_ssa.t_min"/>
-      <param original="ts_ssa.t_max"/>
-      <param original="ts_ssa.ssa_location"/>
-      <param original="ts_ssa.ssa_reference"/>
--->
-
-
         <!-- Add my column -->
       <column name="mag_err" type="double precision"
         ucd="stat.error;phot.mag"
@@ -316,8 +313,8 @@
         description="stellar magnitude error"
         verbLevel="1"
         required="False"/>
-      <column original="personal_shug/t#lightcurves.facility" description="\facility_note"/>
-      <column original="personal_shug/t#lightcurves.note"/>
+      <column original="\sc/t#lightcurves.facility" description="\facility_note"/>
+      <column original="\sc/t#lightcurves.note"/>
     </table>
   </STREAM>
 
@@ -328,14 +325,15 @@
   <macDef name="CCD_facility_note">Facility and telescope code: 1 = AISAS Z-600; 2 = Nauchny Z-600; 3 = Nauchny Maksutov-50; 0 = not specified</macDef>
 
   <LOOP source="instance-template">
+    
     <csvItems>
-            band_short, band_human, band_ucd, effective_wavelength, zero_point_flux, facility_note
-            U,          Bessell/U, em.opt.U, 3.6e-7, 1699.71, \CCD_facility_note
-            B,          Bessell/B, em.opt.B, 4.4e-7, 3908.46, \CCD_facility_note
-            V,          Bessell/V, em.opt.V, 5.4e-7, 3630.22, \CCD_facility_note
-            R,          Bessell/R, em.opt.R, 6.2e-7, 3056.93, \CCD_facility_note
-            I,          Bessell/I, em.opt.I, 8.3e-7, 2415.65, \CCD_facility_note
-            pg,         pg.plate, em.opt.B, 5.0e-7, 3900, Photo Archive code: 1 = SAI; 2 = Sonneberg; 3 = Odessa; 4 = Skalnaté Pleso
+            band_short, band_human, band_ucd, effective_wavelength, zero_point_flux, facility_note, sc
+            U,          Bessell/U, em.opt.U, 3.6e-7, 1699.71, \CCD_facility_note, \schema
+            B,          Bessell/B, em.opt.B, 4.4e-7, 3908.46, \CCD_facility_note, \schema
+            V,          Bessell/V, em.opt.V, 5.4e-7, 3630.22, \CCD_facility_note, \schema
+            R,          Bessell/R, em.opt.R, 6.2e-7, 3056.93, \CCD_facility_note, \schema
+            I,          Bessell/I, em.opt.I, 8.3e-7, 2415.65, \CCD_facility_note, \schema
+            pg,         pg.plate, em.opt.B, 5.0e-7, 3900, Photo Archive code: 1 = SAI; 2 = Sonneberg; 3 = Odessa; 4 = Skalnaté Pleso, \schema
     </csvItems>
   </LOOP>
 
@@ -366,8 +364,8 @@
       <rowmaker idmaps="*" id="make-ts"/>
       <!-- parmaker can get parameters, provided by pargetter and write them as a metadata in the instance table -->
       <!-- <parmaker id="make-ts-par" idmaps="ssa_bandpass, ssa_specmid, t_min, t_max, ssa_location, mynote"> -->
-      <parmaker id="make-ts-par">
-         <!-- Add additioanal stuff to the litghtcure VOTable metadata. TODO: It would be nice to have the period and epoch there --> 
+      <parmaker id="make-ts-par" idmaps="ssa_targclass, ssa_collection, mean_mag">
+         <!-- Add additioanal stuff to the litghtcure VOTable metadata --> 
          <map dest="filter">@ssa_bandpass</map>
          <map dest="bibcode">@ssa_reference</map>
          <map dest="ra">@ssa_location.asDALI()[0]</map>
@@ -378,7 +376,18 @@
              sourceId = vars["ssa_targname"]     # in apply the current input fields are available in the vars dictionary
              targetTable.setMeta("description", base.getMetaText(targetTable, "description") +
                  " for {}".format(sourceId))
-             targetTable.setParam("comment", "This is my best comment")             
+             # retrieve the period and epoch
+             print(f'{sourceId=}')
+
+             with base.getTableConn() as conn:
+                di = next(conn.queryToDicts(
+                   "SELECT period, epoch FROM \schema.objects"
+                   " WHERE object_id=%(object)s",
+                   {"object": sourceId}))
+              
+             # targetTable.setParam("comment", "Thos is my best comment")
+             targetTable.setParam("period", di.get("period", None))
+             targetTable.setParam("epoch", di.get("epoch", None))
              targetTable.setMeta("name", str(sourceId))
              # print(f'\n \n \n {vars=} \n \n \n')
            </code>
@@ -444,7 +453,7 @@
             # Try to pull period and epoch from the objects table:
             with base.getTableConn() as conn:
               res = next(conn.query(
-                "SELECT period, epoch from personal_shug.objects where object_id=%(object)s",
+                "SELECT period, epoch from \schema.objects where object_id=%(object)s",
                 {"object": descriptor.metadata['ssa_targname']})
               )
 

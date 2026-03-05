@@ -284,7 +284,6 @@
       <param original="ts_ssa.ssa_bandpass"/>
       <param original="ts_ssa.ssa_specmid"/>
       Instead add additional parameters, which we will fill up later (while making instance) for each lightcurve separately
-      TODO add there period and epoch and invent how to get them from another table in the rhight place
       -->
       <param name="ra" type="double precision"
            ucd="pos.eq.ra"
@@ -296,8 +295,19 @@
            ucd="meta.id;instr.filter"
            description="Filter used."/>
 
-      <param original="//ssap#instance.ssa_reference" name="bibcode"/>
+      <param name="period" type="double precision"
+           ucd="src.var;time.period"
+           unit="d"
+           description="Period of the variable star; 1/frequency from the vari_eclipsing_binary table"/>
 
+      <param name="epoch" type="double precision"
+           ucd="time.epoch"
+           unit="d"
+           description="Reference time from the vari_eclipsing_binary table; JD-2455197.5"/>
+
+      <param original="//ssap#instance.ssa_reference" name="bibcode"/>
+      <param original="ts_ssa.ssa_targclass"/>
+      <param original="ts_ssa.ssa_collection"/>
       
       <mixin
           effectiveWavelength="\effective_wavelength"
@@ -367,7 +377,7 @@
       <!-- parmaker can get parameters, provided by pargetter and write them as a metadata in the instance table -->
       <!-- Think, what do we really want to keep in the final VOTable metadata
       <parmaker id="make-ts-par" idmaps="ssa_bandpass, ssa_specmid, t_min, t_max, ssa_location">  -->
-      <parmaker id="make-ts-par">
+      <parmaker id="make-ts-par" idmaps="ssa_targclass, ssa_collection">
          <!-- Add additioanal stuff to the litghtcure4 VOTable metadata. TODO: It would be nice to have the period and epoch there --> 
          <map dest="filter">@ssa_bandpass</map>
          <map dest="bibcode">@ssa_reference</map>
@@ -377,10 +387,28 @@
          <!--tut: touch manually the instance table metadata -->
          <apply name="update_metadata">
            <code>
-             sourceId = vars["ssa_targname"]     # in apply the current input fields are available in the vars dictionary
+             sourceId = vars["source_id"]     # in apply the current input fields are available in the vars dictionary
+             targname = vars["ssa_targname"]
              targetTable.setMeta("description", base.getMetaText(targetTable, "description") +
-                 " for {}".format(sourceId))
-             targetTable.setMeta("name", str(sourceId))
+                 " for {}".format(targname))
+             targetTable.setMeta("name", str(targname))
+             print(f'\n\n\n {sourceId=} {type(sourceId)=}\n\n\n')
+
+             # Try to pull period and epoch from the objects table:
+             with base.getTableConn() as conn:
+               res = next(conn.query(
+                  "SELECT frequency, reference_time from \schema.vari_eclipsing_binary_lite where source_id=%(source_id)s",
+                  {"source_id": sourceId})
+               )
+               
+             print(f'{res=}')
+
+             freq, epoch = res
+             # Check if the frequency is present and not zero:
+             period = 1.0/freq if freq else None
+             targetTable.setParam("period", period)
+             targetTable.setParam("epoch", epoch)
+             print('The finish!')
            </code>
          </apply>
       </parmaker>
@@ -622,7 +650,7 @@
       </condDesc>
 
       <condDesc>
-        <inputKey original="ssa_targname" tablehead="Target Object">
+        <inputKey original="ssa_targname" tablehead="Target Object" showItems="10">
           <values fromdb="ssa_targname from \schema.ts_ssa order by ssa_targname limit 10"/>
         </inputKey>
       </condDesc>
