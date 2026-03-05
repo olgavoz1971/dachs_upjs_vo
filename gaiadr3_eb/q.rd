@@ -378,7 +378,7 @@
       <!-- Think, what do we really want to keep in the final VOTable metadata
       <parmaker id="make-ts-par" idmaps="ssa_bandpass, ssa_specmid, t_min, t_max, ssa_location">  -->
       <parmaker id="make-ts-par" idmaps="ssa_targclass, ssa_collection">
-         <!-- Add additioanal stuff to the litghtcure4 VOTable metadata. TODO: It would be nice to have the period and epoch there --> 
+         <!-- Add additioanal stuff to the litghtcure4 VOTable metadata --> 
          <map dest="filter">@ssa_bandpass</map>
          <map dest="bibcode">@ssa_reference</map>
          <map dest="ra">@ssa_location.asDALI()[0]</map>
@@ -401,14 +401,11 @@
                   {"source_id": sourceId})
                )
                
-             print(f'{res=}')
-
              freq, epoch = res
              # Check if the frequency is present and not zero:
              period = 1.0/freq if freq else None
              targetTable.setParam("period", period)
              targetTable.setParam("epoch", epoch)
-             print('The finish!')
            </code>
          </apply>
       </parmaker>

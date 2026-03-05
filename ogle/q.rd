@@ -110,8 +110,10 @@
         verbLevel="1"
         required="False"/>   <!-- And this column is worth showing to users -->
 
+    <!--
     <column original="ogle/o#objects_all.period" name="period"/>
     <column original="ogle/o#objects_all.epoch" name="epoch"/>
+    -->
 
     <!-- ssap#fill-plainlocation mixin converts rd,dec into ssa_location
       (spoint) and ssa_region, but do not forget add aperture 
@@ -155,8 +157,8 @@
           t_max,
           q.ssa_length,
           q.mean_mag AS mean_mag,
-          o.period AS period,
-          o.epoch AS epoch,
+          -- o.period AS period,
+          -- o.epoch AS epoch,
           50000 AS accsize,
           NULL AS embargo,
           NULL AS owner,
@@ -282,10 +284,26 @@
     <table id="instance_\band_short-\\timescale" onDisk="False">
       <!-- metadata modified by sdl's dataFunction -->
       <meta name="description">The OGLE lightcurve in the \band_human filter </meta>
-      <!-- <meta name="source">2025AcA....65....1U</meta> -->
-      <!-- JK: define them _before_ mentioning them the mixin -->
+      <!-- 
       <param original="ts_ssa.ssa_bandpass"/>
-      <param original="ts_ssa.ssa_specmid"/>
+      <param original="ts_ssa.ssa_specmid"/> -->
+      <param name="ra" type="double precision"
+           ucd="pos.eq.ra"
+           description="RA of source object"/>
+      <param name="dec" type="double precision"
+           ucd="pos.eq.dec"
+           description="Dec of source object"/>
+      <param name="filter" type="text"
+           ucd="meta.id;instr.filter"
+           description="Filter used."/>
+      <param original="ogle/o#objects_all.period"/>
+      <param original="ogle/o#objects_all.epoch"/>
+      <param original="ogle/o#objects_all.ogle_vartype"/>
+      <param original="ogle/o#objects_all.subtype"/>
+      <param original="ts_ssa.ssa_targclass"/>
+      <param original="ts_ssa.ssa_collection"/>
+      <param original="//ssap#instance.ssa_reference" name="bibcode"/>
+      
         <mixin
           effectiveWavelength="\effective_wavelength"
           filterIdentifier='"\band_human"'
@@ -299,11 +317,11 @@
           time0="2400000.5"
           timescale="\\timescale"
         >//timeseries#phot-0</mixin>
-
+<!--
         <param original="ts_ssa.t_min"/>
         <param original="ts_ssa.t_max"/>
         <param original="ts_ssa.ssa_location"/>
-
+-->
         <!-- Add my column -->
         <column name="mag_err" type="double precision"
           ucd="stat.error;phot.mag"
@@ -363,17 +381,34 @@
       <rowmaker idmaps="*" id="make-ts"/>
 
       <!-- parmaker can get parameters, provided by pargetter and write them as a metadata in the instance table -->
-      <parmaker id="make-ts-par" idmaps="ssa_bandpass, ssa_specmid, t_min, t_max, ssa_location">
+      <!-- <parmaker id="make-ts-par" idmaps="ssa_bandpass, ssa_specmid, t_min, t_max, ssa_location"> -->
+      <parmaker id="make-ts-par" idmaps="ssa_targclass, ssa_collection">
+         <!-- Add additioanal stuff to the litghtcure4 VOTable metadata --> 
+         <map dest="filter">@ssa_bandpass</map>
+         <map dest="bibcode">@ssa_reference</map>
+         <map dest="ra">@ssa_location.asDALI()[0]</map>
+         <map dest="dec">@ssa_location.asDALI()[1]</map>
+          
          <!--tut: touch manually the instance table metadata -->
          <apply name="update_metadata">
            <code>
              sourceId = vars["ssa_targname"]     # in apply the current input fields are available in the vars dictionary
              targetTable.setMeta("description", base.getMetaText(targetTable, "description") +
                  " for {}".format(sourceId))
-             # JK: does not work :-( How to specifify it for each ts instance from ssa_reference?
-             # targetTable.setMeta("source", "2035AcA....65....1U")
-             # targetTable.setMeta("publication_id", "2034AcA....65....1U")
              targetTable.setMeta("name", str(sourceId))
+
+             # pull period, epoch and ogle_vartype, subtype from the objects_all table:
+             with base.getTableConn() as conn:
+               res = next(conn.query(
+                  "SELECT period, epoch, ogle_vartype, subtype from \schema.objects_all where object_id=%(object_id)s",
+                  {"object_id": sourceId})
+               )
+               
+             period, epoch, ogle_vartype, subtype = res
+             targetTable.setParam("period", period)
+             targetTable.setParam("epoch", epoch)
+             targetTable.setParam("ogle_vartype", ogle_vartype) 
+             targetTable.setParam("subtype", subtype) 
            </code>
          </apply>
       </parmaker>
@@ -433,8 +468,13 @@
             pubdid = descriptor.metadata['ssa_pubdid']
             target = descriptor.metadata['ssa_targname']
             band = descriptor.metadata['ssa_bandpass']
-            # Check if the period is present:
-            period = descriptor.metadata['period']
+            # Pull period from the objects_all table to check if it is not NULL:
+            with base.getTableConn() as conn:
+              period = next(conn.query(
+                "SELECT period from \schema.objects_all where object_id=%(object)s",
+                {"object": target})
+              )
+
             if period is None:
               # yield None
               yield DatalinkFault.NotFoundFault(target, "No period for this star known here")
