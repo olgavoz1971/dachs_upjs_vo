@@ -47,7 +47,7 @@
 
     <meta name="instrument">Warsaw 1.3m Telescope</meta>
     <meta name="facility">Las Campanas</meta>
-    <meta name="source">2015AcA....65....1U</meta>
+    <!-- <meta name="source">2015AcA....65....1U</meta> -->
 
     <meta name="creator">Soszyński, I.; Udalski, A.; Szymański, M.K.; Pietrukowicz, P.; Skowron, D.M.;
                          Skowron, J.; Poleski, R.; Mróz, P.; Kozłowski, S.; Ulaczyk, K.;
