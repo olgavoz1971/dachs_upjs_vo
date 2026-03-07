@@ -87,16 +87,16 @@
 			<meta>
 				resType: authority
 				creationDate: \metaString{authority.creationDate}
-				title: \\metaString{authority.title}{UNCONFIGURED}
+				title: UPJŠ Authority
 				shortName: \\metaString{authority.shortName}
 				subject: Authority
 				managingOrg: \\metaString{publisher}
-				referenceURL: \\metaString{authority.referenceURL}{UNCONFIGURED}
+				referenceURL: https://astronomy.science.upjs.sk
 				identifier: ivo://\getConfig{ivoa}{authority}
 				sets: ivo_managed
 			</meta>
 			<meta name="description">
-				\\metaString{authority.description}{UNCONFIGURED}
+				These records belong to UPJŠ dachs server
 			</meta>
 		</resRec>
 
@@ -183,7 +183,6 @@
 		</meta>
 
 	</STREAM>
-
 	
 	<NXSTREAM id="tapdescription">
 		<meta name="description">The \\getConfig{web}{sitename}'s TAP end point.
