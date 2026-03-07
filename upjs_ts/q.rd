@@ -710,6 +710,20 @@
 		</pythonCore>
 	</service>
 
+	<service id="ex" allowed="examples">
+		<meta name="title">Kolonica TAP examples</meta>
+		<meta name="description">This service has examples of Kolonica timeseries queries</meta>
+		<meta name="_example" title="Find objects that have VSX names">
+			Find all objects in the :taptable:`upjs_ts.objects` table,
+			as they are known variable stars:
+
+			.. tapquery::
+				SELECT TOP 100 * FROM upjs_ts.objects WHERE vsx_name IS NOT NULL
+		</meta>
+
+		<nullCore/>
+ 	</service>
+
 	<!-- ivo://astro.upjs/~?upjs_ts/q/upjs/ts/2309-R -->
 	<regSuite title="upjs_ts regression">
 		<regTest title="upjs_ts SSAP serves some data">

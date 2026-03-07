@@ -282,8 +282,8 @@
 
   <STREAM id="instance-template">
     <table id="instance_\band_short-\\timescale" onDisk="False">
-      <!-- metadata modified by sdl's dataFunction -->
       <meta name="description">The OGLE lightcurve in the \band_human filter </meta>
+      <!-- metadata modified by sdl's dataFunction -->
       <!-- 
       <param original="ts_ssa.ssa_bandpass"/>
       <param original="ts_ssa.ssa_specmid"/> -->
@@ -692,6 +692,62 @@
       -->
       <FEED source="//ssap#hcd_condDescs"/>
     </ssapCore>
+  </service>
+
+  <service id="ex" allowed="examples">
+    <meta name="title">OGLE OCVS TAP examples</meta>
+    <meta name="description">This service has the examples of OCVS tables usage</meta>
+    <meta name="_example" title="Query against ObsCore by collection">
+            Find all timeseries of Anomalous Cepheids in the Small Magellanic Cloud
+            in the :taptable:`ivoa.obscore` table using obs_collection:
+
+            .. tapquery::
+                SELECT TOP 1000 *
+                  FROM ivoa.obscore WHERE dataproduct_type='timeseries' 
+                  AND obs_collection='OGLE-SMC-ACEP'
+    </meta>
+
+    <meta name="_example" title="Filter RR Lyrae stars by period">
+            Download all RR Lyrae light curves with period in the [0.5–0.7 days]
+            range in the I band. They are kept both in :taptable:`ogle.objects_all`
+            and :taptable:`ogle.rrlyr`:
+
+            .. tapquery::
+                SELECT ssa_targname, accref, o.period FROM ogle.ts_ssa AS t
+                NATURAL JOIN ogle.rrlyr AS o
+                WHERE o.period BETWEEN 0.5 AND 0.7 AND t.ssa_bandpass = 'I'
+    </meta>
+
+    <meta name="_example" title="Variable stars with epoch in the future">
+            Find all variable stars (:taptable:`ogle.objects_all`) with epoch
+            (time of maximum brightness) in the future:
+
+            .. tapquery::
+                SELECT * from ogle.objects_all WHERE epoch > ivo_to_mjd('2027-01-01')
+    </meta>
+
+    <meta name="_example" title="Periods longer than the duration of observations">
+            Find all stars with periods longer than the duration of observations in I filter.
+            Timeseries related metadata is available in :taptable:`ogle.ts_ssa`:
+
+            .. tapquery::
+                SELECT o.* FROM ogle.objects_all o NATURAL JOIN ogle.ts_ssa t
+                WHERE t.ssa_bandpass='I' AND o.period > ssa_timeext
+    </meta>
+
+    <meta name="_example" title="Contact binaries with the longest periods">
+            Select ten eclipsing binary systems, classified as Contact with the 
+            longest periods. The specific information about eclipsing binaries is stored
+            in :taptable:`ogle.eclipsing`:
+
+            .. tapquery::
+                SELECT TOP 10 accref, preview, o.* FROM ogle.eclipsing o 
+                NATURAL JOIN ogle.ts_ssa t
+                WHERE subtype='C' AND ssa_bandpass='I' AND ssa_length>100
+                ORDER BY o.period DESC
+    </meta>
+
+    <nullCore/>
   </service>
 
   <regSuite title="ogle ts regression">
