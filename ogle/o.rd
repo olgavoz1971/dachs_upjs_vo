@@ -846,7 +846,7 @@ or through the SSA service. Light curves can be extracted using the associated D
       \objects_description
     </meta>
     <meta name="_related" title="OGLE Varable Stars Time series"
-            >\internallink{\rdId/ts-web/info}
+            >\internallink{\schema/q/ts-web/info}
     </meta>
 
     <meta>
