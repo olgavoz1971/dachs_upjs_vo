@@ -134,10 +134,10 @@
           -- 'Gaia DR3 ' || q.source_id AS ssa_targname,
           spoint(o.raj_rad, o.dej_rad) as ssa_location,
           spoly(  -- I'm not crazy enough to draw hexagons there, put up with squares
-               '{(' || (o.raj_rad - o.aperture_rad) || ',' || (o.dej_rad - o.aperture_rad) || '),'
-             || '(' || (o.raj_rad - o.aperture_rad) || ',' || (o.dej_rad + o.aperture_rad) || '),'
-             || '(' || (o.raj_rad + o.aperture_rad) || ',' || (o.dej_rad + o.aperture_rad) || '),'
-             || '(' || (o.raj_rad + o.aperture_rad) || ',' || (o.dej_rad - o.aperture_rad) || ')' || '}'
+               '{(' || (o.raj_rad - o.aperture_ra_rad) || ',' || (o.dej_rad - o.aperture_rad) || '),'
+             || '(' || (o.raj_rad - o.aperture_ra_rad) || ',' || (o.dej_rad + o.aperture_rad) || '),'
+             || '(' || (o.raj_rad + o.aperture_ra_rad) || ',' || (o.dej_rad + o.aperture_rad) || '),'
+             || '(' || (o.raj_rad + o.aperture_ra_rad) || ',' || (o.dej_rad - o.aperture_rad) || ')' || '}'
           )::spoly AS ssa_region,
           '\getConfig{web}{serverURL}/\rdId/sdl/dlget?ID=' || '\pubDIDBase' || q.source_id || '-' || q.band AS accref,
           '\pubDIDBase' || q.source_id || '-' || q.band AS ssa_pubdid,
@@ -181,8 +181,10 @@
           SELECT *,
             radians(ra) AS raj_rad,
             radians(dec) AS dej_rad,
-            radians(0.5/3600) AS aperture_rad
+            -- c.aperture_rad AS aperture_rad,
+            c.aperture_rad / cos(radians(dec)) AS aperture_ra_rad
           FROM \schema.gaia_source_lite_eb
+          CROSS JOIN (SELECT radians(1./3600) AS aperture_rad) c
         ) AS o USING (source_id)
         JOIN \schema.vari_eclipsing_binary_lite b USING (source_id)
         JOIN \schema.photosys AS p ON p.band_short = q.band

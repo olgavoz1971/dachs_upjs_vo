@@ -129,10 +129,10 @@
           ssa_targclass,
           spoint(o.raj_rad, o.dej_rad) as ssa_location,
           spoly(  -- I'm not crazy enough to draw hexagons there, put up with squares
-               '{(' || (o.raj_rad - o.aperture_rad) || ',' || (o.dej_rad - o.aperture_rad) || '),'
-             || '(' || (o.raj_rad - o.aperture_rad) || ',' || (o.dej_rad + o.aperture_rad) || '),'
-             || '(' || (o.raj_rad + o.aperture_rad) || ',' || (o.dej_rad + o.aperture_rad) || '),'
-             || '(' || (o.raj_rad + o.aperture_rad) || ',' || (o.dej_rad - o.aperture_rad) || ')' || '}'
+               '{(' || (o.raj_rad - o.aperture_ra_rad) || ',' || (o.dej_rad - o.aperture_rad) || '),'
+             || '(' || (o.raj_rad - o.aperture_ra_rad) || ',' || (o.dej_rad + o.aperture_rad) || '),'
+             || '(' || (o.raj_rad + o.aperture_ra_rad) || ',' || (o.dej_rad + o.aperture_rad) || '),'
+             || '(' || (o.raj_rad + o.aperture_ra_rad) || ',' || (o.dej_rad - o.aperture_rad) || ')' || '}'
           )::spoly AS ssa_region,
           '\getConfig{web}{serverURL}/\rdId/sdl/dlget?ID=' || '\pubDIDBase' || q.object_id || '-' || q.passband AS accref,
           '\pubDIDBase' || q.object_id || '-' || q.passband AS ssa_pubdid,
@@ -178,11 +178,18 @@
             GROUP BY l.object_id, l.passband
         ) AS q
         JOIN (
-          SELECT *,
+          SELECT object_id,
+            ssa_targclass,
+            period,
+            ssa_collection,
+            ssa_reference,
             radians(raj2000) AS raj_rad,
             radians(dej2000) AS dej_rad,
-            radians(0.5/3600) AS aperture_rad
+            c.aperture_rad AS aperture_rad,
+            c.aperture_rad / cos(radians(dej2000)) AS aperture_ra_rad
+            -- radians(1./3600) / cos(radians(dej2000)) AS aperture_ra_rad
           FROM \schema.objects_all 
+          CROSS JOIN (SELECT radians(1./3600) AS aperture_rad) c
         ) AS o USING (object_id)
         JOIN \schema.photosys AS p ON p.band_short = q.passband
       )
