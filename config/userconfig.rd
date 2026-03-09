@@ -129,6 +129,34 @@
 	<STREAM id="tapexamples">
 		<doc>Examples for TAP querying</doc>
 		
+		<meta name="_example" title="Cone selection using ssa_location">
+			Find timeseries for object by simbad resolvable name
+			using ssa_location (:taptable:`upjs_ts.ts_ssa`):
+
+			.. tapquery::
+				SELECT TOP 10 * FROM upjs_ts.ts_ssa
+					WHERE 1=CONTAINS(ivo_simbadpoint('VY UMi'), CIRCLE(ssa_location, ssa_aperture))
+		</meta>
+
+		<meta name="_example" title="Cone selection using ssa_region">
+			Find timeseries for object by simbad resolvable name using
+			ssa_region (:taptable:`upjs_ts.ts_ssa`):
+
+			.. tapquery::
+				SELECT TOP 10 * FROM upjs_ts.ts_ssa
+					WHERE 1=CONTAINS(ivo_simbadpoint('BT Tau'), ssa_region)
+		</meta>
+
+        <meta name="_example" title="Count photometric measurements">
+			How many photometric measurements of the specified star in filter I
+			and performed during phase 4 are there (:taptable:`ogle.lightcurves`)?
+
+			.. tapquery::
+				SELECT COUNT(*) FROM ogle.lightcurves l 
+				NATURAL JOIN ogle.objects_all WHERE object_id='OGLE-BLAP-051' 
+				AND passband='I' AND ogle_phase=4
+		</meta>
+
 		<meta name="_example" title="tap_schema example">
 			To locate columns "by physics", as it were, use UCD in
 			:taptable:`tap_schema.columns`.  For instance,
@@ -136,7 +164,7 @@
 			could write:
 
 			.. tapquery::
-				
+
 				SELECT * FROM tap_schema.columns
 				  WHERE description LIKE '%em.IR.8-15um%'
 		</meta>
