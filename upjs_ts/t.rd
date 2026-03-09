@@ -31,13 +31,15 @@
   <!-- Take keywords from
     http://www.ivoa.net/rdf/uat
     if at all possible -->
-  <meta name="subject">%keywords; repeat the element as needed%</meta>
+  <meta name="subject">light-curves</meta>
+  <meta name="subject">variable-stars</meta>
+  <meta name="subject">time-domain-astronomy</meta>
 
-  <meta name="creator">%authors in the format Last, F.I; Next, A.%</meta>
+  <meta name="creator">UPJŠ</meta>
+  <meta name="source">Parimucha, S., in prep.</meta>
   <meta name="instrument">ZIGA and Alica telescopes</meta>
   <meta name="facility">Kolonica</meta>
 
-  <meta name="source">Parimucha, S., in prep.</meta>
   <meta name="contentLevel">Research</meta>
   <meta name="type">Archive</meta>  <!-- or Archive, Survey, Simulation -->
 
@@ -230,6 +232,37 @@
     </scsCore>
   </service>
 -->
+
+<!--   Cone Search  -->
+  <service id="kolonica-objects" allowed="form,scs.xml">
+    <publish render="scs.xml" sets="ivo_managed"/>
+    <publish render="form" sets="local,ivo_managed"/>
+
+    <meta name="shortName">Kolonica Objects</meta>
+    <meta name="title">Kolonica timeseries Cone Search</meta>
+    <meta name="description">
+      The table with basic parameters of the observed objects
+    </meta>
+    <meta name="_related" title="Kolonica Variable Stars Time series"
+            >\internallink{\schema/q/web/info}
+    </meta>
+
+    <meta>
+      testQuery.ra: 258.55816
+      testQuery.dec: 76.70397
+      testQuery.sr:   0.0001
+    </meta>
+
+    <scsCore queriedTable="objects">
+      <FEED source="//scs#coreDescs"/>
+        <condDesc>
+          <inputKey original="vsx_name" tablehead="VSX" showItems="50">
+            <values fromdb="vsx_name from \schema.objects"/>
+          </inputKey>
+        </condDesc>
+        <condDesc buildFrom="id"/>
+    </scsCore>
+  </service>
 
   <table id="photosys" onDisk="True" adql="Hidden">
     <meta name="description">The external table with photometric systems</meta>
