@@ -121,14 +121,14 @@
 		</column>
 
 	<!-- custom columns -->
-		<column name="p_object_id" type="integer"
+		<column name="object_id" type="integer"
 			ucd="meta.id;meta.main"
 			tablehead="internal id"
 			description="Object id in the original table"
 			verbLevel="1"
 			required="True"/>	<!-- think more about this, I really need this to produce lightcurve -->
 		
-		<column name="p_mean_mag" type="double precision"
+		<column name="mean_mag" type="double precision"
 			ucd="phot.mag;stat.mean"
 			unit="mag"
 			tablehead="mean magnitude"
@@ -136,7 +136,7 @@
 			verbLevel="1"
 			required="True"/>	<!-- And this column is worth showing to users -->
 
- 		<column name="p_ra" type="double precision"
+ 		<column name="ra" type="double precision"
 			ucd="pos.eq.ra;meta.main"
 			tablehead="RA"
 			verbLevel="1"
@@ -144,7 +144,7 @@
 			description="Right ascension"
 			required="False"/>
 
-		<column name="p_dec"
+		<column name="dec"
 			type="double precision"
 			ucd="pos.eq.dec;meta.main"
 			tablehead="Dec"
@@ -163,57 +163,65 @@
 				'\getConfig{web}{serverURL}/\rdId/sdl/dlget?ID=' || o.id || '/' || p.band AS accref,
  		-->
 		<viewStatement>
-			CREATE MATERIALIZED VIEW \curtable AS (
+			CREATE MATERIALIZED VIEW \curtable AS
+			WITH q AS (
+			    SELECT
+			        l.object_id,
+			        l.photosys_id,
+			        COUNT(*) AS ssa_length,
+			        (MAX(EXTRACT(julian FROM l.dateobs AT TIME ZONE 'UTC+12')) -
+			         MIN(EXTRACT(julian FROM l.dateobs AT TIME ZONE 'UTC+12'))) AS ssa_timeExt,
+			        MIN(EXTRACT(julian FROM l.dateobs AT TIME ZONE 'UTC+12')) - 2400000.5 AS t_min,
+			        MAX(EXTRACT(julian FROM l.dateobs AT TIME ZONE 'UTC+12')) - 2400000.5 AS t_max,
+			        AVG(magnitude) AS mean_mag
+			    FROM \schema.lightcurves AS l
+			    GROUP BY l.object_id, l.photosys_id
+			)
 			SELECT
 				'Kolonica lightcurve for Gaia DR3 ' || o.gaia_name AS ssa_dstitle,
-				o.id AS p_object_id,
+				o.object_id,
 				'Gaia DR3 ' || o.gaia_name AS ssa_targname,
 				o.coordequ AS ssa_location,
-				spoly(  -- draw squares instead of hexagons
-					'{(' || (long(o.coordequ) - aperture_rad) || ',' || (lat(o.coordequ) - aperture_rad) || '),'
-					|| '(' || (long(o.coordequ) - aperture_rad) || ',' || (lat(o.coordequ) + aperture_rad) || '),'
-					|| '(' || (long(o.coordequ) + aperture_rad) || ',' || (lat(o.coordequ) + aperture_rad) || '),'
-					|| '(' || (long(o.coordequ) + aperture_rad) || ',' || (lat(o.coordequ) - aperture_rad) || ')' || '}'
-					)::spoly AS ssa_region,
-				-- NULL::spoly AS ssa_region,
-				'\getConfig{web}{serverURL}/\rdId/sdl/dlget?ID=' || '\pubDIDBase' || 'upjs/ts/' || o.id || '-' || p.band AS accref,
-				'\pubDIDBase' || 'upjs/ts/' || o.id || '-' || p.band AS ssa_pubdid,
+				spoly(
+				'{(' || (long(o.coordequ) - aperture_ra_rad) || ',' || (lat(o.coordequ) - aperture_rad) || '),'
+					|| '(' || (long(o.coordequ) - aperture_ra_rad) || ',' || (lat(o.coordequ) + aperture_rad) || '),'
+					|| '(' || (long(o.coordequ) + aperture_ra_rad) || ',' || (lat(o.coordequ) + aperture_rad) || '),'
+					|| '(' || (long(o.coordequ) + aperture_ra_rad) || ',' || (lat(o.coordequ) - aperture_rad) || ')}'
+				)::spoly AS ssa_region,
+				'\getConfig{web}{serverURL}/\rdId/sdl/dlget?ID=' ||
+				'\pubDIDBase' || 'upjs/ts/' || o.object_id || '-' || p.band AS accref,
+				'\pubDIDBase' || 'upjs/ts/' || o.object_id || '-' || p.band AS ssa_pubdid,
 				'application/x-votable+xml' AS mime,
-				'\getConfig{web}{serverURL}/\rdId/preview/qp/' || 'upjs/ts/' || o.id || '-' || p.band AS preview,
+				'\getConfig{web}{serverURL}/\rdId/preview/qp/' ||
+				'upjs/ts/' || o.object_id || '-' || p.band AS preview,
 				50000 AS accsize,
 				NULL AS embargo,
 				NULL AS owner,
-				NULL AS datalink,
+				'\getConfig{web}{serverURL}/\rdId/sdl/dlmeta?ID=' ||
+				'\pubDIDBase' || 'upjs/ts/' || o.object_id || '-' || p.band AS datalink,
 				q.ssa_timeExt,
 				'phot.mag;em.opt.' || p.band AS ssa_fluxucd,
 				p.band AS ssa_bandpass,
 				p.specmid AS ssa_specmid,
-				p.specstart AS ssa_specstart,
-				p.specend AS ssa_specend,
-				p.specend - p.specstart AS ssa_specext,
+				NULL AS ssa_specstart,
+				NULL AS ssa_specend,
+				NULL AS ssa_specext,
 				q.t_min,
 				q.t_max,
 				q.ssa_length,
-				degrees(long(o.coordequ)) AS p_ra,
-				degrees(lat(o.coordequ)) AS p_dec,
-				mean_mag AS p_mean_mag,
+				degrees(long(o.coordequ)) AS ra,
+				degrees(lat(o.coordequ)) AS dec,
+				q.mean_mag AS mean_mag,
 				'ICRS' AS ssa_csysName
-			FROM (
+			FROM q
+			JOIN \schema.objects o USING(object_id)
+			JOIN \schema.photosys p ON p.id = q.photosys_id
+
+			CROSS JOIN LATERAL (
 				SELECT
-					l.object_id, l.photosys_id,
-					COUNT(*) AS ssa_length,
-					(MAX(extract(julian from l.dateobs at time zone 'UTC+12')) -
-					MIN(extract(julian from l.dateobs at time zone 'UTC+12'))) AS ssa_timeExt,
-					MIN(extract(julian from l.dateobs at time zone 'UTC+12')) - 2400000.5 AS t_min,
-					MAX(extract(julian from l.dateobs at time zone 'UTC+12')) - 2400000.5 AS t_max,
-			    		AVG(magnitude) AS mean_mag
-				FROM \schema.lightcurves AS l
-					GROUP BY l.object_id, l.photosys_id
-				) AS q
-				JOIN \schema.objects AS o ON o.id = q.object_id
-				JOIN \schema.photosys AS p ON p.id = q.photosys_id
-				CROSS JOIN LATERAL (SELECT RADIANS(0.5/3600.) AS aperture_rad) AS c 
-			)
+				RADIANS(1.5/3600.) AS aperture_rad,
+				RADIANS(1.5/3600.) / COS(lat(o.coordequ)) AS aperture_ra_rad
+			) AS ap
 		</viewStatement>
 	</table>
 
@@ -713,13 +721,33 @@
 	<service id="ex" allowed="examples">
 		<meta name="title">Kolonica TAP examples</meta>
 		<meta name="description">This service has examples of Kolonica timeseries queries</meta>
+
 		<meta name="_example" title="Find objects that have VSX names">
-			Find all objects in the :taptable:`upjs_ts.objects` table,
-			as they are known variable stars:
+			Find lightcurves of objects having VSX names in the :taptable:`upjs_ts.objects` table;
+			these are known variable stars:
 
 			.. tapquery::
-				SELECT TOP 100 * FROM upjs_ts.objects WHERE vsx_name IS NOT NULL
+				SELECT TOP 100 o.vsx_name, s.* FROM upjs_ts.ts_ssa s 
+				NATURAL JOIN upjs_ts.objects o WHERE vsx_name IS NOT NULL
 		</meta>
+
+        <meta name="_example" title="Cone search using ssa_location">
+            Find timeseries for object by simbad resolvable name
+            using ssa_location (:taptable:`upjs_ts.ts_ssa`):
+
+            .. tapquery::
+                SELECT TOP 10 * FROM upjs_ts.ts_ssa
+                    WHERE 1=CONTAINS(ivo_simbadpoint('VY UMi'), CIRCLE(ssa_location, ssa_aperture))
+        </meta>
+
+        <meta name="_example" title="Cone search using ssa_region">
+            Find timeseries for object by simbad resolvable name using
+            ssa_region (:taptable:`upjs_ts.ts_ssa`):
+
+            .. tapquery::
+                SELECT TOP 10 * FROM upjs_ts.ts_ssa
+                    WHERE 1=CONTAINS(ivo_simbadpoint('BT Tau'), ssa_region)
+        </meta>
 
 		<nullCore/>
  	</service>

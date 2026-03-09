@@ -141,11 +141,11 @@
 
   <table id="objects" onDisk="True" adql="True">
     <meta name="table-rank">100</meta>
-    <index columns="id"/>
+    <index columns="object_id"/>
     <mixin>//scs#pgs-pos-index</mixin>
     <meta name="description">The external table with objects</meta>
 
-    <column name="id" type="integer"
+    <column name="object_id" type="integer"
       ucd="meta.id;meta.main"
       tablehead="Object Id"
       description="Internal object identifier"
@@ -260,7 +260,7 @@
             <values fromdb="vsx_name from \schema.objects"/>
           </inputKey>
         </condDesc>
-        <condDesc buildFrom="id"/>
+        <condDesc buildFrom="object_id"/>
     </scsCore>
   </service>
 
