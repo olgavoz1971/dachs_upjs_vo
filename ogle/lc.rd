@@ -115,9 +115,9 @@
 <!-- ############################## web service ################################### -->
 
   <service id="lc-web" allowed="form">
-    <meta name="title">OGLE lightcurves table</meta>
+    <meta name="title">OGLE OCVS lightcurve points</meta>
     <meta name="description">
-      This form allows the selection of Lightcurve points for the entire OGLE Varibale Star Collection. Enjoy
+      This form allows the selection of Lightcurve points for the entire OGLE Varibale Star Collection.
     </meta>
     <meta name="shortName">Lightcurves form</meta>
 

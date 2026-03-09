@@ -679,8 +679,8 @@
     <publish render="ssap.xml" sets="ivo_managed"/>
     <publish render="form" sets="ivo_managed,local" service="ts-web"/>
 
-    <meta name="title">OGLE light curves</meta>
-    <meta name="description">This service exposes OGLE photometric light curves
+    <meta name="title">OGLE OCVS SSA Lightcurve Datasets</meta>
+    <meta name="description">This service exposes OGLE photometric light curves.
           The light curves are published per-band and are also discoverable
           through ObsCore.
     </meta>
