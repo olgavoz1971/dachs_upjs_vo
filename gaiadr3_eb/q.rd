@@ -690,36 +690,40 @@
 
   <regSuite title="gaiadr3_eb ts regression">
     <regTest title="gaiadr3_eb SSAP serves some data">
-      <url REQUEST="queryData" PUBDID="ivo://upjs.jk/~?personal_shug/q/MO_Psc-R"
+      <url REQUEST="queryData" PUBDID="ivo://astro.upjs/~?gaiadr3_eb/q/1916588203329221632-BP"
       >ssa/ssap.xml</url>
       <code>
         # print(self.data)
-        # self.assertHasStrings("OGLE I lightcurve for OGLE-SMC-CEP-1759", "12.972499999999977 -72.95352777777752")
-        # self.assertHasStrings("OGLE I lightcurve for OGLE-SMC-CEP-1759")
-        self.assertHasStrings("R lightcurve for MO_Psc")
+        self.assertHasStrings("Gaia DR3 BP lightcurve for 1916588203329221632", "347.88429175172195 36.89284814821633")
       </code>
     </regTest>
 
     <regTest title="gaiadr3_eb Datalink metadata looks about right.">
-      <url ID="ivo://upjs.jk/~?personal_shug/q/AY_Lac-B">
+      <url ID="ivo://astro.upjs/~?gaiadr3_eb/q/1970282471425154432-G">
            sdl/dlmeta</url>
       <code>
         # dachs test -k datalink  q
         by_sem = self.datalinkBySemantics()
         # print(by_sem)
+        self.assertHasStrings("Gaia DR3 time series for Gaia DR3 1970282471425154432 in Gaia G",
+                              "Preview for Gaia DR3 1970282471425154432 in Gaia G",
+                              "Preview of folded lightcurve for Gaia DR3 1970282471425154432 in Gaia G")
         # self.fail("Fill this in")
         # self.assertHasStrings("Preview for OGLE-SMC-CEP-1733 in I", "OGLE time series for OGLE-SMC-CEP-1733 in I")
-        self.assertHasStrings("S.Shugarov archive time series for AY_Lac in B", "Preview for AY_Lac in B")
+        # self.assertHasStrings("S.Shugarov archive time series for AY_Lac in B", "Preview for AY_Lac in B")
       </code>
     </regTest>
 
     <regTest title="gaiadr3_eb ts_ssa TAP serves some data">
-      <url parSet="TAP" QUERY="SELECT count(*) n from personal_shug.ts_ssa where ssa_collection='PERSONAL shug'"
+      <url parSet="TAP" QUERY="select source_id, ra, dec, frequency from gaiadr3_eb.gaia_source_lite_eb
+                                     NATURAL JOIN gaiadr3_eb.vari_eclipsing_binary_lite
+                                     WHERE source_id=1007152651082368"
       >/tap/sync</url>
       <code>
         row = self.getFirstVOTableRow()
-        # print(f'n = {row["n"]}')
-        self.assertEqual(row["n"], 10)
+        # print(f'n = {row}')
+        self.assertAlmostEqual(row["frequency"], 3.311861898282655)
+        # self.assertEqual(row["n"], 10)
       </code>
     </regTest>
   </regSuite>
