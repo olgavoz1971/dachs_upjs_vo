@@ -140,11 +140,11 @@
 
 		<meta name="_example" title="Cone selection using ssa_region">
 			Find timeseries for object by simbad resolvable name using
-			ssa_region (:taptable:`upjs_ts.ts_ssa`):
+			ssa_region (:taptable:`gaiadr3_eb.ts_ssa`):
 
 			.. tapquery::
-				SELECT TOP 10 * FROM upjs_ts.ts_ssa
-					WHERE 1=CONTAINS(ivo_simbadpoint('BT Tau'), ssa_region)
+				SELECT TOP 10 * FROM gaiadr3_eb.ts_ssa
+					WHERE 1=CONTAINS(ivo_simbadpoint('AA And'), ssa_region)
 		</meta>
 
         <meta name="_example" title="Count photometric measurements">
@@ -176,7 +176,7 @@
 			.. tapquery::
 
 				SELECT count(*) as n, ivo_healpix_index(8, raj2000, dej2000) as hpx
-					FROM ogle.objects_all
+					FROM ogle.objects_all GROUP BY hpx
 		</meta>
 
 		<meta name="_example" title="ObsCore coverage">
