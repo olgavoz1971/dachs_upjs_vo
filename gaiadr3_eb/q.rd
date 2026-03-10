@@ -172,7 +172,7 @@
             l.source_id, l.band,
             count(*) AS ssa_length,
             MAX(l.obs_time) - MIN(l.obs_time) AS ssa_timeExt,
-            MIN(l.obs_time)+55197.0 AS t_min,	-- + 2455197.5 - 2400000.5 converting gaia_jd to mjd
+            MIN(l.obs_time)+55197.0 AS t_min,    -- + 2455197.5 - 2400000.5 converting gaia_jd to mjd
             MAX(l.obs_time)+55197.0 AS t_max
           FROM \schema.lightcurves AS l
             GROUP BY l.source_id, l.band
@@ -210,8 +210,18 @@
     <index columns="ssa_targname"/>
 
     <meta name="description">
-		This table contains metadata of photometric timeseries for eclipsing binaries from 
-		Gaia DR3 epoch photometry in IVOA SSA format. The actual data is available through a datalink service.
+      This table contains metadata of photometric timeseries for eclipsing binaries from 
+      Gaia DR3 epoch photometry in IVOA SSA format. The actual data is available through
+      a datalink service.
+
+        We store only fluxes, which can be turned into Vega magnitudes using Gaia DR3 zero points:
+        ZP_G_Vega = 25.6873668671 ± 0.0027553202
+        ZP_Bp_Vega = 25.3385422158 ± 0.0027901700
+        ZP_Rp_Vega = 24.7478955012 ± 0.0037793818
+
+        mag = -2.5 log10(flux) + ZP
+
+        Corresponding zero points will be stored as parameters in the lightcurve instance
     </meta>
 
     <stc>
@@ -279,7 +289,7 @@
   <STREAM id="instance-template">
     <table id="instance_\band_short" onDisk="False">
       <!-- metadata modified by sdl's dataFunction -->
-      <!--	TODO: correct zeroPointFlux -->
+      <!--  TODO: correct zeroPointFlux -->
 
       <meta name="description">Lightcurve in the \band_human filter </meta>
       <!--
@@ -306,6 +316,16 @@
            ucd="time.epoch"
            unit="d"
            description="Reference time from the vari_eclipsing_binary table; JD-2455197.5"/>
+
+      <param name="zero_point_vegamag" type="double precision"
+           ucd="phot.mag;arith.zp"
+           unit="mag"
+           description="Zero point magnitude for turning fluxes into vega magnitudes: mag = -2.5 log10(flux)+zero point"/>
+
+      <param name="zero_point_err" type="double precision"
+           ucd="stat.error;phot.mag;aurith.zp"
+           unit="mag"
+           description="Zero point magnitude uncertainty"/>
 
       <param original="//ssap#instance.ssa_reference" name="bibcode"/>
       <param original="ts_ssa.ssa_targclass"/>
@@ -406,8 +426,23 @@
              freq, epoch = res
              # Check if the frequency is present and not zero:
              period = 1.0/freq if freq else None
+             if vars["ssa_bandpass"] == 'Gaia G':
+                 zero_point_vegamag = 25.6873668671
+                 zero_point_err = 0.002755320
+             elif vars["ssa_bandpass"] == 'Gaia BP':
+                 zero_point_vegamag = 25.3385422158
+                 zero_point_err = 0.0027901700
+             elif vars["ssa_bandpass"] == 'Gaia RP':
+                 zero_point_vegamag = 24.7478955012
+                 zero_point_err = 0.0037793818
+             else:
+                 zero_point_vegamag = None
+                 zero_point_err = None
+             
              targetTable.setParam("period", period)
              targetTable.setParam("epoch", epoch)
+             targetTable.setParam("zero_point_vegamag", zero_point_vegamag)
+             targetTable.setParam("zero_point_err", zero_point_err)
            </code>
          </apply>
       </parmaker>
@@ -668,7 +703,7 @@
     <meta name="ssap.creationType">archival</meta>
     <meta name="ssap.testQuery">MAXREC=1</meta>
     <meta name="ssap.complianceLevel">query</meta>
-    <meta name="productTypesServed">timeseries</meta>	<!-- TODO: add this to other ssa-service descriptions -->
+    <meta name="productTypesServed">timeseries</meta>    <!-- TODO: add this to other ssa-service descriptions -->
 
     <publish render="ssap.xml" sets="ivo_managed"/>
     <publish render="form" sets="ivo_managed,local" service="ts-web"/>
