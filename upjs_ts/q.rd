@@ -239,8 +239,8 @@
 		</meta>
 
 		<meta name="description">
-			This table contains metadata about the photometric time
-			series from Kolonica in IVOA SSA format. The actual data is
+			This table contains metadata about the photometric timeseries 
+			from Kolonica in IVOA SSA format. The actual data is
 			available through a datalink service or in the lightcurves table.
 		</meta>
 

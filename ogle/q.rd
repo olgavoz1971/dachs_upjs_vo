@@ -214,7 +214,7 @@
     </meta>
 
     <meta name="description">
-      This table contains metadata about the OCVS photometric time series
+      This table contains metadata about the OCVS photometric timeseries
       in IVOA SSA format. The actual data is available through a datalink service.
       The original data of the OGLE Collection of Variable Stars (OCVS)
       is available at: https://www.astrouw.edu.pl/ogle/ogle4/OCVS

@@ -239,7 +239,7 @@
     <publish render="form" sets="local,ivo_managed"/>
 
     <meta name="shortName">Kolonica Objects</meta>
-    <meta name="title">Kolonica timeseries Cone Search</meta>
+    <meta name="title">Kolonica objects Cone Search</meta>
     <meta name="description">
       The table with basic parameters of the observed objects
     </meta>
