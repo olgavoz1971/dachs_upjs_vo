@@ -131,7 +131,7 @@
     <index columns="phot_bp_mean_mag"/>
     <index columns="phot_rp_mean_mag"/>
     <mixin>//scs#pgs-pos-index</mixin>
-    <publish sets="ivo_managed,local"/>
+    <!-- <publish sets="ivo_managed,local"/> -->
     <stc>
             Position ICRS BARYCENTER SPHER3 Epoch J2016.0 "ra" "dec" "parallax"
                     Error "ra_error" "dec_error" "parallax_error"
