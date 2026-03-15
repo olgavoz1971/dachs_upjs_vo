@@ -18,6 +18,8 @@
     <meta name="description">The (almost) original table M54variables.dat with identification and parameters of stars
                    from Sagittarius Dwarf Spheroidal Galaxy and its M54 Globular Cluster</meta>
 
+    <meta name="title">Stars from M54</meta>
+
     <meta name="table-rank">151</meta>
     <meta name="source">\referenceM54</meta>
 
@@ -417,9 +419,10 @@
 <!-- ==================== BLAP (Blue Large-Amplitude Pulsators)  =========================================== -->
 
   <table id="blap" onDisk="True" adql="True">
-    <meta name="description">The original table blap.dat with observational parameters of
+    <meta name="description">The original OCVS table blap.dat with observational parameters of
                              Blue Large-Amplitude Pulsators (BLAPs) </meta>
 
+    <meta name="title">Blue Large-Amplitude Pulsators (BLAPs)</meta>
     <meta name="table-rank">150</meta>
     <meta name="source">\referenceBLAP</meta>
 
