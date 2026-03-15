@@ -157,6 +157,22 @@
 				AND passband='I' AND ogle_phase=4
 		</meta>
 
+		<meta name="_example" title="Distribution of star types">
+			Estimate the distribution of sources by type.
+			Estimate sources distributeion by types. The ssa_targclass contains
+			one of the SIMBAD object type codes. 
+			We can estimate their distribution using the TABLESAMPLE method.
+			This method does not work on non-materialized views (ssa_ts is not),
+			so we will use :taptable:`ogle.raw_data` table and pretend we believe that
+			TABLESAMPLE produces truly random sampling
+
+			.. tapquery::
+				SELECT ssa_targclass, count(*) AS n
+					FROM ogle.raw_data TABLESAMPLE(0.1)
+					GROUP BY ssa_targclass
+
+		</meta>
+
 		<meta name="_example" title="tap_schema example">
 			To locate columns "by physics", as it were, use UCD in
 			:taptable:`tap_schema.columns`.  For instance,

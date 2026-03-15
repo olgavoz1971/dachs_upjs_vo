@@ -74,10 +74,11 @@
   <meta name="productType">timeseries</meta>
   <meta name="ssap.testQuery">MAXREC=1</meta>
 
-  <table id="raw_data" onDisk="True" adql="hidden"
+  <table id="raw_data" onDisk="True" adql="True"
       namePath="//ssap#instance">
     <meta name="table-rank">500</meta>
     <meta name="description">Gaia DR3 timeseries of eclipsing binaries for SSA/ObsCore ingestion</meta>
+    <meta name="title">Gaia DR3 epoch photometry of eclipsing binaries (Raw Table)</meta>
 
     <LOOP listItems="ssa_dstitle
       ssa_pubDID ssa_bandpass ssa_specmid ssa_specstart ssa_specend ssa_specext ssa_fluxucd
@@ -223,6 +224,7 @@
 
         Corresponding zero points will be stored as parameters in the lightcurve instance
     </meta>
+    <meta name="title">Gaia DR3 epoch photometry of eclipsing binaries</meta>
 
     <stc>
       TimeInterval TCB BARYCENTER "t_min" "t_max"

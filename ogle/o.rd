@@ -14,6 +14,7 @@
     <property name="forceStats">1</property>
 
     <meta name="table-rank">150</meta>
+    <meta name="title">Anomalous Cepheids</meta>
     <meta name="description">
       Coordinates and variability parameters of all Anomalous Cepheids from the OGLE Variable Star Collection.
       The table was constructed by merging all A.Cepheid-related data from all OGLE fields, such as GD, LMC, and SMC.
@@ -90,6 +91,7 @@
       Coordinates and variability parameters of all Classical Cepheids from the OGLE Variable Star Collection.
       The table was constructed by merging all Cepheid-related data from all OGLE fields, such as BLG, GD, LMC, and SMC.
     </meta>
+    <meta name="title">Classical Cepheids</meta>
 
     <!-- Pull all columns from the prototype tables: -->
     <!--
@@ -208,9 +210,10 @@
 
     <meta name="table-rank">150</meta>
     <meta name="description">
-      Coordinates and variability parameters of all Delta Sct from the OGLE Variable Star Collection.
+      Coordinates and variability parameters of all Delta Scuti from the OGLE Variable Star Collection.
       The table was constructed by merging all d Sct-related data from all OGLE fields, such as BLG, GD, LMC, and SMC.
     </meta>
+    <meta name="title">Delta Scuti stars</meta>
 
     <LOOP>
       <codeItems>
@@ -267,6 +270,7 @@
       from the OGLE Variable Star Collection.
       The table was constructed by merging all EB-related data from all OGLE fields, such as BLG, GD, LMC, and SMC.
     </meta>
+    <meta name="title">Eclipsing and Ellipsoidal Binary Systems</meta>
 
     <LOOP>
       <codeItems>
@@ -335,6 +339,7 @@
       from the OGLE Variable Star Collection.
       The table was constructed by merging all Hb-related data from all OGLE fields, such as BLG, GD, LMC, and SMC.
     </meta>
+    <meta name="title">Heartbeat Variables</meta>
 
     <LOOP>
       <codeItems>
@@ -387,6 +392,7 @@
       (LPV, Miras) from the OGLE Variable Star Collection.
       The table was constructed by merging all LPV-related data from all OGLE fields, such as BLG, GD, LMC, and SMC.
     </meta>
+    <meta name="title">Long Period Variables</meta>
 
     <LOOP>
       <codeItems>
@@ -435,6 +441,7 @@
       from the OGLE Variable Star Collection.
       The table was constructed by merging all rotating variable-related data from all OGLE fields, such as BLG, GD, LMC, and SMC.
     </meta>
+    <meta name="title">Rotating Variables</meta>
 
     <LOOP>
       <codeItems>
@@ -475,10 +482,11 @@
     <property name="forceStats">1</property>
     <meta name="table-rank">150</meta>
     <meta name="description">
-      Coordinates and variability parameters of all RR Lyr Variables
+      Coordinates and variability parameters of all RR Lyrae Variables
       from the OGLE Variable Star Collection.
       The table was constructed by merging all RR Lyr-related data from all OGLE fields, such as BLG, GD, LMC, and SMC.
     </meta>
+    <meta name="title">RR Lyrae Variables</meta>
 
     <!-- Pull references -->
     <LOOP>
@@ -572,6 +580,7 @@
       from the OGLE Variable Star Collection.
       The table was constructed by merging all Type II Cepheids-related data from all OGLE fields, such as BLG, GD, LMC, and SMC.
     </meta>
+    <meta name="title">Type II Cepheids</meta>
 
     <!-- Pull references -->
     <LOOP>
@@ -628,6 +637,7 @@
       from the OGLE Variable Star Collection.
       The table was constructed by merging all transits-related data
     </meta>
+    <meta name="title">Transiting planet candidates</meta>
 
     <!-- Pull references -->
     <LOOP>
@@ -671,6 +681,7 @@
     <meta name="description">
       Coordinates and variability parameters of of dwarf nova candidates (Cataclysmic Variables) from the OGLE Variable Star Collection.
     </meta>
+    <meta name="title">Cataclysmic Variables</meta>
 
     <!-- Pull references -->
     <LOOP>
@@ -760,6 +771,8 @@ or through the SSA service. Light curves can be extracted using the associated D
     <meta name="description">
       \objects_description
      </meta>
+
+    <meta name="title">Unified table of Variable Star Parameters from OCVS</meta>
 
     <index columns="object_id"/>
     <index columns="ssa_collection"/>

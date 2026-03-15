@@ -24,9 +24,7 @@
 
   <meta name="subject">surveys</meta>
   <meta name="subject">astrometry</meta>
-  <meta name="subject">light-curves</meta>
   <meta name="subject">variable-stars</meta>
-  <meta name="subject">time-domain-astronomy</meta>
 
   <meta name="facility">Gaia</meta>
   <meta name="instrument">Gaia</meta>
@@ -47,6 +45,7 @@
 <!-- ==============  photometric system ===================== -->
 
   <table id="photosys" onDisk="True" adql="Hidden">
+    <meta name="title">Photometric system parameters</meta>
     <meta name="description">The table with photometric system parameters</meta>
 
     <column name="band_short" type="text"
@@ -116,6 +115,7 @@
 
   <table id="gaia_source_lite_eb" onDisk="True" primary="source_id" adql="True">
     <meta name="table-rank">150</meta>
+    <meta name="title">Subset of gaiadr3.gaia_source_lite table for eclipsing binaries</meta>
     <meta name="description" format="rst">
             This is a light version of the full gaiadr3.gaia_source table,
             containing astrometric and photometric columns and most columns
@@ -657,6 +657,8 @@
     <meta name="description">This table contains all rows of Gaia DR3 epoch photometry
        for eclipsing binaries. The data were retrieved via the original Gaia DR3 DataLink service.
     </meta>
+    <meta name="title">Gaia DR3 epoch photometry for eclipsing binaries</meta>
+
     <!-- <index columns="source_id"/> -->
     <index columns="source_id, band"/>
     <index columns="obs_time"/>

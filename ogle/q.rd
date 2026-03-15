@@ -42,6 +42,7 @@
       namePath="//ssap#instance">
     <meta name="table-rank">500</meta>
     <meta name="description">A united view over original ident tables for SSA/ObsCore ingestion</meta>
+    <meta name="title">Timeseries Metadata (Raw Table)</meta>
 
     <!-- the table with your custom metadata; it is transformed
       to something palatable for SSA and Obscore using the view below -->
@@ -219,6 +220,7 @@
       The original data of the OGLE Collection of Variable Stars (OCVS)
       is available at: https://www.astrouw.edu.pl/ogle/ogle4/OCVS
     </meta>
+    <meta name="title">OGLE variable stars timeseries metadata </meta>
 
     <stc>
       TimeInterval UTC HELIOCENTER "t_min" "t_max"
