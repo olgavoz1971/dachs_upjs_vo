@@ -173,6 +173,17 @@
 
 		</meta>
 
+		<meta name="_example" title="Lightcurve length histogram">
+			Estimate the distribution of G-band lightcurve lengths from Gaia DR3
+			epoch photometry using the SSA-style table :taptable:`gaiadr3_eb.ts_ssa`: 
+
+			.. tapquery::
+				SELECT ROUND(ssa_length/2) * 2 AS bin, count(*) AS n
+					FROM gaiadr3_eb.ts_ssa
+					WHERE ssa_bandpass='Gaia G'
+					GROUP BY bin
+		</meta>
+
 		<meta name="_example" title="tap_schema example">
 			To locate columns "by physics", as it were, use UCD in
 			:taptable:`tap_schema.columns`.  For instance,

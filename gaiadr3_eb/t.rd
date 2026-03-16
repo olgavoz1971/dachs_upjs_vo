@@ -747,7 +747,7 @@
   </data>
 
 
-  <service id="dr3cone" allowed="form,scs.xml">
+  <service id="gdr3cone" allowed="form,scs.xml">
     <meta name="shortName">GDR3light SCS</meta>
     <publish render="scs.xml" sets="ivo_managed"/>
     <publish render="form" sets="local,ivo_managed"/>
