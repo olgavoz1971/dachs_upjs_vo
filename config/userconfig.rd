@@ -175,13 +175,27 @@
 
 		<meta name="_example" title="Lightcurve length histogram">
 			Estimate the distribution of G-band lightcurve lengths from Gaia DR3
-			epoch photometry using the SSA-style table :taptable:`gaiadr3_eb.ts_ssa`: 
+			epoch photometry using the SSA-style table :taptable:`gaiadr3_eb.ts_ssa`.
+			If you are curious why this distribution has two humps,
+			follow the next example, "Lightcurve Length HEALPix Map".
 
 			.. tapquery::
 				SELECT ROUND(ssa_length/2) * 2 AS bin, count(*) AS n
 					FROM gaiadr3_eb.ts_ssa
 					WHERE ssa_bandpass='Gaia G'
 					GROUP BY bin
+		</meta>
+
+		<meta name="_example" title="Lightcurve length HEALPix Map">
+			Draw HEALPix map showing the  the celestial distribution of lightcurve length.
+			To plot it in TOPCAT use Sky Plot --> Add new healpix layer, 
+			select the last table, and set HEALPix Data Level to 6:
+
+			.. tapquery::
+				SELECT round(AVG(ssa_length)) AS length, 
+					ivo_healpix_index(6, coord1(ssa_location), coord2(ssa_location)) AS hpx
+					FROM gaiadr3_eb.ts_ssa 
+					GROUP BY hpx
 		</meta>
 
 		<meta name="_example" title="tap_schema example">
