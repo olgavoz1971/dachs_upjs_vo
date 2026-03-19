@@ -301,6 +301,8 @@
           phot_unit="mag"
           refposition="HELIOCENTER"
           refframe="ICRS"
+          longitude="@ra"
+          latitude="@dec"
           time0="2400000.5"
           timescale="UTC"
       >//timeseries#phot-0</mixin>
@@ -322,18 +324,21 @@
   <!-- zero point are from https://svo2.cab.inta-csic.es/theory/fps -->
   <!-- It would be interesting to have here a mixin like  //siap#getBandFromFilter but for ssap -->
 
-  <macDef name="CCD_facility_note">Facility and telescope code: 1 = AISAS Z-600; 2 = Nauchny Z-600; 3 = Nauchny Maksutov-50; 0 = not specified</macDef>
+  <macDef name="CCD_facility_note">Facility and telescope code: 1 = CCD AISAS Z-600; \
+  2 = CCD Nauchny Z-600; 3 = CCD Nauchny Maksutov-50; 4 = PMT Nauchny Z-600; 5 =  PMT AISAS; \
+  0 = not specified</macDef>
 
   <LOOP source="instance-template">
     
     <csvItems>
             band_short, band_human, band_ucd, effective_wavelength, zero_point_flux, facility_note, sc
-            U,          Bessell/U, em.opt.U, 3.6e-7, 1699.71, \CCD_facility_note, \schema
-            B,          Bessell/B, em.opt.B, 4.4e-7, 3908.46, \CCD_facility_note, \schema
-            V,          Bessell/V, em.opt.V, 5.4e-7, 3630.22, \CCD_facility_note, \schema
-            R,          Bessell/R, em.opt.R, 6.2e-7, 3056.93, \CCD_facility_note, \schema
-            I,          Bessell/I, em.opt.I, 8.3e-7, 2415.65, \CCD_facility_note, \schema
-            pg,         pg.plate, em.opt.B, 5.0e-7, 3900, Photo Archive code: 1 = SAI; 2 = Sonneberg; 3 = Odessa; 4 = Skalnaté Pleso, \schema
+            U,          Generic/Bessell.U, em.opt.U, 3.6e-7, 1699.71, \CCD_facility_note, \schema
+            B,          Generic/Bessell.B, em.opt.B, 4.4e-7, 3908.46, \CCD_facility_note, \schema
+            V,          Generic/Bessell.V, em.opt.V, 5.4e-7, 3630.22, \CCD_facility_note, \schema
+            R,          Generic/Bessell.R, em.opt.R, 6.2e-7, 3056.93, \CCD_facility_note, \schema
+            I,          Generic/Bessell.I, em.opt.I, 8.3e-7, 2415.65, \CCD_facility_note, \schema
+            DR,         Instrum.R, em.opt.R, 6.2e-7, None, "Instrumental magnitudes nearby R band, PMT AISAS", \schema
+            pg,         Photographic, em.opt.B, 5.0e-7, None, Photo Archive code: 1 = SAI; 2 = Sonneberg; 3 = Odessa; 4 = Skalnaté Pleso, \schema
     </csvItems>
   </LOOP>
 
@@ -397,7 +402,7 @@
   </data>
 
   <service id="sdl" allowed="dlget,dlmeta,static">
-    <meta name="title">S. Shugarov light curves Datalink Service</meta>
+    <meta name="title">personal_shug light curves Datalink Service</meta>
     <meta name="shortName">TS Datalink</meta>
     <meta name="description">
       This service produces time series datasets for lightcurves
@@ -578,7 +583,7 @@
             <setup>
                 <code>
                     from gavo.svcs import UnknownURI
-                    from gavo.helpers.processing import SpectralPreviewMaker
+                    from gavo.helpers.processing import OneDPreviewMaker	# SpectralPreviewMaker
                 </code>
             </setup>
             <code>
@@ -598,7 +603,9 @@
               # Invert y-axis:
               jds, mags = zip(*res)
               lc = list(zip(jds, [-m for m in mags]))
-              return "image/png", SpectralPreviewMaker.get2DPlot(lc, linear=True, connectPoints=False)
+
+              return "image/png", OneDPreviewMaker.get2DPlot(lc, linear=True, connectPoints=False)
+              # return "image/png", SpectralPreviewMaker.get2DPlot(lc, linear=True, connectPoints=False)
             </code>
         </coreProc>
     </pythonCore>
@@ -685,7 +692,7 @@
       <code>
         row = self.getFirstVOTableRow()
         # print(f'n = {row["n"]}')
-        self.assertEqual(row["n"], 10)
+        self.assertEqual(row["n"], 24)
       </code>
     </regTest>
   </regSuite>
