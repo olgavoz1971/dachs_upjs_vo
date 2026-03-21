@@ -215,7 +215,7 @@
     </meta>
 
     <meta name="description">
-      This table contains metadata about the OCVS photometric timeseries
+      This table contains metadata about the OCVS photometric time series
       in IVOA SSA format. The actual data is available through a datalink service.
       The original data of the OGLE Collection of Variable Stars (OCVS)
       is available at: https://www.astrouw.edu.pl/ogle/ogle4/OCVS
@@ -357,8 +357,8 @@
       <LOOP source="instance-template">
         <csvItems>
             band_short, band_human, band_ucd, effective_wavelength, zero_point_flux
-            V,          Bessell/V, em.opt.V, 5.4e-7, 3630.22
-            I,          Bessell/I, em.opt.I, 8.3e-7, 2415.65
+            V,          Generic/Bessell.V, em.opt.V, 5.4e-7, 3630.22
+            I,          Generic/Bessell.I, em.opt.I, 8.3e-7, 2415.65
         </csvItems>
       </LOOP>
     </events> 

@@ -367,9 +367,9 @@
   <LOOP source="instance-template">
     <csvItems>
             band_short, band_human, band_ucd, effective_wavelength, zero_point_flux
-            G,          Gaia G,  em.opt, 5.82e-7, 3228.75
-            BP,         Gaia Bp, em.opt.B, 5.04e-7, 3552.01
-            RP,         Gaia Rp, em.opt.R, 7.62e-7, 2554.95
+            G,          GAIA/GAIA3.G,  em.opt, 5.82e-7, 3228.75
+            BP,         GAIA/GAIA3.Gbp, em.opt.B, 5.04e-7, 3552.01
+            RP,         GAIA/GAIA3.Grp, em.opt.R, 7.62e-7, 2554.95
     </csvItems>
   </LOOP>
 
