@@ -51,6 +51,8 @@
   <meta name="subject">variable-stars</meta>
   <meta name="subject">time-domain-astronomy</meta>
 
+  <meta name="productType">timeseries</meta>
+
   <meta name="facility">Gaia</meta>
   <meta name="instrument">Gaia</meta>
 

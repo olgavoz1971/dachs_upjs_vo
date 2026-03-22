@@ -14,6 +14,7 @@
   <meta name="ssap.creationType">archival</meta>
   <meta name="productType">timeseries</meta>
   <meta name="ssap.testQuery">MAXREC=1</meta>
+  <meta name="productType">timeseries</meta>
 
   <execute on="loaded" title="define id parse functions"><job>
     <code><![CDATA[

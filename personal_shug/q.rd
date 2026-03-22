@@ -21,6 +21,7 @@
   <meta name="subject">light-curves</meta>
   <meta name="subject">variable-stars</meta>
   <meta name="subject">time-domain-astronomy</meta>
+  <meta name="productType">timeseries</meta>
 
   <meta name="creator">Shugarov, S. Yu.</meta>
   <meta name="instrument">Various</meta>

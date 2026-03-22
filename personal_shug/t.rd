@@ -5,7 +5,6 @@
 
   <meta name="title">Personal archive of S.Yu.Shugarov</meta>
 
-  <meta name="subject">light-curves</meta>
   <meta name="subject">variable-stars</meta>
   <meta name="subject">time-domain-astronomy</meta>
 
