@@ -143,6 +143,10 @@
     <meta name="table-rank">100</meta>
     <index columns="object_id"/>
     <mixin>//scs#pgs-pos-index</mixin>
+    <stc>
+      Position ICRS "ra" "dec"
+    </stc>
+
     <meta name="description">The external table with objects</meta>
 
     <column name="object_id" type="integer"
@@ -204,6 +208,10 @@
       description="Target description"
       required="False"/>
   </table>
+
+  <coverage>
+    <updater sourceTable="objects"/>
+  </coverage>
 
   <data id="import_objects">
     <make table="objects">

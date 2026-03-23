@@ -37,8 +37,8 @@
   </meta>
 
   <coverage>  
-        <temporal>2015-06-01 2015-06-01</temporal>
-        <spatial>0/0-11</spatial>
+        <!-- <temporal>2015-06-01 2015-06-01</temporal>
+        <spatial>0/0-11</spatial> -->
         <spectral>1.986e-19 4.966e-19</spectral>
   </coverage>
 
@@ -388,6 +388,10 @@
         verbLevel="1"/>
   </table>
 
+  <coverage>
+    <updater sourceTable="gaia_source_lite_eb"/>
+  </coverage>
+
   <data id="import_gaia_source">
     <sources item="data/gaia_source_lite_eb.csv"/>
     <csvGrammar delimiter="," strip="True"/>
@@ -652,7 +656,7 @@
 
 <!-- ============================= lightcurves ====================== -->
 
-  <table id="lightcurves" onDisk="True" adql="True">
+  <table id="lightcurves" onDisk="True" adql="True" nrows="267547343">
     <meta name="table-rank">200</meta>
     <meta name="description">This table contains all rows of Gaia DR3 epoch photometry
        for eclipsing binaries. The data were retrieved via the original Gaia DR3 DataLink service.

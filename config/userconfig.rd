@@ -147,7 +147,7 @@
 					WHERE 1=CONTAINS(ivo_simbadpoint('AA And'), ssa_region)
 		</meta>
 
-        <meta name="_example" title="Count photometric measurements">
+		<meta name="_example" title="Count photometric measurements">
 			How many photometric measurements of the specified star in filter I
 			and performed during phase 4 are there (:taptable:`ogle.lightcurves`)?
 
@@ -212,7 +212,8 @@
 
 		<meta name="_example" title="HEALPix map">
 			To draw HEALPix map of the OCVS :taptable:`ogle.objects_all`, use TOPCAT's 
-			Sky Plot --> Add new healpix layer control with results of the query:
+			Sky Plot --> Add new healpix layer control with results of the query.
+			Before running the query, set TOPCAT "Max Rows" to "max"
 
 			.. tapquery::
 
@@ -223,7 +224,8 @@
 		<meta name="_example" title="ObsCore coverage">
 			To see actual coverage of Kolonica observations (both images and
 			timeseries), you can plot the result of this query against :taptable:`ivoa.obscore`
-			table with TOPCAT (Sky Plot --> Add a new area plot control):
+			table with TOPCAT (Sky Plot --> Add a new area plot
+			control). Before running the query, set TOPCAT "Max Rows" to "max":
 
 			.. tapquery::
 
