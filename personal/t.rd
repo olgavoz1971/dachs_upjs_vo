@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resource schema="personal_shug" resdir=".">
+<resource schema="personal" resdir=".">
   <meta name="schema-rank">100</meta>
   <meta name="creationDate">2026-02-19T12:38:44Z</meta>
 
-  <meta name="title">Personal archive of S.Yu.Shugarov</meta>
+  <meta name="title">Observations from personal collections</meta>
 
+  <meta name="subject">light-curves</meta>
   <meta name="subject">variable-stars</meta>
   <meta name="subject">time-domain-astronomy</meta>
 
@@ -158,6 +159,10 @@
       required="False"/>
   </table>
 
+  <coverage>
+    <updater sourceTable="objects"/>
+  </coverage>
+
   <data id="import_objects">
     <make table="objects">
       <script lang="python" type="postCreation" name="Load dump">
@@ -173,17 +178,17 @@
   </data>
 
 <!--   Cone Search  -->
-  <service id="shug-objects" allowed="form,scs.xml">
+  <service id="personal-objects" allowed="form,scs.xml">
     <publish render="scs.xml" sets="ivo_managed"/>
     <publish render="form" sets="local,ivo_managed"/>
 
-    <meta name="shortName">All shug Objects</meta>
-    <meta name="title">personal_shug objects Cone Search</meta>
+    <meta name="shortName">PersonalObsObj</meta>
+    <meta name="title">Cone Search on Observations from Personal Collections</meta>
     <meta name="description">
       The table with basic parameters of the observed objects
     </meta>
-    <meta name="_related" title="shug Varable Stars Time series"
-            >\internallink{\rdId/ts-web/info}
+    <meta name="_related" title="Timeseries from personal collections"
+            >\internallink{\schema/q/ts-web/info}
     </meta>
 
     <meta>
@@ -267,10 +272,10 @@
     </make>
   </data>
 
-  <regSuite title="personal_shug regression">
-    <regTest title="personal_shug objects table serves some data">
+  <regSuite title="personal collections regression">
+    <regTest title="personal collections objects table serves some data">
       <url parSet="TAP"
-        QUERY="SELECT * FROM personal_shug.objects WHERE gaia_id='1656754192432536832'"
+        QUERY="SELECT * FROM personal.objects WHERE gaia_id='2072769054079863040'"
       >/tap/sync</url>
       <code>
         # The actual assertions are pyUnit-like.  Obviously, you want to
@@ -278,14 +283,14 @@
         # against.
         row = self.getFirstVOTableRow()
         # print(row)
-        self.assertAlmostEqual(row["ra"], 259.244800000003)
-        self.assertAlmostEqual(row["dec"], 76.53109999999987)
+        self.assertAlmostEqual(row["raj2000"], 149.27090271051)
+        self.assertAlmostEqual(row["dej2000"], 39.82668781751)
       </code>
     </regTest>
 
-    <regTest title="personal_shug objects table seems to contain the correct number of rows">
+    <regTest title="personal collections objects table seems to contain the correct number of rows">
       <url parSet="TAP"
-        QUERY="SELECT COUNT(*) AS nrows FROM personal_shug.objects"
+        QUERY="SELECT COUNT(*) AS nrows FROM personal.objects"
       >/tap/sync</url>
       <code>
         # The actual assertions are pyUnit-like.  Obviously, you want to
@@ -293,38 +298,10 @@
         # against.
         row = self.getFirstVOTableRow()
         # print(row)
-        self.assertTrue(row["nrows"] == 14331)
+        self.assertTrue(row["nrows"] == 5)
       </code>
     </regTest>
-
-    <regTest title="personal_shug lightcurves table serves some data">
-      <url parSet="TAP"
-        QUERY="select l.dateobs, l.image_filename FROM personal_shug.lightcurves l join personal_shug.objects o on l.object_id = o.id  WHERE o.gaia_id='1656754192432536832' and l.dateobs='2021-10-22 22:37:08.832'"
-      >/tap/sync</url>
-      <code>
-        # The actual assertions are pyUnit-like.  Obviously, you want to
-        # remove the print statement once you've worked out what to test
-        # against.
-        row = self.getFirstVOTableRow()
-        # print(row)
-        self.assertEqual(row["image_filename"], 'upjs_img/data/Alica/2021-10-22/2021-10-22T20:36:42_r.fit.fz')
-      </code>
-    </regTest>
-
-    <regTest title="personal_shug photosys table serves some data">
-      <url parSet="TAP"
-        QUERY="SELECT * FROM personal_shug.photosys WHERE band='I'"
-      >/tap/sync</url>
-      <code>
-        # The actual assertions are pyUnit-like.  Obviously, you want to
-        # remove the print statement once you've worked out what to test
-        # against.
-        row = self.getFirstVOTableRow()
-        # print(row)
-        self.assertEqual(row["description"], "BESSELL")
-      </code>
-    </regTest>
-
+   
     <!-- add more tests: extra tests for the web side, custom widgets,
       rendered outputFields... -->
   </regSuite>

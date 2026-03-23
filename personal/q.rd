@@ -1,19 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resource schema="personal_shug" resdir=".">
+<resource schema="personal" resdir=".">
   <meta name="schema-rank">100</meta>
   <meta name="creationDate">2026-02-19T08:41:36Z</meta>
   <macDef name="pubDIDBase">ivo://\getConfig{ivoa}{authority}/~?\rdId/</macDef>
 
-  <meta name="title">Personal archive of S.Yu.Shugarov</meta>
+  <meta name="title">Observations from personal collections</meta>
   <meta name="description">
     This project is dedicated to publishing observations of variable stars, 
     in particular light curves, from personal archives. 
     All data has been published with the permission of the respective owners.
-
-    The archive presented here comprises the results of observations obtained 
-    with various small telescopes by S. Yu. Shugarov and colleagues. 
-    The majority of the data result from monitoring programmes of cataclysmic 
-    variable stars in the UBVRI photometric bands
   </meta>
   <!-- Take keywords from
     http://www.ivoa.net/rdf/uat
@@ -21,9 +16,8 @@
   <meta name="subject">light-curves</meta>
   <meta name="subject">variable-stars</meta>
   <meta name="subject">time-domain-astronomy</meta>
-  <meta name="productType">timeseries</meta>
 
-  <meta name="creator">Shugarov, S. Yu.</meta>
+  <meta name="creator">Shugarov, S. Yu.; Vozyakova, O.</meta>
   <meta name="instrument">Various</meta>
   <meta name="facility">Various</meta>
 
@@ -202,7 +196,7 @@
     </meta>
 
     <meta name="description">
-      This table contains metadata about the photometric time series from personal archive of S.Shugarov
+      This table contains metadata for the photometric time series from personal collections
       in IVOA SSA format. The actual data is available through a datalink service.
     </meta>
 
@@ -221,6 +215,7 @@
         required="True">
     </column>
 
+ <!-- fill ssa_creator with information from the object table -->
     <mixin
       sourcetable="raw_data"
       copiedcolumns="*"
@@ -231,7 +226,7 @@
       ssa_fluxunit="'mag'"
       ssa_spectralucd="NULL"
       ssa_spectralunit="NULL"
-      ssa_creator="'Shugarov, S.'"
+      ssa_creator ="'Shugarov, S.'"
       ssa_csysName="'ICRS'"
       ssa_datasource="'pointed'"
       mime="'application/x-votable+xml'"
@@ -403,7 +398,7 @@
   </data>
 
   <service id="sdl" allowed="dlget,dlmeta,static">
-    <meta name="title">personal_shug light curves Datalink Service</meta>
+    <meta name="title">personal light curves Datalink Service</meta>
     <meta name="shortName">TS Datalink</meta>
     <meta name="description">
       This service produces time series datasets for lightcurves
@@ -425,7 +420,7 @@
           passband = descriptor.metadata["ssa_bandpass"]
           yield descriptor.makeLink(
               descriptor.metadata["accref"],
-              description=f"S.Shugarov archive time series for {targname} in {passband}",
+              description=f"Time series for {targname} in {passband}",
               contentType="application/x-votable+xml",
               contentLength="15000",
               contentQualifier="#timeseries")
@@ -613,8 +608,8 @@
   </service>
 
   <service id="ts-web" defaultRenderer="form">
-    <meta name="shortName">Shug Web</meta>
-    <meta name="title">Time Series Browser Service</meta>
+    <meta name="shortName">Personal Web</meta>
+    <meta name="title">Browser Service for timeseries from personal collections</meta>
 
     <dbCore queriedTable="ts_ssa">
       <condDesc buildFrom="ssa_location"/>
@@ -644,13 +639,13 @@
   </service>
 
   <service id="ssa" allowed="form,ssap.xml">
-    <meta name="shortName">Shug TS SSAP</meta>
+    <meta name="shortName">Personal TS SSAP</meta>
     <meta name="ssap.complianceLevel">full</meta>
 
     <publish render="ssap.xml" sets="ivo_managed"/>
     <publish render="form" sets="ivo_managed,local" service="ts-web"/>
 
-    <meta name="title">Personal archive light curves</meta>
+    <meta name="title">Lightcurves from Personal Collections</meta>
     <meta name="description">This service exposes photometric light curves.
           The light curves are published per-band and are also discoverable
           through ObsCore.
@@ -665,9 +660,9 @@
     </ssapCore>
   </service>
 
-  <regSuite title="shug regression">
-    <regTest title="personal_shug SSAP serves some data">
-      <url REQUEST="queryData" PUBDID="ivo://upjs.jk/~?personal_shug/q/MO_Psc-R"
+  <regSuite title="personal regression">
+    <regTest title="personal SSAP serves some data">
+      <url REQUEST="queryData" PUBDID="ivo://upjs.jk/~?personal/q/MO_Psc-R"
       >ssa/ssap.xml</url>
       <code>
         # print(self.data)
@@ -675,20 +670,20 @@
       </code>
     </regTest>
 
-    <regTest title="shug Datalink metadata looks about right.">
-      <url ID="ivo://upjs.jk/~?personal_shug/q/AY_Lac-B">
+    <regTest title="personal Datalink metadata looks about right.">
+      <url ID="ivo://upjs.jk/~?personal/q/AY_Lac-B">
            sdl/dlmeta</url>
       <code>
         # dachs test -k datalink  q
         by_sem = self.datalinkBySemantics()
         # print(by_sem)
         # self.fail("Fill this in")
-        self.assertHasStrings("S.Shugarov archive time series for AY_Lac in B", "Preview for AY_Lac in B")
+        self.assertHasStrings("Time series for AY_Lac in B", "Preview for AY_Lac in B")
       </code>
     </regTest>
 
-    <regTest title="shug ts_ssa TAP serves some data">
-      <url parSet="TAP" QUERY="SELECT count(*) n from personal_shug.ts_ssa where ssa_collection='PERSONAL shug'"
+    <regTest title="personal ts_ssa TAP serves some data">
+      <url parSet="TAP" QUERY="SELECT count(*) n from personal.ts_ssa where ssa_collection='PERSONAL'"
       >/tap/sync</url>
       <code>
         row = self.getFirstVOTableRow()
