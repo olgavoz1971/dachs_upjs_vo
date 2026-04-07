@@ -45,6 +45,43 @@ param_map = {
     "ZeroPointType": "zeropoint_type",
 }
 
+# Mapping filte-d (FPS code) to human-readable band
+band_map = {
+    "GAIA/GAIA3.G": "Gaia G",
+    "GAIA/GAIA3.Grp": "Gaia RP",
+    "GAIA/GAIA3.Gbp": "Gaia BP",
+    "GAIA/GAIA3.Grvs": "Gaia RVS",
+    "SLOAN/SDSS.u": "sdss_u",
+    "SLOAN/SDSS.g": "sdss_g",
+    "SLOAN/SDSS.r": "sdss_r",
+    "SLOAN/SDSS.i": "sdss_i",
+    "SLOAN/SDSS.z": "sdss_z",
+    "TESS/TESS.Red": "TESS"
+}
+
+
+band_ucd = [
+        ((300, 400), "opt.u"),
+        ((400, 500), "opt.b"),
+        ((500, 600), "opt.v"),
+        ((600, 750), "opt.r"),
+        ((750, 1000), "opt.i"),
+    ]
+
+def get_band_ucd(lambda_eff_angstrom):
+    """
+    Return UCD for photometric band based on effective wavelength (Angstrom).
+    """
+
+    # convert Å --> nm
+    wl_nm = lambda_eff_angstrom * 1e-1
+
+    for (lo, hi), ucd in band_ucd:
+        if lo <= wl_nm < hi:
+            return ucd
+
+    return None  # or "em.wl" if you prefer default
+
 tree = ET.parse(xml_file)
 root = tree.getroot()
 
@@ -56,12 +93,18 @@ for param in root.iter("PARAM"):
     if name in param_map:
         params[param_map[name]] = value
 
-# Add FPS URL
 if "filter_id" in params:
     params["fps_url"] = (
         "https://svo2.cab.inta-csic.es/svo/theory/fps/fps.php?ID="
         + params["filter_id"]
     )
+
+band = params.get("band", None)
+
+if "filter_id" in params:
+    params["band"] = band_map.get(params["filter_id"], band)
+
+params["band_ucd"] = get_band_ucd(float(params.get("wavelength_ref",  None)))
 
 # -------- Write metadata CSV --------
 columns = list(params.keys())

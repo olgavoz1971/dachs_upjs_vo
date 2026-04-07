@@ -242,6 +242,13 @@ projects, you'll still have to read documentation... -->
       verbLevel="1"
     />
 
+    <!-- Non-FPS column -->
+    <column name="band_ucd" type="text"
+      ucd="meta.ucd"
+      tablehead="Band ucd"
+      description="UCD of the photometric band"
+      required="True"/>
+
   </table>
 
   <data id="import">
