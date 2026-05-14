@@ -243,16 +243,6 @@
 			moreExamples.title: Kolonica lightcurves queries
 		</meta>
 
-		<meta>
-			moreExamples: https://dc.g-vo.org/static/obscore-examples.shtml
-			moreExamples.title: ObsCore queries
-		</meta>
-
-		<meta>
-			moreExamples: https://dc.g-vo.org/misc/udfexamples/examples
-			moreExamples.title: Local UDFs
-		</meta>
-
 	</STREAM>
 	
 	<NXSTREAM id="tapdescription">
