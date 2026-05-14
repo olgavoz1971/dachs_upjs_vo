@@ -38,7 +38,7 @@
  	<meta name="subject">light-curves</meta>
  	<meta name="subject">variable-stars</meta>
 	<meta name="subject">time-domain-astronomy</meta>
-    <meta name="productType">timeseries</meta>
+	<meta name="productType">timeseries</meta>
 
 	<meta name="creator">UPJŠ</meta>
 	<meta name="source">Parimucha, S., in prep.</meta>

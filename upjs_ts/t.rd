@@ -358,7 +358,7 @@
 
     <regTest title="upjs_ts lightcurves table serves some data">
       <url parSet="TAP"
-        QUERY="select l.dateobs, l.image_filename FROM upjs_ts.lightcurves l join upjs_ts.objects o on l.object_id = o.id  WHERE o.gaia_name='1656754192432536832' and l.dateobs='2021-10-22 22:37:08.832'"
+        QUERY="select l.dateobs, l.image_filename FROM upjs_ts.lightcurves l join upjs_ts.objects o on l.object_id = o.object_id  WHERE o.gaia_name='1656754192432536832' and l.dateobs='2021-10-22 22:37:08.832'"
       >/tap/sync</url>
       <code>
         # The actual assertions are pyUnit-like.  Obviously, you want to

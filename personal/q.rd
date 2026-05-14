@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resource schema="personal" resdir=".">
-  <meta name="schema-rank">100</meta>
+  <meta name="schema-rank">160</meta>
   <meta name="creationDate">2026-02-19T08:41:36Z</meta>
   <macDef name="pubDIDBase">ivo://\getConfig{ivoa}{authority}/~?\rdId/</macDef>
 
@@ -662,7 +662,7 @@
 
   <regSuite title="personal regression">
     <regTest title="personal SSAP serves some data">
-      <url REQUEST="queryData" PUBDID="ivo://upjs.jk/~?personal/q/MO_Psc-R"
+      <url REQUEST="queryData" PUBDID="ivo://astro.upjs/~?personal/q/MO_Psc-R"
       >ssa/ssap.xml</url>
       <code>
         # print(self.data)
@@ -671,7 +671,7 @@
     </regTest>
 
     <regTest title="personal Datalink metadata looks about right.">
-      <url ID="ivo://upjs.jk/~?personal/q/AY_Lac-B">
+      <url ID="ivo://astro.upjs/~?personal/q/AY_Lac-B">
            sdl/dlmeta</url>
       <code>
         # dachs test -k datalink  q

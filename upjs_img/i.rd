@@ -161,7 +161,7 @@
   </service>
 
   <service id="unpack" allowed="qp">
-    <meta name="title">Experimenting with fz unpacking on the fly</meta>
+    <meta name="title">fz unpacking on the fly</meta>
     <property key="queryField">accref</property>
     <pythonCore>
       <inputTable>
@@ -214,7 +214,10 @@
     element. -->
   <service id="browse" allowed="form">
     <meta name="shortName">Kolonica web form</meta>
-    <meta name="title">Browser interface for searching Kolonica fits images</meta>
+    <meta name="title">Kolonica fits images browser interface</meta>
+    <meta name="_related" title="Kolonica Variable Stars Time series"
+            >\internallink{upjs_ts/q/web/info}
+    </meta>
 
     <dbCore queriedTable="main">
       <condDesc original="//siap2#humanInput"/>
@@ -238,6 +241,10 @@
     <meta name="description">
       The images in this collection were acquired to monitor selected sky fields around 
       eclipsing binary stars at the Kolonica Observatory, Slovakia. 
+    </meta>
+
+    <meta name="_related" title="Kolonica Variable Stars Time series"
+            >\internallink{upjs_ts/q/web/info}
     </meta>
 
     <!-- other sia.types: Cutout, Mosaic, Atlas -->
