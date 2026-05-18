@@ -1,0 +1,18 @@
+1) ./fetch_filters.sh
+
+# Perhaps, you want to add or correct the Band param, sort of:
+	<PARAM name="Band" value="pg" ucd="instr.bandpass" utype="photdm:PhotometryFilter.bandName" datatype="char" arraysize="*"/>
+or
+    <PARAM name="Band" value="sdss_u" ucd="instr.bandpass" utype="photdm:PhotometryFilter.bandName" datatype="char" arraysize="*"/>
+
+Alternatively, it can be done by mapping in xml2csv.py script
+
+# In case the "PhotSystem" parameter is absent in the FPS, you should insert a kind of
+
+   <PARAM name="PhotSystem" value="Photographic" utype="photdm:PhotometricSystem.description" datatype="char" arraysize="*">
+       <DESCRIPTION>Photometric system</DESCRIPTION>
+    </PARAM>
+
+2) ./xml2csv.sh
+
+3) dachs imp q.rd

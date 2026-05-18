@@ -56,7 +56,11 @@ band_map = {
     "SLOAN/SDSS.r": "sdss_r",
     "SLOAN/SDSS.i": "sdss_i",
     "SLOAN/SDSS.z": "sdss_z",
-    "TESS/TESS.Red": "TESS"
+    "TESS/TESS.Red": "TESS",
+    "Palomar_Arp1961.103aO_atm": "pg",
+    "Palomar_Arp1961.103aO_B": "pg",
+    "Palomar_Arp1961.103aO_Sch": "pg",
+    "Palomar_Arp1961.103aO_WG2": "pg",
 }
 
 

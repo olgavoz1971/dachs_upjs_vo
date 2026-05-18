@@ -1,6 +1,6 @@
 #!/bin/bash
 
-filters=(
+base_filters=(
   "GAIA/GAIA3.G"
   "GAIA/GAIA3.Gbp"
   "GAIA/GAIA3.Grp"
@@ -16,12 +16,19 @@ filters=(
   "SLOAN/SDSS.i"
   "SLOAN/SDSS.z"
   "TESS/TESS.Red"
+  "Palomar/Arp1961.103aO_atm"
+  "Palomar/Arp1961.103aO_Sch"
+  "Palomar/Arp1961.103aO_WG2"
+  "Palomar/Arp1961.103aO_B"
+)
+
+more_filters=(
 )
 
 base_url="https://svo2.cab.inta-csic.es/svo/theory/fps/fps.php?ID="
 
-for f in "${filters[@]}"; do
+for f in "${base_filters[@]}"; do
   # replace '/' to make valid filename
-  safe_name="${f//\//_}"
+  safe_name="../data/${f//\//_}"
   curl -o "${safe_name}.xml" "${base_url}${f}"
 done
