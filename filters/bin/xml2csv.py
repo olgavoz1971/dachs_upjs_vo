@@ -65,9 +65,9 @@ band_map = {
 
 
 band_ucd = [
-        ((300, 400), "opt.u"),
-        ((400, 500), "opt.b"),
-        ((500, 600), "opt.v"),
+        ((300, 380), "opt.u"),
+        ((380, 500), "opt.b"),	# we should  catch Palomar/Arp1961.103aO_atm in this interval (λref = 3839.80)
+        ((500, 600), "opt.v"), 
         ((600, 750), "opt.r"),
         ((750, 1000), "opt.i"),
     ]
