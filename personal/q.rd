@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resource schema="personal" resdir=".">
-  <meta name="schema-rank">160</meta>
+  <meta name="schema-rank">100</meta>
   <meta name="creationDate">2026-02-19T08:41:36Z</meta>
   <macDef name="pubDIDBase">ivo://\getConfig{ivoa}{authority}/~?\rdId/</macDef>
 
@@ -61,16 +61,17 @@
     <meta name="description">A united view over original ident tables for SSA/ObsCore ingestion</meta>
 
     <LOOP listItems="ssa_dstitle ssa_targname ssa_targclass
-      ssa_pubDID ssa_bandpass ssa_specmid ssa_specstart ssa_specend ssa_specext ssa_fluxucd
+      ssa_pubDID ssa_bandpass ssa_specmid ssa_specstart ssa_specend ssa_specext
       ssa_timeExt ssa_length ssa_collection ssa_reference">
       <events>
         <column original="\item"/>
       </events>
     </LOOP>
+    <!-- without this "False" DaCHS refuses to pull this colum as a param in the lc_instance -->
+    <column original="//ssap#instance.ssa_fluxucd" required="False"/>
     <column original="//obscore#ObsCore.t_min"/>
     <column original="//obscore#ObsCore.t_max"/>
     <column original="//products#products.preview"/>
-
 
     <mixin>//products#table</mixin>
     <mixin>//ssap#plainlocation</mixin>
@@ -108,8 +109,9 @@
         verbLevel="1"
         required="False"/>
 
-   <viewStatement>
+    <column original="filters/q#main.filter_id" name="fps_filter_id"/>
 
+    <viewStatement>
       CREATE MATERIALIZED VIEW \curtable AS (
         SELECT
           q.passband || ' lightcurve ' || 'for ' || q.object_id AS ssa_dstitle,
@@ -135,12 +137,20 @@
 
           -- '\getConfig{web}{serverURL}/\rdId/preview/qp/' || q.object_id || '-' || q.passband AS preview,
 
-          'phot.mag;em.opt.' || q.passband AS ssa_fluxucd,
+          -- 'phot.mag;em.opt.' || q.passband AS ssa_fluxucd,
+
+          CASE 
+            WHEN q.passband = 'DR' THEN 
+              'phot.mag;' || f.band_ucd || ';arith.diff'
+            ELSE 'phot.mag;' || f.band_ucd
+          END AS ssa_fluxucd,
+
           q.passband AS ssa_bandpass,
-          p.specmid AS ssa_specmid,
-          p.specstart AS ssa_specstart,
-          p.specend AS ssa_specend,
-          p.specend-p.specstart AS ssa_specext,
+          f.wavelength_ref * 1e-10 AS ssa_specmid,
+          f.wavelength_min * 1e-10  AS ssa_specstart,
+          f.wavelength_max * 1e-10  AS ssa_specend,
+          f.width_eff * 1e-10 AS ssa_specext,
+          q.fps_filter_id AS fps_filter_id,
           ssa_timeExt,
           t_min,
           t_max,
@@ -156,15 +166,31 @@
           o.ssa_collection,
           o.ssa_reference
         FROM (
+          -- in general, there are no one-to-one passband-filter_id relations
+          -- they are data-specific
+          WITH passband_map(passband, fps_filter_id) AS (
+            VALUES
+              ('U', 'Generic/Bessell.U'),
+              ('B', 'Generic/Bessell.B'),
+              ('V', 'Generic/Bessell.V'),
+              ('R', 'Generic/Bessell.R'),
+              ('DR', 'Generic/Bessell.R'),
+              ('I', 'Generic/Bessell.I'),
+              ('pg', 'Palomar/Arp1961.103aO_atm')             
+          )
           SELECT
             l.object_id, l.passband,
             count(*) AS ssa_length,
             MAX(l.obs_time) - MIN(l.obs_time) AS ssa_timeExt,
             MIN(l.obs_time) AS t_min,
             MAX(l.obs_time) AS t_max,
-            AVG(magnitude) AS mean_mag
+            AVG(magnitude) AS mean_mag,
+            COALESCE(m.fps_filter_id, l.passband) AS fps_filter_id
+
           FROM \schema.lightcurves AS l
-            GROUP BY l.object_id, l.passband
+          JOIN passband_map m
+            ON l.passband = m.passband
+          GROUP BY l.object_id, l.passband, fps_filter_id
         ) AS q
         JOIN (
           SELECT *,
@@ -173,11 +199,11 @@
             radians(0.5/3600) AS aperture_rad
           FROM \schema.objects
         ) AS o USING (object_id)
-        JOIN \schema.photosys AS p ON p.band_short = q.passband
+        JOIN filters.main AS f ON f.filter_id = q.fps_filter_id
+--        JOIN \schema.photosys AS p ON p.band_short = q.passband
       )
 
     </viewStatement>
-
   </table>
 
   <data id="create-raw-view">
@@ -258,14 +284,10 @@
     <updater sourceTable="ts_ssa"/>
   </coverage>
 
-  <STREAM id="instance-template">
-    <table id="instance_\band_short" onDisk="False">
+  <table id="lc_instance" onDisk="False">
       <!-- metadata modified by sdl's dataFunction -->
-      <meta name="description">The lightcurve in the \band_human filter </meta>
-<!--
-      <param original="ts_ssa.ssa_bandpass"/>
-      <param original="ts_ssa.ssa_specmid"/>
--->
+      <meta name="description">The lightcurve</meta>
+
       <param name="ra" type="double precision"
            ucd="pos.eq.ra"
            description="RA of source object"/>
@@ -280,20 +302,25 @@
            type="text"
            ucd="meta.note"/>
       
-      <param original="//ssap#instance.ssa_reference" name="bibcode"/>	<!-- I'm afraid people may not recognise ssa_reference -->
-      <param original="\sc/t#objects.period"/>
-      <param original="\sc/t#objects.epoch"/>
+      <param original="//ssap#instance.ssa_reference" name="bibcode"/>
+      <param original="personal/t#objects.period"/>
+      <param original="personal/t#objects.epoch"/>
       <param original="ts_ssa.ssa_targclass"/>
       <param original="ts_ssa.ssa_collection"/>
+      <param original="ts_ssa.ssa_fluxucd"/>
       <param original="ts_ssa.mean_mag"/>
+      <param original="ts_ssa.ssa_bandpass"/>
+      <param original="ts_ssa.ssa_specmid"/>
+      <param original="ts_ssa.fps_filter_id" required="False"/>
+      <param original="filters/q#main.zeropoint"/>      
 
       <mixin
-          effectiveWavelength="\effective_wavelength"
-          filterIdentifier='"\band_human"'
+          effectiveWavelength="@ssa_specmid"
+          filterIdentifier="@fps_filter_id"
           magnitudeSystem="Vega"
-          zeroPointFlux="\zero_point_flux"
-          phot_description="Landolt magnitude in \band_human"
-          phot_ucd='phot.mag;\band_ucd'
+          zeroPointFlux="@zeropoint"
+          phot_description="Landolt magnitude"
+          phot_ucd="phot.mag;em.opt"
           phot_unit="mag"
           refposition="HELIOCENTER"
           refframe="ICRS"
@@ -303,6 +330,7 @@
           timescale="UTC"
       >//timeseries#phot-0</mixin>
 
+
         <!-- Add my column -->
       <column name="mag_err" type="double precision"
         ucd="stat.error;phot.mag"
@@ -311,32 +339,13 @@
         description="stellar magnitude error"
         verbLevel="1"
         required="False"/>
-      <column original="\sc/t#lightcurves.facility" description="\facility_note"/>
-      <column original="\sc/t#lightcurves.note"/>
-    </table>
-  </STREAM>
-
-  <!-- instantiate for a few bands - take names from https://svo2.cab.inta-csic.es/theory/fps/ -->
-  <!-- zero point are from https://svo2.cab.inta-csic.es/theory/fps -->
-  <!-- It would be interesting to have here a mixin like  //siap#getBandFromFilter but for ssap -->
+      <column original="personal/t#lightcurves.facility" description="\facility_note"/>
+      <column original="personal/t#lightcurves.note"/>
+  </table>
 
   <macDef name="CCD_facility_note">Facility and telescope code: 1 = CCD AISAS Z-600; \
   2 = CCD Nauchny Z-600; 3 = CCD Nauchny Maksutov-50; 4 = PMT Nauchny Z-600; 5 =  PMT AISAS; \
   0 = not specified</macDef>
-
-  <LOOP source="instance-template">
-    
-    <csvItems>
-            band_short, band_human, band_ucd, effective_wavelength, zero_point_flux, facility_note, sc
-            U,          Generic/Bessell.U, em.opt.U, 3.6e-7, 1699.71, \CCD_facility_note, \schema
-            B,          Generic/Bessell.B, em.opt.B, 4.4e-7, 3908.46, \CCD_facility_note, \schema
-            V,          Generic/Bessell.V, em.opt.V, 5.4e-7, 3630.22, \CCD_facility_note, \schema
-            R,          Generic/Bessell.R, em.opt.R, 6.2e-7, 3056.93, \CCD_facility_note, \schema
-            I,          Generic/Bessell.I, em.opt.I, 8.3e-7, 2415.65, \CCD_facility_note, \schema
-            DR,         Instrum.R, em.opt.R, 6.2e-7, None, "Instrumental magnitudes nearby R band, PMT AISAS", \schema
-            pg,         Photographic, em.opt.B, 5.0e-7, None, Photo Archive code: 1 = SAI; 2 = Sonneberg; 3 = Odessa; 4 = Skalnaté Pleso, \schema
-    </csvItems>
-  </LOOP>
 
   <data id="build-ts" auto="False">
     <embeddedGrammar>
@@ -360,37 +369,53 @@
       </pargetter>
     </embeddedGrammar>
 
-    <make table="instance_V">   <!-- just a placeholder, we don't have the bare "instance" table. But we need a name from the LOOP -->
+    <make table="lc_instance">
 
       <rowmaker idmaps="*" id="make-ts"/>
       <!-- parmaker can get parameters, provided by pargetter and write them as a metadata in the instance table -->
       <!-- <parmaker id="make-ts-par" idmaps="ssa_bandpass, ssa_specmid, t_min, t_max, ssa_location, mynote"> -->
-      <parmaker id="make-ts-par" idmaps="ssa_targclass, ssa_collection, mean_mag">
+      <parmaker id="make-ts-par" idmaps="ssa_targclass, ssa_collection, ssa_bandpass, ssa_fluxucd, ssa_specmid, mean_mag, fps_filter_id">
          <!-- Add additioanal stuff to the litghtcure VOTable metadata --> 
          <map dest="filter">@ssa_bandpass</map>
          <map dest="bibcode">@ssa_reference</map>
          <map dest="ra">@ssa_location.asDALI()[0]</map>
          <map dest="dec">@ssa_location.asDALI()[1]</map>
-         <!--tut: touch manually the instance table metadata -->
+
+         <!--tut: touch the instance table metadata -->
+         <!-- Can I penetrate GROUP to change photDM parameters?
+              Can I get into TABLE->FIELD phot to correct ucd? -->
+               
          <apply name="update_metadata">
            <code>
-             sourceId = vars["ssa_targname"]     # in apply the current input fields are available in the vars dictionary
+             sourceId = vars["ssa_targname"]
+             ssa_bandpass = vars["ssa_bandpass"]
              targetTable.setMeta("description", base.getMetaText(targetTable, "description") +
-                 " for {}".format(sourceId))
+                 f" for {sourceId} in the {ssa_bandpass} filter")
+
              # retrieve the period and epoch
-             print(f'{sourceId=}')
 
              with base.getTableConn() as conn:
-                di = next(conn.queryToDicts(
+                di_objects = next(conn.queryToDicts(
                    "SELECT period, epoch FROM \schema.objects"
                    " WHERE object_id=%(object)s",
                    {"object": sourceId}))
-              
-             # targetTable.setParam("comment", "Thos is my best comment")
-             targetTable.setParam("period", di.get("period", None))
-             targetTable.setParam("epoch", di.get("epoch", None))
+
+             with base.getTableConn() as conn:
+                di_filters = next(conn.queryToDicts(
+                  "SELECT band, zeropoint, band_ucd FROM filters.main"
+                  " WHERE filter_id=%(fps_filter_id)s",
+                  {"fps_filter_id":vars.get("fps_filter_id", None)}))
+                 
+             targetTable.setParam("period", di_objects.get("period", None))
+             targetTable.setParam("epoch", di_objects.get("epoch", None))
              targetTable.setMeta("name", str(sourceId))
-             # print(f'\n \n \n {vars=} \n \n \n')
+
+             if ssa_bandpass == 'DR':
+               zeropoint = None
+             else:
+               zeropoint = di_filters.get("zeropoint", None)
+             targetTable.setParam("zeropoint", zeropoint)
+
            </code>
          </apply>
       </parmaker>
@@ -481,8 +506,7 @@
         <code>
             _, bandid = rd.parseIdentifier(descriptor.metadata["ssa_pubdid"])
             dd = rd.getById("build-ts")
-            descriptor.data = rsc.Data.createWithTable(dd,
-                rd.getById("instance_" + bandid))
+            descriptor.data = rsc.Data.createWithTable(dd, rd.getById("lc_instance"))
             descriptor.data = rsc.makeData(
                 dd,
                 data=descriptor.data,
@@ -492,10 +516,12 @@
 
       <dataFormatter>
         <!-- to VOTable -->
-        <setup imports="gavo.formats.votablewrite"/>
+        <setup imports="gavo.formats"/>
         <code>
-            return ("application/x-votable+xml;version=1.5",
-                votablewrite.getAsVOTable(descriptor.data, version=(1,5)))
+            return (base.votableType,   
+                  formats.getFormatted("vodml", descriptor.data))
+        
+        
         </code>
       </dataFormatter>
     </datalinkCore>
@@ -662,7 +688,7 @@
 
   <regSuite title="personal regression">
     <regTest title="personal SSAP serves some data">
-      <url REQUEST="queryData" PUBDID="ivo://astro.upjs/~?personal/q/MO_Psc-R"
+      <url REQUEST="queryData" PUBDID="ivo://upjs.jk/~?personal/q/MO_Psc-R"
       >ssa/ssap.xml</url>
       <code>
         # print(self.data)
@@ -671,7 +697,7 @@
     </regTest>
 
     <regTest title="personal Datalink metadata looks about right.">
-      <url ID="ivo://astro.upjs/~?personal/q/AY_Lac-B">
+      <url ID="ivo://upjs.jk/~?personal/q/AY_Lac-B">
            sdl/dlmeta</url>
       <code>
         # dachs test -k datalink  q
