@@ -113,6 +113,7 @@
 
     <viewStatement>
       CREATE MATERIALIZED VIEW \curtable AS (
+        SELECT \colNames FROM (			-- magic ! otherwise i must follow there predefined column order
         SELECT
           q.passband || ' lightcurve ' || 'for ' || q.object_id AS ssa_dstitle,
           q.object_id AS ssa_targname,
@@ -159,7 +160,7 @@
           -- o.period AS period,
           -- o.epoch AS epoch,
           50000 AS accsize,
-          NULL AS embargo,
+          NULL::DATE AS embargo,
           NULL AS owner,
           'application/x-votable+xml' AS mime,
           '\getConfig{web}{serverURL}/\rdId/sdl/dlmeta?ID=' || '\pubDIDBase' || q.object_id || '-' || q.passband AS datalink,
@@ -201,6 +202,7 @@
         ) AS o USING (object_id)
         JOIN filters.main AS f ON f.filter_id = q.fps_filter_id
 --        JOIN \schema.photosys AS p ON p.band_short = q.passband
+      ) as ww		-- end of colnames-magic 
       )
 
     </viewStatement>
