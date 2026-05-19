@@ -1,9 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resource schema="personal" resdir=".">
-  <meta name="schema-rank">100</meta>
+  <meta name="schema-rank">160</meta>
   <meta name="creationDate">2026-02-19T12:38:44Z</meta>
 
   <meta name="title">Observations from personal collections</meta>
+
+  <meta name="description">
+    This project is dedicated to publishing observations of variable stars, 
+    in particular light curves, from personal archives. 
+    All data has been published with the permission of the respective owners.
+  </meta>
 
   <meta name="subject">light-curves</meta>
   <meta name="subject">variable-stars</meta>

@@ -310,7 +310,7 @@
       <param original="ts_ssa.ssa_fluxucd"/>
       <param original="ts_ssa.mean_mag"/>
       <param original="ts_ssa.ssa_bandpass"/>
-      <param original="ts_ssa.ssa_specmid"/>
+      <param original="ts_ssa.ssa_specmid" ucd="em.wl.effective"/>
       <param original="ts_ssa.fps_filter_id" required="False"/>
       <param original="filters/q#main.zeropoint"/>      
 
