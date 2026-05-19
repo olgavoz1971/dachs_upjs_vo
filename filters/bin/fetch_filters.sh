@@ -27,8 +27,14 @@ more_filters=(
 
 base_url="https://svo2.cab.inta-csic.es/svo/theory/fps/fps.php?ID="
 
+DATA_DIR="../data"
+
+if [ ! -d "$DATA_DIR" ]; then
+  mkdir -p "$DATA_DIR"
+fi
+
 for f in "${base_filters[@]}"; do
   # replace '/' to make valid filename
-  safe_name="../data/${f//\//_}"
+  safe_name="${DATA_DIR}/${f//\//_}"
   curl -o "${safe_name}.xml" "${base_url}${f}"
 done

@@ -34,7 +34,7 @@ projects, you'll still have to read documentation... -->
   <meta name="facility"></meta>
 
   <meta name="source">2024A&amp;A...689A..93R</meta>
-  <meta name="contentLevel">TBD</meta>
+  <meta name="contentLevel">Research</meta>
   <meta name="type">Catalog</meta>  <!-- or Archive, Survey, Simulation -->
 
   <!-- Waveband is of Radio, Millimeter,
@@ -42,8 +42,8 @@ projects, you'll still have to read documentation... -->
       remove if there are no messengers involved.  -->
   <meta name="coverage.waveband">Infrared, Optical, UV</meta>
 
-  <table id="main" onDisk="True" adql="True">
-
+  <!-- <table id="main" onDisk="True" adql="True"> -->
+  <table id="main" onDisk="True" adql="Hidden">
 
     <!-- B -->
     <column name="band" type="text"
