@@ -49,7 +49,7 @@
     <meta name="table-rank">150</meta>
     <meta name="description">The external table with photometric points of all objects</meta>
     <index columns="object_id"/>
-    <index columns="photosys_id"/>
+    <index columns="passband"/>
     <index columns="dateobs"/>
 
     <column name="id" type="bigint"
@@ -84,10 +84,10 @@
       description="Estimation of magnitude error"
       required="False"/>
 
-    <column name="photosys_id" type="integer"
-      ucd="meta.id"
-      tablehead="PhotoSys id"
-      description="Photometric system identifier"
+    <column name="passband" type="text"
+      utype="ssa:DataID.Bandpass" ucd="instr.bandpass"
+      tablehead="Filter" verbLevel="15"
+      description="Bandpass (i.e., rough spectral location) of this dataset"
       required="True"/>
 
     <column name="mag_diff" type="double precision"
@@ -129,7 +129,7 @@
     <make table="lightcurves">
       <script lang="python" type="postCreation" name="Load dump">
         table.connection.commit()
-        src = table.tableDef.rd.getAbsPath("dumps/lightcurves.dump")
+        src = table.tableDef.rd.getAbsPath("dumps/lightcurves_with_bands_limited.dump")
         with open(src) as f:
           cursor = table.connection.cursor()
           cursor.copy_expert(
@@ -146,7 +146,6 @@
     <stc>
       Position ICRS "ra" "dec"
     </stc>
-
     <meta name="description">The external table with objects</meta>
 
     <column name="object_id" type="integer"
@@ -178,7 +177,8 @@
       description="Equatorial coordiantes, ICRS"
       required="False"/>
 
-    <column name="gaia_name" type="bigint"
+    <column name="gaia_name"
+      type="bigint"
       ucd="meta.id"
       tablehead="Gaia DR3 ID"
       description="Gaia DR3 identifier"
@@ -247,7 +247,7 @@
     <publish render="form" sets="local,ivo_managed"/>
 
     <meta name="shortName">Kolonica Objects</meta>
-    <meta name="title">Kolonica objects Cone Search</meta>
+    <meta name="title">Kolonica Objects Cone Search</meta>
     <meta name="description">
       The table with basic parameters of the observed objects
     </meta>

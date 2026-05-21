@@ -55,7 +55,7 @@
       ]]></code>
   </job></execute>
 
-  <table id="raw_data" onDisk="True" adql="hidden"
+  <table id="raw_data" onDisk="True" adql="True"
       namePath="//ssap#instance">
     <meta name="table-rank">500</meta>
     <meta name="description">A united view over original ident tables for SSA/ObsCore ingestion</meta>
@@ -136,10 +136,6 @@
               '\getConfig{web}{serverURL}/\rdId/preview/qp/' || q.object_id || '-' || q.passband
           END AS preview,
 
-          -- '\getConfig{web}{serverURL}/\rdId/preview/qp/' || q.object_id || '-' || q.passband AS preview,
-
-          -- 'phot.mag;em.opt.' || q.passband AS ssa_fluxucd,
-
           CASE 
             WHEN q.passband = 'DR' THEN 
               'phot.mag;' || f.band_ucd || ';arith.diff'
@@ -157,8 +153,6 @@
           t_max,
           q.ssa_length,
           q.mean_mag AS mean_mag,
-          -- o.period AS period,
-          -- o.epoch AS epoch,
           50000 AS accsize,
           NULL::DATE AS embargo,
           NULL AS owner,
@@ -292,9 +286,11 @@
 
       <param name="ra" type="double precision"
            ucd="pos.eq.ra"
+           unit="deg"
            description="RA of source object"/>
       <param name="dec" type="double precision"
            ucd="pos.eq.dec"
+           unit="deg"
            description="Dec of source object"/>
       <param name="filter" type="text"
            ucd="meta.id;instr.filter"
@@ -521,9 +517,7 @@
         <setup imports="gavo.formats"/>
         <code>
             return (base.votableType,   
-                  formats.getFormatted("vodml", descriptor.data))
-        
-        
+                  formats.getFormatted("vodmlb", descriptor.data))	# vodmlb for binary, vodml for "td"  
         </code>
       </dataFormatter>
     </datalinkCore>
