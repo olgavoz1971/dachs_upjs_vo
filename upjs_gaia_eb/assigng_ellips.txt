@@ -1,0 +1,9 @@
+select gaia_id, period, teff,
+CASE
+  when period > 3.0 and main_class='overcontact' then 
+    'ellipsoidal'
+  else
+    main_class
+END AS main_class,
+prob_detached, prob_overcontact, spot_class, prob_spot
+from upjs_gaia_eb.classification
