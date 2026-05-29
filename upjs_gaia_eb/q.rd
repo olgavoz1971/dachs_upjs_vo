@@ -103,10 +103,9 @@
       ucd="meta.code.class;stat.probability"
       tablehead="spot probability"
       description="Probability of classification as spotted"
-      required="True"
-      note="prob_over"/>
+      required="True"/>
 
-    <meta name="main_class_note">
+    <meta name="note" tag="main_class_note">
       We explicitly assign the main class "ellipsoidal" to all systems with period > 3 d
       that are classified as overcontact, because such systems are physically unlikely.
       Using a single-passband light curve alone, we cannot reliably distinguish between
