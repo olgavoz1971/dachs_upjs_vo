@@ -10,18 +10,35 @@ projects, you'll still have to read documentation... -->
 
 
 <resource schema="filters" resdir=".">
+  <meta name="schema-rank">61</meta>
+
   <meta name="creationDate">2026-04-06T11:37:56Z</meta>
 
   <meta name="title">Filter Profiles</meta>
-  <meta name="description">
-    This schema provides photometric filter characteristics derived from the 
-    SVO Filter Profile Service https://svo2.cab.inta-csic.es/svo/theory/fps/. 
-    Each row corresponds to a single filter and contains basic information about bandpass.
-    Exposing these data as a TAP table enables SQL queries joining filter data with 
-    photometric datasets. 
-    The table contains a selected subset of filters used in the published light-curve collections.
-    The full transmission curves can be retrieved from the original SVO Filter 
-    Profile Service using the provided fps_url column.
+  <meta name="description" format="rst">
+This table provides photometric filter characteristics derived from the SVO Filter Profile Service https://svo2.cab.inta-csic.es/svo/theory/fps/.
+Each row corresponds to a single photometric filter and contains basic bandpass information.
+
+Exposing these data through TAP enables ADQL queries joining filter data with photometric datasets. 
+
+The table contains a selected subset of filters used in the published light-curve collections. 
+The full transmission curves can be retrieved from the original SVO Filter Profile Service using the fps_url column.
+
+These data are republished with permission from the SVO Filter Profile Service.
+If this table contributes to your research, please acknowledge the original service and cite the following references:
+
+Rodrigo, C., Cruz, P., Aguilar, J.F., et al. 2024, :bibcode:`2024A&amp;A...689A..93R`; 
+The SVO Filter Profile Service. Rodrigo, C., Solano, E., Bayo, A., 2012, :bibcode:`2012ivoa.rept.1015R`;
+The SVO Filter Profile Service. Rodrigo, C., Solano, E., 2020, :bibcode:`2020sea..confE.182R`.
+
+The SVO Filter Profile Service is funded by MCIN/AEI/10.13039/501100011033/ through grant PID2023-146210NB-I00.
+  </meta>
+
+  <meta name="copyright" format="rst">
+        If this table contributes to your research, please acknowledge the original service and cite the following references:
+        Rodrigo, C., Cruz, P., Aguilar, J.F., et al. 2024, :bibcode:`2024A&amp;A...689A..93R`; 
+        The SVO Filter Profile Service. Rodrigo, C., Solano, E., Bayo, A., 2012, :bibcode:`2012ivoa.rept.1015R`;
+        The SVO Filter Profile Service. Rodrigo, C., Solano, E., 2020, :bibcode:`2020sea..confE.182R`.
   </meta>
   <!-- Take keywords from
     http://www.ivoa.net/rdf/uat
@@ -29,11 +46,12 @@ projects, you'll still have to read documentation... -->
   <meta name="subject">optical-filters</meta>
   <meta name="subject">photometric-systems</meta>
 
-  <meta name="creator">Rodrigo, C.</meta>
+  <meta name="creator">Rodrigo, C.; Solano, E.</meta>
   <meta name="instrument"></meta>
   <meta name="facility"></meta>
 
-  <meta name="source">2024A&amp;A...689A..93R</meta>
+  <!-- <meta name="source">2024A&amp;A...689A..93R</meta> -->
+  <meta name="source">2020sea..confE.182R</meta>
   <meta name="contentLevel">Research</meta>
   <meta name="type">Catalog</meta>  <!-- or Archive, Survey, Simulation -->
 
@@ -42,8 +60,8 @@ projects, you'll still have to read documentation... -->
       remove if there are no messengers involved.  -->
   <meta name="coverage.waveband">Infrared, Optical, UV</meta>
 
-  <!-- <table id="main" onDisk="True" adql="True"> -->
-  <table id="main" onDisk="True" adql="Hidden">
+  <table id="main" onDisk="True" adql="True">
+
 
     <!-- B -->
     <column name="band" type="text"
@@ -249,6 +267,7 @@ projects, you'll still have to read documentation... -->
       description="UCD of the photometric band"
       required="True"/>
 
+    <publish/>
   </table>
 
   <data id="import">
@@ -268,37 +287,19 @@ projects, you'll still have to read documentation... -->
     </make>
   </data>
 
-  <service id="q" allowed="form">
-    <!-- if you want a browser-based service in addition to TAP, use
-    this.  Otherwise, delete this and just write <publish/> into
-    the table element above to publish the table as such.  With a
-    service, the table will be published as part of the service -->
-    <meta name="shortName">FPS</meta>
-
-    <!-- the browser interface goes to the VO and the front page -->
-    <publish render="form" sets="ivo_managed, local"/>
-    <!-- all publish elements only become active after you run
-      dachs pub q -->
-
-    <dbCore queriedTable="main">
-      <!-- to add query constraints on table columns, add condDesc
-      elements built from the column -->
-      <condDesc buildFrom="filter_id"/>
-    </dbCore>
-  </service>
-
   <regSuite title="filters regression">
     <regTest title="filters table serves some data">
       <url parSet="TAP"
-        QUERY="SELECT * FROM filters.main WHERE %select one column%"
+        QUERY="select * from filters.main WHERE filter_id='Generic/Bessell.U'"
         >/tap/sync</url>
       <code>
         # The actual assertions are pyUnit-like.  Obviously, you want to
         # remove the print statement once you've worked out what to test
         # against.
         row = self.getFirstVOTableRow()
-        print(row)
-        self.assertAlmostEqual(row["ra"], 22.22222)
+        # print(row)
+        # print(f'\n\n\n row={row}')
+        self.assertAlmostEqual(row["wavelength_ref"], 3584.7769658367)
       </code>
     </regTest>
 
