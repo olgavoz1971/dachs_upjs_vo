@@ -34,7 +34,8 @@
   <meta name="subject">starspots</meta>
   <meta name="subject">stellar-classification</meta>
 
-  <meta name="creator">Parimucha, Š., Gabdeev, M., Vaňko, M., Markus, Y., Vozyakova, O., GAIA Collaboration</meta>
+  <meta name="creator">Parimucha, Š., Gabdeev, M., Vaňko, M., Markus, Y., Vozyakova, O.</meta>
+  <meta name="creator">GAIA Collaboration</meta>
   <meta name="instrument">Gaia</meta>
 
   <meta name="source">Parimucha, S. and all, in prep.</meta>
@@ -47,11 +48,11 @@
   <meta name="coverage.waveband">Optical</meta>
   <coverage>  
         <spatial>0/0-11</spatial>
-        <spectral>1.986e-19 4.966e-19</spectral>
+        <spectral>325[nm] 1000[nm]</spectral>
   </coverage>
 
   <STREAM id="all_columns">
-    <column name="gaia_id"
+    <column name="source_id"
       ucd="meta.id;meta.main"
       type="bigint"
       tablehead="Gaia DR3 ID"
@@ -122,7 +123,7 @@
 
 
 <!--
-  I gave up on an idea of ingestong all as is
+  I gave up on an idea of ingesting all as is
   <table id="detached" onDisk="True" adql="hidden">
 
     <FEED source="all_columns">
@@ -137,7 +138,7 @@
     <csvGrammar delimiter="," strip="True"/>
       <make table="detached">
         <rowmaker idmaps="*">
-          <var name="gaia_id">@star_id</var>
+          <var name="source_id">@star_id</var>
           <var name="main_class">@class_name</var>
         </rowmaker>
     </make>
@@ -157,7 +158,7 @@
     <csvGrammar delimiter="," strip="True"/>
       <make table="overcontact">
         <rowmaker idmaps="*">
-          <var name="gaia_id">@star_id</var>
+          <var name="source_id">@star_id</var>
           <var name="main_class">@class_name</var>
         </rowmaker>
     </make>
@@ -176,7 +177,7 @@
     <csvGrammar delimiter="," strip="True"/>
       <make table="spot_detached">
         <rowmaker idmaps="*">
-          <var name="gaia_id">@star_id</var>
+          <var name="source_id">@star_id</var>
           <var name="spot_class">@classification</var>
         </rowmaker>
     </make>
@@ -195,7 +196,7 @@
     <csvGrammar delimiter="," strip="True"/>
       <make table="spot_overcontact">
         <rowmaker idmaps="*">
-          <var name="gaia_id">@star_id</var>
+          <var name="source_id">@star_id</var>
           <var name="spot_class">@classification</var>
         </rowmaker>
     </make>
@@ -210,7 +211,7 @@
     
     <FEED source="all_columns"/>
 
-    <index columns="gaia_id"/>
+    <index columns="source_id"/>
     <index columns="period"/>
   
     <viewStatement>
@@ -218,11 +219,11 @@
         SELECT \colNames FROM (
           SELECT md.*, sd.spot_class, sd.prob_spot
             FROM \schema.spot_detached AS sd
-            JOIN \schema.detached AS md USING (gaia_id)
+            JOIN \schema.detached AS md USING (source_id)
           UNION ALL
           SELECT mo.*, so.spot_class, so.prob_spot
             FROM \schema.spot_overcontact AS so
-            JOIN \schema.overcontact AS mo USING (gaia_id)
+            JOIN \schema.overcontact AS mo USING (source_id)
         ) AS ww
       )
     </viewStatement>
@@ -233,7 +234,7 @@
   </data>
 -->
 
-  <table id="classification_raw" onDisk="True" primary="gaia_id" adql="hidden">
+  <table id="classification_raw" onDisk="True" primary="source_id" adql="hidden">
     <FEED source="all_columns"/>
   </table>
 
@@ -249,9 +250,9 @@
   <table id="classification" onDisk="True" adql="True">
     <property name="forceStats">1</property>
     <meta name="table-rank">50</meta>
-    <meta name="description">
+    <meta name="description" format="rst">
       The table contains the results of morphological classification of eclipsing binaries and selected parameters 
-      from Gaia DR3 (2023A&amp;A...674A...1G), including orbital periods, GSP-Phot effective temperatures, and sky coordinates.
+      from Gaia DR3 (:bibcode: `2023A&amp;A...674A...1G`), including orbital periods, GSP-Phot effective temperatures, and sky coordinates.
 
       Because the morphological classification is based on single-passband Gaia G photometry alone, overcontact and ellipsoidal 
       systems cannot be reliably distinguished. Therefore, systems with orbital periods P &gt; 3 d initially classified as overcontact 
@@ -259,8 +260,10 @@
       for main-sequence stars.
     </meta>
     
-    <index columns="gaia_id"/>
+    <index columns="source_id"/>
     <index columns="period"/>
+    <index columns="main_class"/>
+    <index columns="spot_class"/>
     <mixin>//scs#pgs-pos-index</mixin>
     <publish sets="ivo_managed,local"/>
  
@@ -302,7 +305,7 @@
           SELECT c.*, ra, dec, ra_error, dec_error 
             FROM \schema.classification_raw AS c
             JOIN gaiadr3_eb.gaia_source_lite_eb g 
-            ON g.source_id=c.gaia_id
+            USING (source_id)
         ) AS ww
       )
     </viewStatement>
@@ -315,10 +318,10 @@
 
 
   <service id="upjs_eb_cone" allowed="form,scs.xml">
-    <meta name="shortName">GDR3light SCS</meta>
+    <meta name="shortName">GDR3class SCS</meta>
     <publish render="scs.xml" sets="ivo_managed"/>
     <publish render="form" sets="local,ivo_managed"/>
-    <meta name="title">Gaia DR3 EB Cone Search</meta>
+    <meta name="title">Gaia EB classification Cone Search</meta>
     <meta>
             testQuery.ra:  39.78593
             testQuery.dec:  4.83580
@@ -326,7 +329,7 @@
     </meta>
     <scsCore queriedTable="classification">
       <FEED source="//scs#coreDescs"/>
-      <LOOP listItems="gaia_id main_class spot_class">
+      <LOOP listItems="source_id main_class spot_class">
         <events>
           <condDesc buildFrom="\item"/>
         </events>
@@ -345,8 +348,8 @@
         # remove the print statement once you've worked out what to test
         # against.
         row = self.getFirstVOTableRow()
-        print(row)
-        self.assertEqual(row["n"], 1000)
+        # print(row)
+        self.assertEqual(row["n"], 2184283)
       </code>
     </regTest>
 
