@@ -287,6 +287,20 @@ The SVO Filter Profile Service is funded by MCIN/AEI/10.13039/501100011033/ thro
     </make>
   </data>
 
+  <service id="q" allowed="form">
+    <meta name="shortName">FPS form</meta>
+
+    <publish render="form" sets="ivo_managed, local"/>
+
+    <dbCore queriedTable="main">
+      <condDesc>
+        <inputKey original="filter_id">
+          <values fromdb="filter_id from \schema.main"/>
+        </inputKey>
+      </condDesc>
+    </dbCore>
+  </service>
+
   <regSuite title="filters regression">
     <regTest title="filters table serves some data">
       <url parSet="TAP"
