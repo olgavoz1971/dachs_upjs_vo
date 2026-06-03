@@ -84,11 +84,12 @@
 
     <LOOP listItems="ssa_dstitle
       ssa_pubDID ssa_bandpass ssa_specmid ssa_specstart ssa_specend ssa_specext ssa_fluxucd
-      ssa_timeExt ssa_length">
+      ssa_length">
       <events>
         <column original="\item"/>
       </events>
     </LOOP>
+    <column original="//ssap#instance.ssa_timeExt" unit="d"/> <!-- Replace default seconds with days -->
     <column original="//obscore#ObsCore.t_min"/>
     <column original="//obscore#ObsCore.t_max"/>
     <column original="//products#products.preview"/>
@@ -131,6 +132,7 @@
    <viewStatement>
 
       CREATE MATERIALIZED VIEW \curtable AS (
+        SELECT \colNames FROM (                 -- magic ! otherwise i must follow there predefined column order
         SELECT
           'Gaia DR3 ' || q.band || ' lightcurve for ' || q.source_id AS ssa_dstitle,
            q.source_id,
@@ -166,7 +168,7 @@
           t_max,
           q.ssa_length,
           50000 AS accsize,
-          NULL AS embargo,
+          NULL::DATE AS embargo,
           NULL AS owner,
           'application/x-votable+xml' AS mime,
           '\getConfig{web}{serverURL}/\rdId/sdl/dlmeta?ID=' || '\pubDIDBase' || q.source_id || '-' || q.band AS datalink
@@ -191,6 +193,7 @@
         ) AS o USING (source_id)
         JOIN \schema.vari_eclipsing_binary_lite b USING (source_id)
         JOIN \schema.photosys AS p ON p.band_short = q.band
+      ) as ww		 -- end of colnames-magic
       )
 
     </viewStatement>
@@ -725,72 +728,6 @@
       -->
       <FEED source="//ssap#hcd_condDescs"/>
     </ssapCore>
-  </service>
-
-  <service id="ex" allowed="examples">
-    <meta name="title">Gaia EB Classification TAP Examples</meta>
-    <meta name="description">
-      This service provides examples of server-side matching between the Gaia EB Classification and OGLE tables.
-    </meta>
-
-      <meta name="_example" title="Compare OGLE and UPJŠ EB classifications. Simple match">
-        Match the `ogle.objects_all` table with `upjs_gaia_eb.classification` by coordinates and compare the types assigned
-        to the common eclipsing binaries by both sources. Here we perform a simple coordinate match, ignoring proper motion.
-
-        Why do we choose 5 arcsec? 
-        Try increasing the matching radius, retrieve a larger sample, and plot a histogram of `sep` in TOPCAT. 
-        The histogram shows a peak at small separations produced by genuine matches. 
-        Beyond the peak, the contribution of true matches decreases, while the contribution of false matches increases with radius. 
-        We see a local minimum around 5 arcsec and choose it as a reasonable compromise between copleteness and contamination:
-
-        .. tapquery::
-          SELECT TOP 1000 object_id, main_class, spot_class, ogle_vartype, subtype, ssa_targclass,
-            DISTANCE(o.raj2000, o.dej2000, g.ra, g.dec)*3600 AS sep
-          FROM ogle.objects_all o
-          JOIN upjs_gaia_eb.classification g
-            ON DISTANCE(o.raj2000, o.dej2000, g.ra, g.dec) &lt; 5.0/3600
-      </meta>
-
-      <meta name="_example" title="Compare OGLE and UPJŠ EB classifications. Match with sky position propagation">
-        Match the `ogle.objects_all` table with `upjs_gaia_eb.classification` by coordinates, taking into account 
-        the 16-year epoch difference between the Gaia DR3 and OGLE equatorial coordinates.
-
-        Many TAP services provide coordinate propagation through the `ivo_epoch_prop_pos` UDF. However, here, 
-        we should perform the propagation explicitly in the query.
-
-        Note that matching large tables using calculated coordinates instead of indexed values is generally inefficient. 
-        Therefore, we first apply a rough spatial pre-filter using indexed coordinates and only then perform the match 
-        on the preselected subset.
-
-        If you need the complete result set, remove `TOP 1000` and increase the MAXREC (MAX RO+WS in TOPCAT) value. 
-        The input Gaia table contain slightly more than two million rows.
-
-        .. tapquery::
-        SELECT TOP 1000
-          res.object_id, res.main_class, res.spot_class, res.ogle_vartype, res.subtype, res.ssa_targclass, res.sep_j2000
-        FROM (
-          SELECT 
-            o.object_id, o.raj2000, o.dej2000, o.ogle_vartype, o.subtype,
-            o.ssa_targclass, gc.main_class, gc.spot_class,
-            gs.ra AS gaia_ra_2016, gs.dec AS gaia_dec_2016, gs.pmra, gs.pmdec,
-            DISTANCE(		--  propagate Gaia positions to 2000.0
-              o.raj2000, o.dej2000, 
-              gc.ra + ((COALESCE(gs.pmra, 0.0)) * -16.0) / (3600000.0 * COS(RADIANS(gc.dec))),  -- Note: mention there gc to force planner filter tables first
-              gc.dec + ((COALESCE(gs.pmdec, 0.0)) * -16.0) / 3600000.0  -- Note: use these additional brackets around COALESCE in the expression
-            ) * 3600.0 AS sep_j2000
-          FROM ogle.objects_all AS o
-          JOIN upjs_gaia_eb.classification AS gc
-            ON 
-              -- Rough spatial pre-filter using indexed J2016 coordinates
-              DISTANCE(o.raj2000, o.dej2000, gc.ra, gc.dec) &lt; 10.0 / 3600.0
-          JOIN gaiadr3_eb.gaia_source_lite_eb AS gs -- Note: it's safer not to use USING(source_id) in a multitable join 
-            ON gc.source_id = gs.source_id
-        ) AS res
-        WHERE res.sep_j2000 &lt; 5.0
-
-      </meta>
-
-    <nullCore/>
   </service>
 
   <regSuite title="gaiadr3_eb ts regression">
