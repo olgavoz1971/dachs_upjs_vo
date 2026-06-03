@@ -14,7 +14,6 @@
   <meta name="ssap.creationType">archival</meta>
   <meta name="productType">timeseries</meta>
   <meta name="ssap.testQuery">MAXREC=1</meta>
-  <meta name="productType">timeseries</meta>
 
   <execute on="loaded" title="define id parse functions"><job>
     <code><![CDATA[
@@ -63,11 +62,12 @@
     -->
     <LOOP listItems="ssa_dstitle ssa_targname ssa_targclass
       ssa_pubDID ssa_bandpass ssa_specmid ssa_specstart ssa_specend ssa_specext ssa_fluxucd
-      ssa_timeExt ssa_length ssa_collection ssa_reference">
+      ssa_length ssa_collection ssa_reference">
       <events>
         <column original="\item"/>
       </events>
     </LOOP>
+    <column original="//ssap#instance.ssa_timeExt" unit="d"/> <!-- Replace default seconds with days -->
     <column original="//obscore#ObsCore.t_min"/>
     <column original="//obscore#ObsCore.t_max"/>
 
@@ -125,6 +125,7 @@
     <viewStatement>
 
       CREATE MATERIALIZED VIEW \curtable AS (
+        SELECT \colNames FROM (         -- magic ! otherwise i must follow there predefined column order
         SELECT
           'OGLE ' || q.passband || ' lightcurve ' || 'for ' || q.object_id AS ssa_dstitle,
           q.object_id AS ssa_targname,
@@ -162,7 +163,7 @@
           -- o.period AS period,
           -- o.epoch AS epoch,
           50000 AS accsize,
-          NULL AS embargo,
+          NULL::DATE AS embargo,
           NULL AS owner,
           'application/x-votable+xml' AS mime,
           '\getConfig{web}{serverURL}/\rdId/sdl/dlmeta?ID=' || '\pubDIDBase' || q.object_id || '-' || q.passband AS datalink,
@@ -194,6 +195,7 @@
           CROSS JOIN (SELECT radians(1./3600) AS aperture_rad) c
         ) AS o USING (object_id)
         JOIN \schema.photosys AS p ON p.band_short = q.passband
+      ) as ww       -- end of colnames-magic 
       )
 
     </viewStatement>
@@ -519,8 +521,11 @@
         <!-- to VOTable -->
         <setup imports="gavo.formats.votablewrite"/>
         <code>
-            return ("application/x-votable+xml;version=1.5",
-                votablewrite.getAsVOTable(descriptor.data, version=(1,5)))
+            from gavo import formats
+            return (base.votableType,   
+                        formats.getFormatted("vodml", descriptor.data))
+            # return ("application/x-votable+xml;version=1.5",
+            #    votablewrite.getAsVOTable(descriptor.data, version=(1,6)))
         </code>
       </dataFormatter>
     </datalinkCore>

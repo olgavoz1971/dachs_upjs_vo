@@ -754,7 +754,7 @@ or through the SSA service. Light curves can be extracted using the associated D
 
   <macDef name="common_cols">
     object_id, raj2000, dej2000,
-    vsx, ssa_targclass, ogle_vartype, ssa_reference, ssa_collection,
+    vsx, ogle_vartype, ssa_targclass, ssa_reference, ssa_collection,
     mean_I, mean_V, period, period_err
   </macDef>
 
@@ -793,6 +793,7 @@ or through the SSA service. Light curves can be extracted using the associated D
       
     <viewStatement>
       CREATE MATERIALIZED VIEW \curtable AS (
+        SELECT \colNames FROM (		-- magic ! otherwise i must follow there predefined column order
         SELECT \common_cols, epoch, ampl_I, pulse_mode AS subtype			--acep
           FROM \schema.acepheids
         UNION ALL
@@ -836,6 +837,7 @@ or through the SSA service. Light curves can be extracted using the associated D
                  COALESCE(period_err, sh_period_err),
                  NULL AS epoch, ampl_I, NULL AS subtype
           FROM \schema.cv
+        ) AS ww		-- end of colnames magic
         )
     </viewStatement>
   </table>
