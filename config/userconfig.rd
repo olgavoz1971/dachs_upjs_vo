@@ -135,7 +135,7 @@
 
 			.. tapquery::
 				SELECT TOP 10 * FROM upjs_ts.ts_ssa
-					WHERE 1=CONTAINS(ivo_simbadpoint('VY UMi'), CIRCLE(ssa_location, ssa_aperture))
+				WHERE 1=CONTAINS(ivo_simbadpoint('VY UMi'), CIRCLE(ssa_location, ssa_aperture))
 		</meta>
 
 		<meta name="_example" title="Cone selection using ssa_region">
@@ -144,7 +144,7 @@
 
 			.. tapquery::
 				SELECT TOP 10 * FROM gaiadr3_eb.ts_ssa
-					WHERE 1=CONTAINS(ivo_simbadpoint('AA And'), ssa_region)
+				WHERE 1=CONTAINS(ivo_simbadpoint('AA And'), ssa_region)
 		</meta>
 
 		<meta name="_example" title="Count photometric measurements">
@@ -154,7 +154,7 @@
 			.. tapquery::
 				SELECT COUNT(*) FROM ogle.lightcurves l 
 				NATURAL JOIN ogle.objects_all WHERE object_id='OGLE-BLAP-051' 
-				AND passband='I' AND ogle_phase=4
+					AND passband='I' AND ogle_phase=4
 		</meta>
 
 		<meta name="_example" title="Distribution of star types">
@@ -168,7 +168,7 @@
 
 			.. tapquery::
 				SELECT ssa_targclass, count(*) AS n
-					FROM ogle.raw_data TABLESAMPLE(0.1)
+				FROM ogle.raw_data TABLESAMPLE(0.1)
 					GROUP BY ssa_targclass
 
 		</meta>
@@ -181,8 +181,8 @@
 
 			.. tapquery::
 				SELECT ROUND(ssa_length/2) * 2 AS bin, count(*) AS n
-					FROM gaiadr3_eb.ts_ssa
-					WHERE ssa_bandpass='Gaia G'
+				FROM gaiadr3_eb.ts_ssa
+				WHERE ssa_bandpass='Gaia G'
 					GROUP BY bin
 		</meta>
 
@@ -194,20 +194,8 @@
 			.. tapquery::
 				SELECT round(AVG(ssa_length)) AS length, 
 					ivo_healpix_index(6, coord1(ssa_location), coord2(ssa_location)) AS hpx
-					FROM gaiadr3_eb.ts_ssa 
+				FROM gaiadr3_eb.ts_ssa 
 					GROUP BY hpx
-		</meta>
-
-		<meta name="_example" title="tap_schema example">
-			To locate columns "by physics", as it were, use UCD in
-			:taptable:`tap_schema.columns`.  For instance,
-			to find everything talking about the mid-infrared about 10µm, you
-			could write:
-
-			.. tapquery::
-
-				SELECT * FROM tap_schema.columns
-				  WHERE description LIKE '%em.IR.8-15um%'
 		</meta>
 
 		<meta name="_example" title="HEALPix map">
@@ -218,7 +206,7 @@
 			.. tapquery::
 
 				SELECT count(*) as n, ivo_healpix_index(8, raj2000, dej2000) as hpx
-					FROM ogle.objects_all GROUP BY hpx
+				FROM ogle.objects_all GROUP BY hpx
 		</meta>
 
 		<meta name="_example" title="ObsCore coverage">
@@ -229,13 +217,32 @@
 
 			.. tapquery::
 
-				SELECT obs_id, s_region from ivoa.obscore 
-					WHERE obs_collection ILIKE '%kolonica%'
+				SELECT obs_id, s_region FROM ivoa.obscore 
+				WHERE obs_collection ILIKE '%kolonica%'
+		</meta>
+
+		<meta name="_example" title="ADQL Unit Conversion">
+			Demonstration of the new ADQL unit-conversion feature. 
+			Query ObsCore for timeseries spanning more than one year and display the spectral 
+			passband limits in nanometres rather than metres.
+			
+			.. tapquery::
+				SELECT TOP 100 access_url, preview, 
+					em_min@{nm} AS em_min, 
+					em_max@{nm} AS em_max 
+				FROM ivoa.obscore
+				WHERE dataproduct_type='timeseries' 
+					AND (t_max-t_min)@{yr} > 1{yr}
 		</meta>
 
 		<meta>
 			moreExamples: ogle/q#ex
 			moreExamples.title: OGLE OCVS queries
+		</meta>
+
+		<meta>
+			moreExamples: upjs_gaia_eb/q#ex
+			moreExamples.title: OGLE–Gaia Cross-Matching
 		</meta>
 
 		<meta>

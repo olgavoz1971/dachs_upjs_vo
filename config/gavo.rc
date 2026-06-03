@@ -1,5 +1,5 @@
 [general]
-maintainerAddress: astro.upjs@gmail.com
+maintainerAddress: olga.vozyakova@student.upjs.sk
 
 [web]
 bindAddress:
@@ -12,3 +12,4 @@ logFormat: combined
 
 [ivoa]
 authority: astro.upjs
+VOSITableDetail: max

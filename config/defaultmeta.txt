@@ -1,7 +1,7 @@
-publisher: Pavol Jozef Šafárik University
+publisher: UPJŠ DC Team
 contact.name: UPJŠ Archive
 contact.address: Jesenná 5, 040 01 Košice, Slovakia
-contact.email: astro.upjs@gmail.com
+contact.email: olga.vozyakova@student.upjs.sk
 creator.name: UPJŠ Archive
 creator.logo: \getConfig{web}{serverURL}/favicon.png
 
