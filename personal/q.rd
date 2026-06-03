@@ -62,11 +62,12 @@
 
     <LOOP listItems="ssa_dstitle ssa_targname ssa_targclass
       ssa_pubDID ssa_bandpass ssa_specmid ssa_specstart ssa_specend ssa_specext
-      ssa_timeExt ssa_length ssa_collection ssa_reference">
+      ssa_length ssa_collection ssa_reference">
       <events>
         <column original="\item"/>
       </events>
     </LOOP>
+    <column original="//ssap#instance.ssa_timeExt" unit="d"/> <!-- Replace default seconds with days -->
     <!-- without this "False" DaCHS refuses to pull this colum as a param in the lc_instance -->
     <column original="//ssap#instance.ssa_fluxucd" required="False"/>
     <column original="//obscore#ObsCore.t_min"/>
