@@ -8,7 +8,21 @@
   <FEED source="ogle/meta#ogle_meta"/>
   <FEED source="ogle/meta#longdoc_ogle"/>
 
+
 <!-- ======================= All Anomalous Cepheids ============================= -->
+
+  <execute on="loaded" title="retrieve references acepheids">
+      <job>
+        <code>
+          tbl = rd.getById("acepheids")
+          with base.getTableConn() as conn:
+            row = list(conn.query("SELECT ssa_reference FROM ogle.ident_gal_acep LIMIT 1"))
+            if row and row[0]:
+              reference = row[0][0]
+              tbl.setMeta("source", reference)
+        </code>
+      </job>
+  </execute>
 
   <table id="acepheids" adql="True" onDisk="True">
     <property name="forceStats">1</property>
@@ -21,6 +35,7 @@
     </meta>
 
     <!-- Unfortunately, I've failed to wrap this into something reusable, so I put up with vulgar copypasting ;-( -->
+	<!-- I'm not allowed to use multiple sources there unfortunately
     <LOOP>
       <codeItems>
         # Collect references from all involved tables
@@ -36,6 +51,21 @@
         <meta name="source">\db_source</meta>
       </events>
     </LOOP>
+    -->
+
+    <!--    This does work, but let's try something fresh
+    <LOOP>
+       <codeItems>
+        # Pick up  reference from one table
+         with base.getTableConn() as conn:
+           ref = list(conn.query("SELECT ssa_reference FROM ogle.ident_gal_acep LIMIT 1"))[0][0]
+           yield {"db_source": ref}
+       </codeItems>
+       <events>
+         <meta name="source">\db_source</meta>
+       </events>
+    </LOOP>
+    -->    
 
     <!-- Pull all columns related to acepheid: -->
     <mixin>ogle/aux#acepheid_id</mixin>
@@ -82,6 +112,19 @@
   </data>
 
 <!-- ======================= All Classical Cepheids ============================= -->
+
+  <execute on="loaded" title="retrieve references cepheids">
+      <job>
+        <code>
+          tbl = rd.getById("cepheids")
+          with base.getTableConn() as conn:
+            row = list(conn.query("SELECT ssa_reference FROM ogle.ident_blg_cep LIMIT 1"))
+            if row and row[0]:
+              reference = row[0][0]
+              tbl.setMeta("source", reference)
+        </code>
+      </job>
+  </execute>
 
   <table id="cepheids" adql="True" onDisk="True">
     <property name="forceStats">1</property>
@@ -205,6 +248,19 @@
 
 <!-- ======================= All DSct ============================= -->
 
+  <execute on="loaded" title="retrieve references dsct">
+      <job>
+        <code>
+          tbl = rd.getById("dsct")
+          with base.getTableConn() as conn:
+            row = list(conn.query("SELECT ssa_reference FROM ogle.ident_blg_dsct LIMIT 1"))
+            if row and row[0]:
+              reference = row[0][0]
+              tbl.setMeta("source", reference)
+        </code>
+      </job>
+  </execute>
+
   <table id="dsct" adql="True" onDisk="True">
     <property name="forceStats">1</property>
 
@@ -215,6 +271,7 @@
     </meta>
     <meta name="title">Delta Scuti stars</meta>
 
+<!--
     <LOOP>
       <codeItems>
         # Collect references from all involved tables
@@ -231,6 +288,7 @@
         <meta name="source">\db_source</meta>
       </events>
     </LOOP>
+-->
 
     <mixin>ogle/aux#dsct_id</mixin>
     <mixin>ogle/aux#dsct_p</mixin>
@@ -261,6 +319,19 @@
 
 <!-- ======================= All Ecl/Ell binaries ============================= -->
 
+  <execute on="loaded" title="retrieve references ecl">
+      <job>
+        <code>
+          tbl = rd.getById("eclipsing")
+          with base.getTableConn() as conn:
+            row = list(conn.query("SELECT ssa_reference FROM ogle.ident_blg_ecl LIMIT 1"))
+            if row and row[0]:
+              reference = row[0][0]
+              tbl.setMeta("source", reference)
+        </code>
+      </job>
+  </execute>
+
   <table id="eclipsing" adql="True" onDisk="True">
     <property name="forceStats">1</property>
 
@@ -272,6 +343,7 @@
     </meta>
     <meta name="title">Eclipsing and Ellipsoidal Binary Systems</meta>
 
+<!--
     <LOOP>
       <codeItems>
         # Collect references from all involved tables
@@ -287,6 +359,7 @@
         <meta name="source">\db_source</meta>
       </events>
     </LOOP>
+-->
 
     <mixin>ogle/aux#ecl_id</mixin>
     <mixin>ogle/aux#ecl_p</mixin>
@@ -331,6 +404,19 @@
 
 <!-- ======================= HB (Heartbeat stars) ============================= -->
 
+  <execute on="loaded" title="retrieve references hb">
+      <job>
+        <code>
+          tbl = rd.getById("heartbeat")
+          with base.getTableConn() as conn:
+            row = list(conn.query("SELECT ssa_reference FROM ogle.ident_blg_hb LIMIT 1"))
+            if row and row[0]:
+              reference = row[0][0]
+              tbl.setMeta("source", reference)
+        </code>
+      </job>
+  </execute>
+
   <table id="heartbeat" adql="True" onDisk="True">
     <property name="forceStats">1</property>
     <meta name="table-rank">150</meta>
@@ -341,6 +427,7 @@
     </meta>
     <meta name="title">Heartbeat Variables</meta>
 
+<!--
     <LOOP>
       <codeItems>
         # Collect references from all involved tables
@@ -356,6 +443,7 @@
         <meta name="source">\db_source</meta>
       </events>
     </LOOP>
+-->
 
     <mixin>ogle/aux#hb_id</mixin>
     <mixin>ogle/aux#hb_p</mixin>
@@ -384,6 +472,19 @@
 
 <!-- ======================= All LPV (Miras) ============================= -->
 
+  <execute on="loaded" title="retrieve references miras">
+      <job>
+        <code>
+          tbl = rd.getById("miras")
+          with base.getTableConn() as conn:
+            row = list(conn.query("SELECT ssa_reference FROM ogle.ident_blg_lpv LIMIT 1"))
+            if row and row[0]:
+              reference = row[0][0]
+              tbl.setMeta("source", reference)
+        </code>
+      </job>
+  </execute>
+
   <table id="miras" adql="True" onDisk="True">
     <property name="forceStats">1</property>
     <meta name="table-rank">150</meta>
@@ -394,6 +495,7 @@
     </meta>
     <meta name="title">Long Period Variables</meta>
 
+<!--
     <LOOP>
       <codeItems>
         # Collect references from all involved tables
@@ -408,6 +510,7 @@
         <meta name="source">\db_source</meta>
       </events>
     </LOOP>
+-->
 
     <mixin>ogle/aux#mira_id</mixin>
     <mixin>ogle/aux#mira_p</mixin>
@@ -433,6 +536,19 @@
 
 <!-- ======================= All Rot (rotating) ============================= -->
 
+  <execute on="loaded" title="retrieve references rotating">
+      <job>
+        <code>
+          tbl = rd.getById("rotating")
+          with base.getTableConn() as conn:
+            row = list(conn.query("SELECT ssa_reference FROM ogle.ident_blg_rot LIMIT 1"))
+            if row and row[0]:
+              reference = row[0][0]
+              tbl.setMeta("source", reference)
+        </code>
+      </job>
+  </execute>
+
   <table id="rotating" adql="True" onDisk="True">
     <property name="forceStats">1</property>
     <meta name="table-rank">150</meta>
@@ -443,6 +559,7 @@
     </meta>
     <meta name="title">Rotating Variables</meta>
 
+<!--
     <LOOP>
       <codeItems>
         # Collect references from all involved tables
@@ -456,6 +573,7 @@
         <meta name="source">\db_source</meta>
       </events>
     </LOOP>
+-->
 
     <mixin>ogle/aux#rot_id</mixin>
     <mixin>ogle/aux#rot_p</mixin>
@@ -478,6 +596,19 @@
 
 <!-- ======================= All RR Lyr ============================= -->
 
+  <execute on="loaded" title="retrieve references rrlyr">
+      <job>
+        <code>
+          tbl = rd.getById("rrlyr")
+          with base.getTableConn() as conn:
+            row = list(conn.query("SELECT ssa_reference FROM ogle.ident_blg_rr LIMIT 1"))
+            if row and row[0]:
+              reference = row[0][0]
+              tbl.setMeta("source", reference)
+        </code>
+      </job>
+  </execute>
+
   <table id="rrlyr" adql="True" onDisk="True">
     <property name="forceStats">1</property>
     <meta name="table-rank">150</meta>
@@ -489,6 +620,7 @@
     <meta name="title">RR Lyrae Variables</meta>
 
     <!-- Pull references -->
+<!--
     <LOOP>
       <codeItems>
         # Collect references from all involved tables
@@ -505,6 +637,7 @@
         <meta name="source">\db_source</meta>
       </events>
     </LOOP>
+-->
 
     <mixin>ogle/aux#rrlyr_id</mixin>
     <mixin>ogle/aux#rrlyr_p</mixin>
@@ -572,6 +705,19 @@
 
 <!-- ======================= All t2cep ============================= -->
 
+  <execute on="loaded" title="retrieve references t2cep">
+      <job>
+        <code>
+          tbl = rd.getById("t2cep")
+          with base.getTableConn() as conn:
+            row = list(conn.query("SELECT ssa_reference FROM ogle.ident_blg_t2cep LIMIT 1"))
+            if row and row[0]:
+              reference = row[0][0]
+              tbl.setMeta("source", reference)
+        </code>
+      </job>
+  </execute>
+
   <table id="t2cep" adql="True" onDisk="True">
     <property name="forceStats">1</property>
     <meta name="table-rank">150</meta>
@@ -583,6 +729,7 @@
     <meta name="title">Type II Cepheids</meta>
 
     <!-- Pull references -->
+<!--
     <LOOP>
       <codeItems>
         # Collect references from all involved tables
@@ -599,6 +746,7 @@
         <meta name="source">\db_source</meta>
       </events>
     </LOOP>
+-->
 
     <mixin>ogle/aux#t2cep_id</mixin>
     <mixin>ogle/aux#t2cep_p</mixin>
@@ -629,6 +777,19 @@
 
 <!-- ======================= All Transits ============================= -->
 
+  <execute on="loaded" title="retrieve references transits">
+      <job>
+        <code>
+          tbl = rd.getById("transits")
+          with base.getTableConn() as conn:
+            row = list(conn.query("SELECT ssa_reference FROM ogle.ident_blg_transit LIMIT 1"))
+            if row and row[0]:
+              reference = row[0][0]
+              tbl.setMeta("source", reference)
+        </code>
+      </job>
+  </execute>
+
   <table id="transits" adql="True" onDisk="True">
     <property name="forceStats">1</property>
     <meta name="table-rank">150</meta>
@@ -640,6 +801,8 @@
     <meta name="title">Transiting planet candidates</meta>
 
     <!-- Pull references -->
+
+<!--
     <LOOP>
       <codeItems>
         # Collect references from all involved tables
@@ -653,6 +816,7 @@
         <meta name="source">\db_source</meta>
       </events>
     </LOOP>
+-->
 
     <mixin>ogle/aux#transit_id</mixin>
     <mixin>ogle/aux#transit_p</mixin>
@@ -675,6 +839,20 @@
 
 
 <!-- ======================= CV special view ============================= -->
+
+  <execute on="loaded" title="retrieve references cv">
+      <job>
+        <code>
+          tbl = rd.getById("cv")
+          with base.getTableConn() as conn:
+            row = list(conn.query("SELECT ssa_reference FROM ogle.cv_basic LIMIT 1"))
+            if row and row[0]:
+              reference = row[0][0]
+              tbl.setMeta("source", reference)
+        </code>
+      </job>
+  </execute>
+
   <table id="cv" adql="True" onDisk="True">
     <property name="forceStats">1</property>
     <meta name="table-rank">150</meta>
@@ -684,6 +862,7 @@
     <meta name="title">Cataclysmic Variables</meta>
 
     <!-- Pull references -->
+<!--
     <LOOP>
       <codeItems>
         # Collect references from all involved tables
@@ -697,7 +876,7 @@
         <meta name="source">\db_source</meta>
       </events>
     </LOOP>
-
+-->
     <!-- pull all columns directly from underlying tables -->
     <LOOP>
        <codeItems>
@@ -771,6 +950,8 @@ or through the SSA service. Light curves can be extracted using the associated D
     <meta name="description">
       \objects_description
      </meta>
+
+    <meta name="source">2014AcA....64..177S</meta>
 
     <meta name="title">Unified table of Variable Star Parameters from OCVS</meta>
 

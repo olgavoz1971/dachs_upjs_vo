@@ -7,6 +7,8 @@
 
   <meta name="title">OGLE Time series</meta>
 
+  <meta name="source">2014AcA....64..177S</meta>
+
   <FEED source="ogle/meta#ogle_meta"/>
   <FEED source="ogle/meta#longdoc_ogle"/>
 
