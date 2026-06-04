@@ -27,18 +27,19 @@ The full transmission curves can be retrieved from the original SVO Filter Profi
 These data are republished with permission from the SVO Filter Profile Service.
 If this table contributes to your research, please acknowledge the original service and cite the following references:
 
-Rodrigo, C., Cruz, P., Aguilar, J.F., et al. 2024, :bibcode:`2024A&amp;A...689A..93R`; 
-The SVO Filter Profile Service. Rodrigo, C., Solano, E., Bayo, A., 2012, :bibcode:`2012ivoa.rept.1015R`;
-The SVO Filter Profile Service. Rodrigo, C., Solano, E., 2020, :bibcode:`2020sea..confE.182R`.
+* Rodrigo, C., Cruz, P., Aguilar, J.F., et al. 2024, :bibcode:`2024A&amp;A...689A..93R`; 
+* The SVO Filter Profile Service. Rodrigo, C., Solano, E., Bayo, A., 2012, :bibcode:`2012ivoa.rept.1015R`;
+* The SVO Filter Profile Service. Rodrigo, C., Solano, E., 2020, :bibcode:`2020sea..confE.182R`.
 
 The SVO Filter Profile Service is funded by MCIN/AEI/10.13039/501100011033/ through grant PID2023-146210NB-I00.
   </meta>
 
   <meta name="copyright" format="rst">
         If this table contributes to your research, please acknowledge the original service and cite the following references:
-        Rodrigo, C., Cruz, P., Aguilar, J.F., et al. 2024, :bibcode:`2024A&amp;A...689A..93R`; 
-        The SVO Filter Profile Service. Rodrigo, C., Solano, E., Bayo, A., 2012, :bibcode:`2012ivoa.rept.1015R`;
-        The SVO Filter Profile Service. Rodrigo, C., Solano, E., 2020, :bibcode:`2020sea..confE.182R`.
+
+        | Rodrigo, C., Cruz, P., Aguilar, J.F., et al. 2024, :bibcode:`2024A&amp;A...689A..93R`; 
+        | The SVO Filter Profile Service. Rodrigo, C., Solano, E., Bayo, A., 2012, :bibcode:`2012ivoa.rept.1015R`;
+        | The SVO Filter Profile Service. Rodrigo, C., Solano, E., 2020, :bibcode:`2020sea..confE.182R`.
   </meta>
   <!-- Take keywords from
     http://www.ivoa.net/rdf/uat
