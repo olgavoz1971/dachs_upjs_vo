@@ -63,24 +63,26 @@
          ssa_location resides in both, ssap#instance and ssap#plainlocation
     -->
     <LOOP listItems="ssa_dstitle ssa_targname ssa_targclass
-      ssa_pubDID ssa_bandpass ssa_specmid ssa_specstart ssa_specend ssa_specext ssa_fluxucd
+      ssa_pubDID ssa_bandpass ssa_specmid ssa_specstart ssa_specend ssa_specext
       ssa_length ssa_collection ssa_reference">
       <events>
         <column original="\item"/>
       </events>
     </LOOP>
     <column original="//ssap#instance.ssa_timeExt" unit="d"/> <!-- Replace default seconds with days -->
+    <!-- without this "False" DaCHS refuses to pull this colum as a param in the lc_instance -->
+    <column original="//ssap#instance.ssa_fluxucd" required="False"/>
     <column original="//obscore#ObsCore.t_min"/>
     <column original="//obscore#ObsCore.t_max"/>
-
     <column original="//products#products.preview"/>
-
 
     <mixin>//products#table</mixin>
     <mixin>//ssap#plainlocation</mixin>
     <mixin>//ssap#simpleCoverage</mixin>
 
     <index columns="ssa_targname"/>
+    <index columns="ssa_bandpass"/>
+
     <FEED source="//scs#splitPosIndex"
       columns="ssa_location"
       long="degrees(long(ssa_location))"
@@ -113,6 +115,8 @@
         description="Stellar magnitude"
         verbLevel="1"
         required="False"/>   <!-- And this column is worth showing to users -->
+    
+    <column original="filters/q#main.filter_id" name="fps_filter_id"/>
 
     <!--
     <column original="ogle/o#objects_all.period" name="period"/>
@@ -153,17 +157,24 @@
           -- '\getConfig{web}{serverURL}/\rdId/preview-plot/qp/' || q.object_id || '-' || q.passband AS preview,
           'phot.mag;em.opt.' || q.passband AS ssa_fluxucd,
           q.passband AS ssa_bandpass,
-          p.specmid AS ssa_specmid,
-          p.specstart AS ssa_specstart,
-          p.specend AS ssa_specend,
-          p.specend-p.specstart AS ssa_specext,
+          f.wavelength_ref * 1e-10 AS ssa_specmid,
+          f.wavelength_min * 1e-10  AS ssa_specstart,
+          f.wavelength_max * 1e-10  AS ssa_specend,
+          f.width_eff * 1e-10 AS ssa_specext,
+
+          q.fps_filter_id AS fps_filter_id,
+          
+          
+          -- p.specmid AS ssa_specmid,
+          -- p.specstart AS ssa_specstart,
+          -- p.specend AS ssa_specend,
+          -- p.specend-p.specstart AS ssa_specext,
+
           ssa_timeExt,
           t_min,
           t_max,
           q.ssa_length,
           q.mean_mag AS mean_mag,
-          -- o.period AS period,
-          -- o.epoch AS epoch,
           50000 AS accsize,
           NULL::DATE AS embargo,
           NULL AS owner,
@@ -172,15 +183,27 @@
           o.ssa_collection,
           o.ssa_reference
         FROM (
+          -- in general, there are no one-to-one passband-filter_id relations
+          -- they are data-specific
+          -- they are data-specific
+          WITH passband_map(passband, fps_filter_id) AS (
+            VALUES
+              ('V', 'Generic/Bessell.V'),
+              ('I', 'Generic/Bessell.I')
+          )        
           SELECT
             l.object_id, l.passband,
             count(*) AS ssa_length,
             MAX(l.obs_time) - MIN(l.obs_time) AS ssa_timeExt,
             MIN(l.obs_time) AS t_min,
             MAX(l.obs_time) AS t_max,
-            AVG(magnitude) AS mean_mag
+            AVG(magnitude) AS mean_mag,
+            m.fps_filter_id AS fps_filter_id
+
           FROM \schema.lightcurves AS l
-            GROUP BY l.object_id, l.passband
+          JOIN passband_map m
+            ON l.passband = m.passband
+          GROUP BY l.object_id, l.passband, fps_filter_id
         ) AS q
         JOIN (
           SELECT object_id,
@@ -196,7 +219,8 @@
           FROM \schema.objects_all 
           CROSS JOIN (SELECT radians(1./3600) AS aperture_rad) c
         ) AS o USING (object_id)
-        JOIN \schema.photosys AS p ON p.band_short = q.passband
+        JOIN filters.main AS f ON f.filter_id = q.fps_filter_id
+--        JOIN \schema.photosys AS p ON p.band_short = q.passband
       ) as ww       -- end of colnames-magic 
       )
 
@@ -294,80 +318,92 @@
   </coverage>
 -->
 
-  <STREAM id="instance-template">
-    <table id="instance_\band_short-\\timescale" onDisk="False">
-      <meta name="description">The OGLE lightcurve in the \band_human filter </meta>
-      <!-- metadata modified by sdl's dataFunction -->
-      <!-- 
-      <param original="ts_ssa.ssa_bandpass"/>
-      <param original="ts_ssa.ssa_specmid"/> -->
-      <param name="ra" type="double precision"
+  <table id="lc_instance" onDisk="False">
+    <!-- metadata modified by sdl's dataFunction (Dangerous? Concurrency?)-->
+    <meta name="description">The OGLE lightcurve</meta>
+
+    <param name="ra" type="double precision"
            ucd="pos.eq.ra"
+           unit="deg"
            description="RA of source object"/>
-      <param name="dec" type="double precision"
+
+    <param name="dec" type="double precision"
            ucd="pos.eq.dec"
+           unit="deg"
+
            description="Dec of source object"/>
-      <param name="filter" type="text"
+    <param name="filter" type="text"
            ucd="meta.id;instr.filter"
            description="Filter used."/>
-      <param original="ogle/o#objects_all.period"/>
-      <param original="ogle/o#objects_all.epoch"/>
-      <param original="ogle/o#objects_all.ogle_vartype"/>
-      <param original="ogle/o#objects_all.subtype"/>
-      <param original="ts_ssa.ssa_targclass"/>
-      <param original="ts_ssa.ssa_collection"/>
-      <param original="//ssap#instance.ssa_reference" name="bibcode"/>
-      
-        <mixin
-          effectiveWavelength="\effective_wavelength"
-          filterIdentifier='"\band_human"'
+  
+    <param name="refposition" type="text"
+           ucd="meta.ref;pos.frame"
+           description="Reference position for the time coordinate."/>
+
+    <param name="timescale" type="text"
+           ucd="time.scale"
+           description="Time scale of the time coordinate."/>    
+
+    <param original="ogle/o#objects_all.period"/>
+    <param original="ogle/o#objects_all.epoch"/>
+    <param original="ogle/o#objects_all.ogle_vartype"/>
+    <param original="ogle/o#objects_all.subtype"/>
+    <param original="ts_ssa.ssa_targclass"/>
+    <param original="ts_ssa.ssa_collection"/>
+    <param original="ts_ssa.ssa_fluxucd"/>
+    <param original="//ssap#instance.ssa_reference" name="bibcode"/>
+    <param original="ts_ssa.ssa_bandpass"/>
+    <param original="ts_ssa.ssa_specmid" ucd="em.wl.effective"/>
+    <param original="ts_ssa.fps_filter_id" required="False"/>
+    <param original="filters/q#main.zeropoint"/>      
+
+    <mixin
+          effectiveWavelength="@ssa_specmid"
+          filterIdentifier="@fps_filter_id"
           magnitudeSystem="Vega"
-          zeroPointFlux="\zero_point_flux"
-          phot_description="OGLE magnitude in \band_human"
-          phot_ucd='phot.mag;\band_ucd'
+          zeroPointFlux="@zeropoint"
+          phot_description="OGLE magnitude"
+          phot_ucd='phot.mag;em.opt'
           phot_unit="mag"
-          refposition="\\refposition"
+          refposition="HELIOCENTER"
           refframe="ICRS"
           time0="2400000.5"
-          timescale="\\timescale"
-        >//timeseries#phot-0</mixin>
-<!--
-        <param original="ts_ssa.t_min"/>
-        <param original="ts_ssa.t_max"/>
-        <param original="ts_ssa.ssa_location"/>
--->
-        <!-- Add my column -->
-        <column name="mag_err" type="double precision"
+          timescale="UTC"
+    >//timeseries#phot-0</mixin>
+    
+    <!-- An altenative coosys. How to rewrite ref="ts-02" for FIELD ID="obs_time in the parmaker-->
+    <dm>
+          (votable:Coords) {
+               time: (votable:TimeCoordinate) {
+                     frame:
+                        (votable:TimeFrame) {
+                               timescale: TDB
+                               refPosition: BARYCENTER
+                               time0: 2400000.5 }
+                        location: @obs_time
+               }
+               space:
+                     (votable:SphericalCoordinate) {
+                            frame: (votable:SpaceFrame) {
+                                orientation: ICRS
+                                epoch: "J2000.0"
+                            }
+                     }
+          }
+    </dm>
+
+    <!-- Add my specific columns -->
+    <column name="mag_err" type="double precision"
           ucd="stat.error;phot.mag"
           unit="mag"
           tablehead="magnitude"
           description="stellar magnitude error"
           verbLevel="1"
           required="False"/>
-        <column original="ogle/aux#lc.ogle_phase"/>
-    </table>
-  </STREAM>
 
-  <!-- instantiate for a few bands - take names from https://svo2.cab.inta-csic.es/theory/fps/ -->
-  <!-- zero point are from https://svo2.cab.inta-csic.es/theory/fps -->
-  <!-- It would be interesting to have here a mixin like  //siap#getBandFromFilter but for ssap -->
-
-  <LOOP reexpand="True">
-    <csvItems>
-      refposition, timescale
-      HELIOCENTER, UTC
-      BARYCENTER,  TDB   
-    </csvItems>
-    <events>
-      <LOOP source="instance-template">
-        <csvItems>
-            band_short, band_human, band_ucd, effective_wavelength, zero_point_flux
-            V,          Generic/Bessell.V, em.opt.V, 5.4e-7, 3630.22
-            I,          Generic/Bessell.I, em.opt.I, 8.3e-7, 2415.65
-        </csvItems>
-      </LOOP>
-    </events> 
-  </LOOP>
+     <column original="ogle/aux#lc.ogle_phase"/>
+   
+  </table>
 
   <data id="build-ts" auto="False">
     <embeddedGrammar>
@@ -391,24 +427,22 @@
       </pargetter>
     </embeddedGrammar>
 
-    <make table="instance_V-UTC">   <!-- just a placeholder, we don't have the bare "instance" table. But we need a name from the LOOP -->
+    <make table="lc_instance">
       <rowmaker idmaps="*" id="make-ts"/>
-
       <!-- parmaker can get parameters, provided by pargetter and write them as a metadata in the instance table -->
       <!-- <parmaker id="make-ts-par" idmaps="ssa_bandpass, ssa_specmid, t_min, t_max, ssa_location"> -->
-      <parmaker id="make-ts-par" idmaps="ssa_targclass, ssa_collection">
+      <parmaker id="make-ts-par" idmaps="ssa_targclass, ssa_collection, ssa_bandpass, ssa_fluxucd, ssa_specmid, fps_filter_id">
          <!-- Add additioanal stuff to the litghtcure4 VOTable metadata --> 
          <map dest="filter">@ssa_bandpass</map>
          <map dest="bibcode">@ssa_reference</map>
          <map dest="ra">@ssa_location.asDALI()[0]</map>
          <map dest="dec">@ssa_location.asDALI()[1]</map>
-          
+         <!-- I set params of the lc_instance here. Can I penetrate GROUP to change photDM parameters (by mapping or with setParam()) as well? -->
+         <!-- Can I replace ref="ts" with ref="ts-02" for the FIELD ID="obs_time" _here_ -->
          <!--tut: touch manually the instance table metadata -->
          <apply name="update_metadata">
            <code>
              sourceId = vars["ssa_targname"]     # in apply the current input fields are available in the vars dictionary
-             targetTable.setMeta("description", base.getMetaText(targetTable, "description") +
-                 " for {}".format(sourceId))
              targetTable.setMeta("name", str(sourceId))
 
              # pull period, epoch and ogle_vartype, subtype from the objects_all table:
@@ -416,13 +450,31 @@
                res = next(conn.query(
                   "SELECT period, epoch, ogle_vartype, subtype from \schema.objects_all where object_id=%(object_id)s",
                   {"object_id": sourceId})
-               )
-               
+               )               
              period, epoch, ogle_vartype, subtype = res
+
+             # Retrieve the filter ZP:
+             with base.getTableConn() as conn:
+                di_filters = next(conn.queryToDicts(
+                  "SELECT band, zeropoint, band_ucd FROM filters.main"
+                  " WHERE filter_id=%(fps_filter_id)s",
+                  {"fps_filter_id":vars.get("fps_filter_id", None)}))
+             zeropoint = di_filters.get("zeropoint", None)
+             
+             # This is _very_ OCVS specific:
+             timescale = "TDB" if vars["ssa_collection"] == "OGLE-BLAP" else "UTC"
+             refposition = "BARYCENTER" if timescale == "TDB" else "HELIOCENTER"
+              
+             targetTable.setMeta("description", base.getMetaText(targetTable, "description") +
+                 " for {} in {} passband".format(sourceId, di_filters["band"]))
+
              targetTable.setParam("period", period)
              targetTable.setParam("epoch", epoch)
              targetTable.setParam("ogle_vartype", ogle_vartype) 
-             targetTable.setParam("subtype", subtype) 
+             targetTable.setParam("subtype", subtype)
+             targetTable.setParam("timescale", timescale)
+             targetTable.setParam("refposition", refposition)
+             targetTable.setParam("zeropoint", zeropoint)
            </code>
          </apply>
       </parmaker>
@@ -508,10 +560,11 @@
         <setup imports="gavo.rsc"/>
         <code>
             _, bandid = rd.parseIdentifier(descriptor.metadata["ssa_pubdid"])
-            timescale = "TDB" if descriptor.metadata["ssa_collection"] == "OGLE-BLAP" else "UTC"
+            # timescale = "TDB" if descriptor.metadata["ssa_collection"] == "OGLE-BLAP" else "UTC"
             dd = rd.getById("build-ts")
-            descriptor.data = rsc.Data.createWithTable(dd,
-                rd.getById("instance_" + bandid + "-" + timescale))
+            # descriptor.data = rsc.Data.createWithTable(dd,
+            #     rd.getById("instance_" + bandid + "-" + timescale))
+            descriptor.data = rsc.Data.createWithTable(dd, rd.getById("lc_instance"))
             descriptor.data = rsc.makeData(
                 dd,
                 data=descriptor.data,
@@ -521,13 +574,13 @@
 
       <dataFormatter>
         <!-- to VOTable -->
-        <setup imports="gavo.formats.votablewrite"/>
+        <!-- <setup imports="gavo.formats.votablewrite"/> -->
+        <setup imports="gavo.formats"/>
         <code>
-            from gavo import formats
-            return (base.votableType,   
-                        formats.getFormatted("vodml", descriptor.data))
+            return (base.votableType,
+                 formats.getFormatted("vodmlb", descriptor.data))	# vodmlb for binary, vodml for "td"
             # return ("application/x-votable+xml;version=1.5",
-            #    votablewrite.getAsVOTable(descriptor.data, version=(1,6)))
+            #   votablewrite.getAsVOTable(descriptor.data, version=(1,6)))
         </code>
       </dataFormatter>
     </datalinkCore>
