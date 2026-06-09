@@ -16,15 +16,16 @@ projects, you'll still have to read documentation... -->
 
   <meta name="title">Filter Profiles</meta>
   <meta name="description" format="rst">
-This table provides photometric filter characteristics derived from the SVO Filter Profile Service https://svo2.cab.inta-csic.es/svo/theory/fps/.
+This table provides photometric filter characteristics derived from the SVO Filter Profile Service "Carlos Rodrigo"
+https://svo2.cab.inta-csic.es/svo/theory/fps/.
 Each row corresponds to a single photometric filter and contains basic bandpass information.
 
 Exposing these data through TAP enables ADQL queries joining filter data with photometric datasets. 
 
 The table contains a selected subset of filters used in the published light-curve collections. 
-The full transmission curves can be retrieved from the original SVO Filter Profile Service using the fps_url column.
+The full transmission curves can be retrieved from the fps using the fps_url column.
 
-These data are republished with permission from the SVO Filter Profile Service.
+These data are republished with permission from the SVO SVO Filter Profile Service "Carlos Rodrigo"
 If this table contributes to your research, please acknowledge the original service and cite the following references:
 
 * Rodrigo, C., Cruz, P., Aguilar, J.F., et al. 2024, :bibcode:`2024A&amp;A...689A..93R`; 
@@ -35,11 +36,14 @@ The SVO Filter Profile Service is funded by MCIN/AEI/10.13039/501100011033/ thro
   </meta>
 
   <meta name="copyright" format="rst">
-        If this table contributes to your research, please acknowledge the original service and cite the following references:
+If this table contributes to your research, please acknowledge the original service.
+This research has made use of the SVO Filter Profile Service "Carlos Rodrigo", 
+funded by MCIN/AEI/10.13039/501100011033/ through grant PID2023-146210NB-I00
+and cite the following references:
 
-        | Rodrigo, C., Cruz, P., Aguilar, J.F., et al. 2024, :bibcode:`2024A&amp;A...689A..93R`; 
-        | The SVO Filter Profile Service. Rodrigo, C., Solano, E., Bayo, A., 2012, :bibcode:`2012ivoa.rept.1015R`;
-        | The SVO Filter Profile Service. Rodrigo, C., Solano, E., 2020, :bibcode:`2020sea..confE.182R`.
+Rodrigo, C., Cruz, P., Aguilar, J.F., et al. 2024, :bibcode:`2024A&amp;A...689A..93R`; 
+The SVO Filter Profile Service. Rodrigo, C., Solano, E., Bayo, A., 2012, :bibcode:`2012ivoa.rept.1015R`;
+The SVO Filter Profile Service. Rodrigo, C., Solano, E., 2020, :bibcode:`2020sea..confE.182R`.
   </meta>
   <!-- Take keywords from
     http://www.ivoa.net/rdf/uat
