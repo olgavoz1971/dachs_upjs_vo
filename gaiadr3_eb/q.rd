@@ -73,7 +73,7 @@
 
   <meta name="ssap.dataSource">survey</meta> 
   <meta name="ssap.creationType">archival</meta>
-  <meta name="productType">timeseries</meta>
+  <meta name="productTypeServed">timeseries</meta>
   <meta name="ssap.testQuery">MAXREC=1</meta>
 
   <table id="raw_data" onDisk="True" adql="True"
